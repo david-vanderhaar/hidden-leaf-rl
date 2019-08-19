@@ -3,13 +3,15 @@ import logo from './logo.svg';
 import './App.css';
 import * as ROT from 'rot-js';
 import * as Entity from './lib/entity'
+import * as Helper from './lib/helper'
 import * as Components from './components/index'
 
 const TILES = {
   'GROUND': {
     background: '#974',
     foreground: '#aaa',
-    character: '',
+    character: '.',
+    passable: true,
   }
 }
 
@@ -44,9 +46,16 @@ const DRAW = (map, display) => {
       let entity = tile.entities[tile.entities.length - 1]
       character = entity.components.renderer.character
       foreground = entity.components.renderer.color
+      if (entity.components.renderer.background) {
+        background = entity.components.renderer.background
+      }
     }
     display.draw(x, y, character, foreground, background);
   }
+}
+
+let getImpassableEntities = (entities) => {
+  return entities.filter((e) => e.components.hasOwnProperty('impasse') && !e.components.impasse.passable)
 }
 
 let world = {
@@ -55,27 +64,43 @@ let world = {
   map: {},
   display: new ROT.Display({ fontSize: 24, bg: '#099' }),
   canOccupy: (map, pos) => {
-    // if (world.objects.filter((obj) => obj.pos.x === pos.x && obj.pos.y === pos.y).length === 0) {
-    //   return true
-    // } else {
-    //   return false
-    // }
-    if (map.hasOwnProperty(`${pos.x},${pos.y}`)) {
-      return true
+    if (map.hasOwnProperty(Helper.coordsToString(pos))) {
+      let tile = map[Helper.coordsToString(pos)];
+      if (TILES[tile.type].passable && getImpassableEntities(tile.entities).length === 0) {
+        return true
+      }
     } else {
       return false
     }
   }
 }
 
+let naruto = {
+  ...Entity.createEntity(1, 'Naruto', {
+      reciever: Components.receiver({ x: 10, y: 30 }),
+      body: Components.body(world, { x: 19, y: 21 }),
+      renderer: Components.renderer(world, 'N', 'orange', 'black'),
+    }
+  )
+}
 
+let box = {
+  ...Entity.createEntity(2, 'Box', {
+      body: Components.body(world, { x: 22, y: 21 }),
+      renderer: Components.renderer(world, '#', 'black'),
+      impasse: Components.impasse(),
+      destructible: Components.destructible(world),
+    }
+  )
+}
 
-let o = {
-  ...Entity.createEntity(1, '# One', {
-    reciever: Components.receiver({ x: 10, y: 30 }),
-    body: Components.body(world, { x: 19, y: 21 }),
-    renderer: Components.renderer(world, '$'),
-  }
+let kunai = {
+  ...Entity.createEntity(3, 'Kunai', {
+      body: Components.body(world, { x: 22, y: 21 }),
+      renderer: Components.renderer(world, '<>', 'black'),
+      destructible: Components.destructible(world),
+      attack: Components.attack(),
+    }
   )
 }
 
@@ -96,7 +121,6 @@ class App extends React.Component {
 
     let code = event.key;
     let dir = ROT.DIRS[4][keyMap[code]];
-    /* one of numpad directions? */
     if (!(code in keyMap)) { return; }
     let newX = entity.components.body.pos.x + dir[0];
     let newY = entity.components.body.pos.y + dir[1];
@@ -118,14 +142,15 @@ class App extends React.Component {
     ROT.RNG.setSeed(7);
     SHOW(world.display.getContainer());
     CREATE_LEVEL(world);
-    o.sendEvent(o, 'PREPARE_RENDER')
+    naruto.sendEvent(naruto, 'PREPARE_RENDER')
+    box.sendEvent(box, 'PREPARE_RENDER')
     DRAW(world.map, world.display)
     this.presserRef.current.focus();
   }
 
   render() {
     return (
-      <div className="App" ref={this.presserRef} onKeyDown={(event) => this.handleKeyPress(event, world, o)} tabIndex='0'>
+      <div className="App" ref={this.presserRef} onKeyDown={(event) => this.handleKeyPress(event, world, naruto)} tabIndex='0'>
         <div id='display'></div>
       </div>
     );

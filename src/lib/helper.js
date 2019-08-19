@@ -1,0 +1,1 @@
+export const coordsToString = (coords) => `${coords.x},${coords.y}`
