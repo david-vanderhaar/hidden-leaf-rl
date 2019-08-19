@@ -6,15 +6,6 @@ import * as Entity from './lib/entity'
 import * as Helper from './lib/helper'
 import * as Components from './components/index'
 
-const TILES = {
-  'GROUND': {
-    background: '#974',
-    foreground: '#aaa',
-    character: '.',
-    passable: true,
-  }
-}
-
 const SHOW = (canvas) => {
   let d = document.getElementById('display')
   d.appendChild(canvas)
@@ -35,29 +26,6 @@ const CREATE_LEVEL = (world) => {
   digger.create(digCallback.bind(this));
 }
 
-const DRAW = (map, display) => {
-  for (let key in map) {
-    let parts = key.split(",");
-    let x = parseInt(parts[0]);
-    let y = parseInt(parts[1]);
-    let tile = map[key];
-    let { character, foreground, background } = TILES[tile.type]
-    if (tile.entities.length > 0) {
-      let entity = tile.entities[tile.entities.length - 1]
-      character = entity.components.renderer.character
-      foreground = entity.components.renderer.color
-      if (entity.components.renderer.background) {
-        background = entity.components.renderer.background
-      }
-    }
-    display.draw(x, y, character, foreground, background);
-  }
-}
-
-let getImpassableEntities = (entities) => {
-  return entities.filter((e) => e.components.hasOwnProperty('impasse') && !e.components.impasse.passable)
-}
-
 let world = {
   objects: [{ pos: { x: 1, y: 0 } }],
   actors: [],
@@ -66,13 +34,13 @@ let world = {
   canOccupy: (map, pos) => {
     if (map.hasOwnProperty(Helper.coordsToString(pos))) {
       let tile = map[Helper.coordsToString(pos)];
-      if (TILES[tile.type].passable && getImpassableEntities(tile.entities).length === 0) {
+      if (Helper.TILE_KEY()[tile.type].passable && Helper.getImpassableEntities(tile.entities).length === 0) {
         return true
       }
     } else {
       return false
     }
-  }
+  },
 }
 
 let naruto = {
@@ -94,12 +62,33 @@ let box = {
   )
 }
 
+let box2 = {
+  ...Entity.createEntity(2, 'Box', {
+      body: Components.body(world, { x: 22, y: 19 }),
+      renderer: Components.renderer(world, '#', 'black'),
+      impasse: Components.impasse(),
+      destructible: Components.destructible(world),
+    }
+  )
+}
+
+let box3 = {
+  ...Entity.createEntity(2, 'Box', {
+      body: Components.body(world, { x: 22, y: 17 }),
+      renderer: Components.renderer(world, '#', 'black'),
+      impasse: Components.impasse(),
+      destructible: Components.destructible(world),
+    }
+  )
+}
+
 let kunai = {
   ...Entity.createEntity(3, 'Kunai', {
-      body: Components.body(world, { x: 22, y: 21 }),
+      body: Components.body(world, { x: 20, y: 21 }),
       renderer: Components.renderer(world, '<>', 'black'),
       destructible: Components.destructible(world),
       attack: Components.attack(),
+      throwable: Components.throwable(world),
     }
   )
 }
@@ -121,6 +110,16 @@ class App extends React.Component {
 
     let code = event.key;
     let dir = ROT.DIRS[4][keyMap[code]];
+    if (code === 't') {
+      kunai.sendEvent(kunai, 'MOVE', {
+        currentPos: kunai.components.body.pos, 
+        targetPos: {
+          x: entity.components.body.pos.x + 1,
+          y: entity.components.body.pos.y,
+        },
+      })
+      return kunai.sendEvent(kunai, 'THROW', {direction: {x: 1, y: 0}})
+    }
     if (!(code in keyMap)) { return; }
     let newX = entity.components.body.pos.x + dir[0];
     let newY = entity.components.body.pos.y + dir[1];
@@ -134,7 +133,9 @@ class App extends React.Component {
         } 
       }
     )
-    return DRAW(world.map, world.display)
+
+    return;
+    // return Helper.DRAW(world.map, world.display)
 
   }
 
@@ -143,8 +144,11 @@ class App extends React.Component {
     SHOW(world.display.getContainer());
     CREATE_LEVEL(world);
     naruto.sendEvent(naruto, 'PREPARE_RENDER')
+    kunai.sendEvent(kunai, 'PREPARE_RENDER')
     box.sendEvent(box, 'PREPARE_RENDER')
-    DRAW(world.map, world.display)
+    box2.sendEvent(box2, 'PREPARE_RENDER')
+    box3.sendEvent(box3, 'PREPARE_RENDER')
+    Helper.DRAW(world.map, world.display)
     this.presserRef.current.focus();
   }
 

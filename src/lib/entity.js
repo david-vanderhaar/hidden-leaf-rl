@@ -13,6 +13,7 @@ export const sendEvent = (target = null, eventType = null, parameters = null) =>
   for (let key in target.components) {
     let component = target.components[key]
     if (component.hasOwnProperty(eventType)) {
+      console.log('SUCCESSFUL EVENT: ', eventType)
       success = true
       component[eventType]({ ...parameters, self: target, component: component });
     }

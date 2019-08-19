@@ -39,6 +39,7 @@ export const body = (world, pos = { x: 0, y: 0 }) => {
           let tile = world.map[Helper.coordsToString(currentPos)]
           world.map[Helper.coordsToString(currentPos)] = {...tile, entities: []}
           self.sendEvent(self, 'PREPARE_RENDER')
+          Helper.DRAW(world.map, world.display)
         } else {
           console.log('can\'t move there')
         }
@@ -67,6 +68,8 @@ export const destructible = (world, durability = 1) => {
       let { self, component, value } = parameters;
       let tile = world.map[Helper.coordsToString(self.components.body.pos)];
       world.map[Helper.coordsToString(self.components.body.pos)].entities = tile.entities.filter((e) => e.id !== self.id);
+      // self.sendEvent(self, 'PREPARE_RENDER')
+      Helper.DRAW(world.map, world.display)
     }
   }
 }
@@ -77,15 +80,38 @@ export const attack = (damage = 1) => {
   }
 }
 
-export const throwable = () => {
+export const throwable = (world) => {
   return {
     THROW: (parameters) => {
+      let { self, component, direction } = parameters;
       // if next tile is passable
         // send move action to self
         // send throw action to self
       // else
         // send decrease_durability to entity next in tile
         // send decrease_durability to self
+      let currentPos = self.components.body.pos;
+      let nextPos = { x: currentPos.x + direction.x, y: currentPos.y + direction.y }
+      let nextTile = world.map[Helper.coordsToString(nextPos)];
+      if (world.canOccupy(world.map, nextPos)) { // change to check for target entity
+        self.sendEvent(
+          self, 'MOVE', {
+            currentPos: currentPos,
+            targetPos: nextPos
+          }
+        )
+        self.sendEvent(self, 'THROW', {direction});
+      } else {
+        if (world.map.hasOwnProperty(Helper.coordsToString(nextPos))) {
+          let impassable_and_destructable_entities = Helper.getDestructableEntities(Helper.getImpassableEntities(nextTile.entities))
+          console.log(impassable_and_destructable_entities);
+          
+          if (impassable_and_destructable_entities.length > 0) {
+            self.sendEvent(impassable_and_destructable_entities[0], 'DECREASE_DURABILITY', { value: 1 });
+          }
+        }
+        self.sendEvent(self, 'DECREASE_DURABILITY', { value: 1 });
+      }
     },
   }
 }
