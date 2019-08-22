@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import Nystrum from './Nystrum';
 import * as ROT from 'rot-js';
 import * as Entity from './lib/entity'
 import * as Helper from './lib/helper'
@@ -26,9 +27,13 @@ const CREATE_LEVEL = (world) => {
   digger.create(digCallback.bind(this));
 }
 
+let scheduler = new ROT.Scheduler.Simple()
+let engine = new ROT.Engine(scheduler)
+
 let world = {
-  objects: [{ pos: { x: 1, y: 0 } }],
-  actors: [],
+  canAct: true,
+  scheduler,
+  engine, 
   map: {},
   display: new ROT.Display({ fontSize: 24, bg: '#099' }),
   canOccupy: (map, pos) => {
@@ -48,8 +53,9 @@ let naruto = {
       reciever: Components.receiver({ x: 10, y: 30 }),
       body: Components.body(world, { x: 19, y: 21 }),
       renderer: Components.renderer(world, 'N', 'orange', 'black'),
-    }
-  )
+    },
+    world,
+  ),
 }
 
 let box = {
@@ -58,7 +64,8 @@ let box = {
       renderer: Components.renderer(world, '#', 'black'),
       impasse: Components.impasse(),
       destructible: Components.destructible(world),
-    }
+    },
+    world,
   )
 }
 
@@ -68,7 +75,8 @@ let box2 = {
       renderer: Components.renderer(world, '#', 'black'),
       impasse: Components.impasse(),
       destructible: Components.destructible(world),
-    }
+    },
+    world,
   )
 }
 
@@ -78,7 +86,8 @@ let box3 = {
       renderer: Components.renderer(world, '#', 'black'),
       impasse: Components.impasse(),
       destructible: Components.destructible(world),
-    }
+    },
+    world,
   )
 }
 
@@ -89,7 +98,8 @@ let kunai = {
       destructible: Components.destructible(world),
       attack: Components.attack(),
       throwable: Components.throwable(world),
-    }
+    },
+    world,
   )
 }
 
@@ -140,22 +150,23 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    ROT.RNG.setSeed(7);
-    SHOW(world.display.getContainer());
-    CREATE_LEVEL(world);
-    naruto.sendEvent(naruto, 'PREPARE_RENDER')
-    kunai.sendEvent(kunai, 'PREPARE_RENDER')
-    box.sendEvent(box, 'PREPARE_RENDER')
-    box2.sendEvent(box2, 'PREPARE_RENDER')
-    box3.sendEvent(box3, 'PREPARE_RENDER')
-    Helper.DRAW(world.map, world.display)
-    this.presserRef.current.focus();
+    // ROT.RNG.setSeed(7);
+    // SHOW(world.display.getContainer());
+    // CREATE_LEVEL(world);
+    // naruto.sendEvent(naruto, 'PREPARE_RENDER')
+    // // kunai.sendEvent(kunai, 'PREPARE_RENDER')
+    // box.sendEvent(box, 'PREPARE_RENDER')
+    // box2.sendEvent(box2, 'PREPARE_RENDER')
+    // box3.sendEvent(box3, 'PREPARE_RENDER')
+    // Helper.DRAW(world.map, world.display)
+    // this.presserRef.current.focus();
   }
 
   render() {
     return (
       <div className="App" ref={this.presserRef} onKeyDown={(event) => this.handleKeyPress(event, world, naruto)} tabIndex='0'>
         <div id='display'></div>
+        <Nystrum />
       </div>
     );
   }

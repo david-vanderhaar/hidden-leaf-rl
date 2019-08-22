@@ -1,3 +1,5 @@
+import * as ROT from 'rot-js';
+
 export const TILE_KEY = () => {
   return {
     'GROUND': {
@@ -40,4 +42,39 @@ export const getImpassableEntities = (entities) => {
 
 export const getDestructableEntities = (entities) => {
   return entities.filter((e) => e.components.hasOwnProperty('destructible'))
+}
+
+export const delay = (timeDelayed = 100) => {
+  return new Promise(resolve => setTimeout(resolve, timeDelayed));
+}
+
+export const exampleEngine = () => {
+  let scheduler = new ROT.Scheduler.Simple();
+  let engine = new ROT.Engine(scheduler);
+  let output = [];
+  /* sample actor: pauses the execution when dead */
+  let actor = {
+    lives: 3,
+    act: function () {
+      let done = null;
+      let promise = {
+        then: function (cb) { done = cb; }
+      }
+
+      output.push(".");
+      // SHOW(output.join(""));
+      console.log(output.join(""));
+
+      this.lives--;
+
+      /* if alive, wait for 500ms for next turn */
+      if (this.lives) {
+        setTimeout(function () { done(); }, 500);
+      }
+
+      return promise;
+    }
+  }
+  scheduler.add(actor, true);
+  engine.start();
 }

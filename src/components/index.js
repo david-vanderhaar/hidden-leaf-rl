@@ -39,7 +39,7 @@ export const body = (world, pos = { x: 0, y: 0 }) => {
           let tile = world.map[Helper.coordsToString(currentPos)]
           world.map[Helper.coordsToString(currentPos)] = {...tile, entities: []}
           self.sendEvent(self, 'PREPARE_RENDER')
-          Helper.DRAW(world.map, world.display)
+          // Helper.DRAW(world.map, world.display)
         } else {
           console.log('can\'t move there')
         }
@@ -69,7 +69,7 @@ export const destructible = (world, durability = 1) => {
       let tile = world.map[Helper.coordsToString(self.components.body.pos)];
       world.map[Helper.coordsToString(self.components.body.pos)].entities = tile.entities.filter((e) => e.id !== self.id);
       // self.sendEvent(self, 'PREPARE_RENDER')
-      Helper.DRAW(world.map, world.display)
+      // Helper.DRAW(world.map, world.display)
     }
   }
 }
@@ -104,8 +104,6 @@ export const throwable = (world) => {
       } else {
         if (world.map.hasOwnProperty(Helper.coordsToString(nextPos))) {
           let impassable_and_destructable_entities = Helper.getDestructableEntities(Helper.getImpassableEntities(nextTile.entities))
-          console.log(impassable_and_destructable_entities);
-          
           if (impassable_and_destructable_entities.length > 0) {
             self.sendEvent(impassable_and_destructable_entities[0], 'DECREASE_DURABILITY', { value: 1 });
           }
