@@ -78,3 +78,7 @@ export const exampleEngine = () => {
   scheduler.add(actor, true);
   engine.start();
 }
+
+export const getRandomInArray = (array) => {
+  return array[Math.floor(Math.random() * array.length)];
+}
