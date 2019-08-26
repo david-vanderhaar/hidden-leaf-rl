@@ -5,6 +5,52 @@ import * as Action from './actions';
 import * as Entity from './entites';
 import * as Game from './game';
 
+let ENGINE = new Engine.Engine();
+let actor_1 = new Entity.Mover({
+  pos: { x: 10, y: 10 },
+  renderer: {
+    character: 'B',
+    color: 'white',
+    background: 'black',
+  },
+  name: 'Billy',
+  actions: [],
+  speed: 80,
+  energy: Constant.ENERGY_THRESHOLD,
+})
+let actor_2 = new Entity.Mover({
+  pos: { x: 4, y: 1 },
+  renderer: {
+    character: 'B',
+    color: 'white',
+    background: 'black',
+  },
+  name:   'Bob',
+  actions: [],
+  speed: 70,
+  energy: Constant.ENERGY_THRESHOLD,
+})
+let actor_3 = new Entity.Player({
+  pos: { x: 1, y: 1 },
+  renderer: {
+    character: '@',
+    color: 'orange',
+    background: 'black',
+  },
+  name: 'Boomer',
+  actions: [],
+  speed: 100,
+  energy: Constant.ENERGY_THRESHOLD,
+  durability: 4,
+})
+
+
+ENGINE.actors.push(actor_1)
+ENGINE.actors.push(actor_2)
+ENGINE.actors.push(actor_3)
+
+let game = new Game.Game({engine: ENGINE})
+
 class Nystrum extends React.Component {
   constructor(props) {
     super(props);
@@ -13,46 +59,15 @@ class Nystrum extends React.Component {
   }
 
   async componentDidMount () {
-    let new_engine = new Engine.Engine();
-    let actor_1 = new Entity.Actor(
-      'Billy',
-      [],
-      100,
-      Constant.ENERGY_THRESHOLD,
-    )
-    let actor_2 = new Entity.Actor(
-      'Bob',
-      [],
-      10,
-      Constant.ENERGY_THRESHOLD,
-    )
-    let actor_3 = new Entity.Mover(
-      {x: 0, y: 0},
-      'Boomer',
-      [],
-      100,
-      Constant.ENERGY_THRESHOLD,
-    )
-    actor_1.actions.push(new Action.Base(null, actor_1, Constant.ENERGY_THRESHOLD))
-    actor_1.actions.push(new Action.Say(`Hey Im ${actor_1.name}`, null, actor_1, Constant.ENERGY_THRESHOLD))
-    actor_2.actions.push(new Action.Base(null, actor_2, Constant.ENERGY_THRESHOLD))
-    actor_2.actions.push(new Action.Say(`Yo Im ${actor_2.name}`, null, actor_2, Constant.ENERGY_THRESHOLD))
-    new_engine.actors.push(actor_1)
-    new_engine.actors.push(actor_2)
-    new_engine.actors.push(actor_3)
-
-    let game = new Game.Game(new_engine)
     game.initialize(this.presserRef)
-
-    await new_engine.start()
-
+    ENGINE.start()
   }
 
   render() {
     return (
       <div className="Nystrum">
         <h2>Nystrum</h2>
-        { Game.DisplayElement(this.presserRef) }
+        { Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE) }
       </div>
     );
   }

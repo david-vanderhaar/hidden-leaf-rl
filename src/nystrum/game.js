@@ -1,18 +1,27 @@
 import React from 'react';
 import * as ROT from 'rot-js';
-import * as Constants from './constants';
+import * as Constant from './constants';
+import * as Action from './actions';
+import * as Helper from '../helper';
 
 export class Game {
-  constructor(
+  constructor({
     engine = null,
     map = {},
-    display = new ROT.Display({ fontSize: 24, bg: '#099' }),
-    tileKey = Constants.TILE_KEY,
-  ) {
+    display = new ROT.Display({ fontSize: 24, bg: '#000' }),
+    tileKey = Constant.TILE_KEY,
+  }) {
     this.engine = engine;
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
+  }
+
+  placeActorsOnMap() {
+    this.engine.actors.forEach((actor) => {
+      let tile = this.map[Helper.coordsToString(actor.pos)]
+      tile.entities.push(actor);
+    })
   }
 
   createLevel () {
@@ -28,6 +37,23 @@ export class Game {
       freeCells.push(key);
     }
     digger.create(digCallback.bind(this));
+    this.placeActorsOnMap()
+  }
+
+  canOccupyPosition (pos) {
+    let result = false;
+    let targetTile = this.map[Helper.coordsToString(pos)];
+    if (targetTile) {
+      let isOccupied = targetTile.entities.length > 0;
+      if (!isOccupied) {
+        let tile = this.map[Helper.coordsToString(pos)];
+        if (this.tileKey[tile.type].passable) {
+          result = true;
+        }
+      }
+    }
+
+    return result;
   }
 
   show () {
@@ -55,75 +81,61 @@ export class Game {
   }
 
   initialize (presserRef) {
+    this.engine.game = this;
+    this.engine.actors.forEach((actor) => {
+      actor.game = this;
+    });
     this.show();
     this.createLevel();
     this.draw();
     presserRef.current.focus();
   }
-
-  // canOccupy (map, pos) {
-  //   if (map.hasOwnProperty(Helper.coordsToString(pos))) {
-  //     let tile = map[Helper.coordsToString(pos)];
-  //     if (Helper.TILE_KEY()[tile.type].passable && Helper.getImpassableEntities(tile.entities).length === 0) {
-  //       return true
-  //     }
-  //   } else {
-  //     return false
-  //   }
-  // }
 }
 
 /************************** UI ********************************/
-// handleKeyPress = (event) => {
-//   let keyMap = {
-//     w: 0,
-//     d: 1,
-//     s: 2,
-//     a: 3,
-//   };
+const walk = (direction, engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let newX = actor.pos.x + direction[0];
+  let newY = actor.pos.y + direction[1];
+  actor.setNextAction(new Action.Move({
+    targetPos: { x: newX, y: newY },
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
 
-//   let code = event.key;
-//   let dir = ROT.DIRS[4][keyMap[code]];
-//   if (code === 't') {
-//     kunai.sendEvent(kunai, 'MOVE', {
-//       currentPos: kunai.components.body.pos,
-//       targetPos: {
-//         x: entity.components.body.pos.x + 1,
-//         y: entity.components.body.pos.y,
-//       },
-//     })
-//     return kunai.sendEvent(kunai, 'THROW', { direction: { x: 1, y: 0 } })
-//   }
-//   if (!(code in keyMap)) { return; }
-//   let newX = entity.components.body.pos.x + dir[0];
-//   let newY = entity.components.body.pos.y + dir[1];
+const die = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.destroy();
+}
 
-//   entity.sendEvent(
-//     entity, 'MOVE', {
-//       currentPos: entity.components.body.pos,
-//       targetPos: {
-//         x: newX,
-//         y: newY
-//       }
-//     }
-//   )
+export const handleKeyPress = (event, engine) => {
+  if (!engine.isRunning) {
+    let keyMap = {
+      w: () => walk(Constant.DIRECTIONS.N, engine),
+      d: () => walk(Constant.DIRECTIONS.E, engine),
+      s: () => walk(Constant.DIRECTIONS.S, engine),
+      a: () => walk(Constant.DIRECTIONS.W, engine),
+      k: () => die(engine),
+    };
 
-//   return;
-// }
+    let code = event.key;
+    if (!(code in keyMap)) { return; }
+    keyMap[code]();
+    engine.start()
+  }
+  return;
+}
 
-export const DisplayElement = (presserRef) => {
+export const DisplayElement = (presserRef, handleKeyPress, engine) => {
   return (
     <div
       id='display'
       ref={presserRef}
-      onKeyDown={(event) => this.handleKeyPress(event)}
+      onKeyDown={(event) => handleKeyPress(event, engine)}
       tabIndex='0'
     />
   )
 }
 /************************** UI ********************************/
-
-// SHOW(game.display.getContainer());
-// CREATE_LEVEL(game);
-// Helper.DRAW(game.map, game.display)
-// this.presserRef.current.focus();

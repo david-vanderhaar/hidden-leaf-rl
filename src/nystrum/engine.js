@@ -5,17 +5,19 @@ export class Engine {
     this.actors = [];
     this.currentActor = 0;
     this.isRunning = false;
+    this.game = null;
   }
 
   async process() {
     let actor = this.actors[this.currentActor]
     actor.gainEnergy(actor.speed);
     if (actor.hasEnoughEnergy()) {
-      let action = actor.getAction(actor);
+      let action = actor.getAction(this.game);
       if (!action) { return false; } // if no action given, kick out to UI input
       while (true) {
-        await Helper.delay(1000);
         let result = action.perform();
+        this.game.draw();
+        await Helper.delay(100);
         if (!result.success) return false;
         if (result.alternative === null) break;
         action = result.alternative;
@@ -28,9 +30,11 @@ export class Engine {
   async start() {
     this.isRunning = true;
     let i = 0
+    
     while (this.isRunning) {
       this.isRunning = await this.process();
     }
+    
     // invoke UI input here, it should set next action of Hero and start() engine again.
   }
 
