@@ -8,7 +8,7 @@ export class Game {
   constructor({
     engine = null,
     map = {},
-    display = new ROT.Display({ fontSize: 24, bg: '#000' }),
+    display = new ROT.Display({ fontSize: 24, bg: 'black' }),
     tileKey = Constant.TILE_KEY,
   }) {
     this.engine = engine;
@@ -37,6 +37,10 @@ export class Game {
       freeCells.push(key);
     }
     digger.create(digCallback.bind(this));
+    this.map[`10,11`] = {
+      type: 'WIN',
+      entities:[],
+    }
     this.placeActorsOnMap()
   }
 
@@ -123,7 +127,15 @@ export const handleKeyPress = (event, engine) => {
     let code = event.key;
     if (!(code in keyMap)) { return; }
     keyMap[code]();
-    engine.start()
+
+    let actor = engine.actors[engine.currentActor];
+    let tile = engine.game.map[Helper.coordsToString(actor.pos)]
+    if (tile.type === 'WIN') {
+      alert('You won!!!! HOly craaaaap! You did it man, you really did it!')
+    } else {
+      engine.start()
+    }
+
   }
   return;
 }

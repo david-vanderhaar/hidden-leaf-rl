@@ -17,7 +17,7 @@ export class Engine {
       while (true) {
         let result = action.perform();
         this.game.draw();
-        await Helper.delay(100);
+        await Helper.delay(50);
         if (!result.success) return false;
         if (result.alternative === null) break;
         action = result.alternative;

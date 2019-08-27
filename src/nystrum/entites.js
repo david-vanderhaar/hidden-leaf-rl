@@ -3,6 +3,7 @@ import pipe from 'lodash/fp/pipe';
 import * as Helper from '../helper';
 import * as Constant from './constants';
 import * as Action from './actions';
+import * as ROT from 'rot-js';
 
 export class Entity {
   constructor() {
@@ -18,8 +19,7 @@ const Acting = superclass => class extends superclass {
     this.name = name;
     this.actions = actions;
     this.speed = speed;
-    this.energy = energy;
-    this.energyThreshold = Constant.ENERGY_THRESHOLD;
+    this.energy = 0;
   }
 
   getAction() {
@@ -32,7 +32,7 @@ const Acting = superclass => class extends superclass {
   }
 
   hasEnoughEnergy() {
-    return this.energy >= this.energyThreshold;
+    return this.energy >= 0;
   }
 }
 
@@ -65,14 +65,34 @@ const Playing = superclass => class extends superclass {
     }
 }
 
-const Moving = superclass => class extends superclass {
-  constructor({...args}) {
+const Chasing = superclass => class extends superclass {
+  constructor({targetEntity = null ,...args}) {
     super({...args})
+    this.targetEntity = targetEntity;
+  }
+
+  calculatPath () {
+    let map = this.game.map
+    let isPassable = function (x, y) {
+      if (map[x + "," + y]) {
+        return (map[x + "," + y].type === 'GROUND');
+      } else {
+        return false
+      }
+    }
+    let astar = new ROT.Path.AStar(this.targetEntity.pos.x, this.targetEntity.pos.y, isPassable, {topology: 4});
+    let path = [];
+    astar.compute(this.pos.x, this.pos.y, function (x, y) {
+      path.push({x, y})
+    });
+
+    return path.length > 1 ? path[1] : this.pos;
   }
 
   getAction(game) {
+    let targetPos = this.calculatPath();
     let result = new Action.Move({
-      targetPos: { x: this.pos.x + 1, y: this.pos.y }, 
+      targetPos, 
       game, 
       actor: this, 
       energyCost: Constant.ENERGY_THRESHOLD
@@ -108,5 +128,5 @@ const Destructable = superclass => class extends superclass {
 }
 
 export const Actor = pipe(Acting, Rendering)(Entity);
-export const Mover = pipe(Acting, Rendering, Moving)(Entity);
+export const Chaser = pipe(Acting, Rendering, Chasing)(Entity);
 export const Player = pipe(Acting, Rendering, Destructable, Playing)(Entity);

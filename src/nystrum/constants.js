@@ -2,9 +2,15 @@ export const ENERGY_THRESHOLD = 100;
 
 export const TILE_KEY = {
   'GROUND': {
+    // background: '#5b684d',
     background: '#000',
-    foreground: '#974',
-    character: '.',
+    character: '',
+    passable: true,
+  },
+  'WIN': {
+    background: 'white',
+    foreground: 'black',
+    character: 'W',
     passable: true,
   }
 }

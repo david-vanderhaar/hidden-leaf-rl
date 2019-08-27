@@ -6,48 +6,51 @@ import * as Entity from './entites';
 import * as Game from './game';
 
 let ENGINE = new Engine.Engine();
-let actor_1 = new Entity.Mover({
-  pos: { x: 10, y: 10 },
-  renderer: {
-    character: 'B',
-    color: 'white',
-    background: 'black',
-  },
-  name: 'Billy',
-  actions: [],
-  speed: 80,
-  energy: Constant.ENERGY_THRESHOLD,
-})
-let actor_2 = new Entity.Mover({
-  pos: { x: 4, y: 1 },
-  renderer: {
-    character: 'B',
-    color: 'white',
-    background: 'black',
-  },
-  name:   'Bob',
-  actions: [],
-  speed: 70,
-  energy: Constant.ENERGY_THRESHOLD,
-})
+
 let actor_3 = new Entity.Player({
-  pos: { x: 1, y: 1 },
+  pos: { x: 23, y: 7 },
   renderer: {
-    character: '@',
+    character: '❂',
     color: 'orange',
-    background: 'black',
+    background: '',
   },
   name: 'Boomer',
   actions: [],
-  speed: 100,
-  energy: Constant.ENERGY_THRESHOLD,
+  speed: 20,
   durability: 4,
 })
 
+let actor_1 = new Entity.Chaser({
+  targetEntity: actor_3,
+  pos: { x: 10, y: 10 },
+  renderer: {
+    // character: '◉',
+    character: '⛨',
+    color: 'white',
+    background: '',
+  },
+  name: 'Ross',
+  actions: [],
+  speed: 50,
+})
+let actor_2 = new Entity.Chaser({
+  targetEntity: actor_3,
+  pos: { x: 4, y: 1 },
+  renderer: {
+    // character: '◉',
+    character: '⛨',
+    color: 'white',
+    background: '',
+  },
+  name: 'Bob',
+  actions: [],
+  speed: 500,
+})
 
+
+ENGINE.actors.push(actor_3)
 ENGINE.actors.push(actor_1)
 ENGINE.actors.push(actor_2)
-ENGINE.actors.push(actor_3)
 
 let game = new Game.Game({engine: ENGINE})
 
