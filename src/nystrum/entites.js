@@ -6,20 +6,20 @@ import * as Action from './actions';
 import * as ROT from 'rot-js';
 
 export class Entity {
-  constructor() {
+  constructor({game = null}) {
     let id = uuid();
     this.id = id;
-    this.game = null;
+    this.game = game;
   }
 }
 
 const Acting = superclass => class extends superclass {
-  constructor({name, actions, speed, energy, ...args}) {
+  constructor({name, actions, speed, energy = 0, ...args}) {
     super({...args})
     this.name = name;
     this.actions = actions;
     this.speed = speed;
-    this.energy = 0;
+    this.energy = energy;
   }
 
   getAction() {
@@ -65,32 +65,43 @@ const Playing = superclass => class extends superclass {
     }
 }
 
+const Projecting = superclass => class extends superclass {
+  constructor({path = [], targetPos = null ,...args}) {
+    super({...args})
+    this.path = path;
+    this.targetPos = targetPos;
+  }
+
+  createPath (game) {
+    let path = Helper.calculatPath(game, this.targetPos, this.pos, 8);
+    this.path = path;
+  }
+
+  getAction(game) {
+    let targetPos = this.path.length > 1 ? this.path[1] : this.pos;
+    let result = new Action.Move({
+      targetPos, 
+      game, 
+      actor: this, 
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+    if (this.game.canOccupyPosition(targetPos)) {
+      this.path.shift();
+    }
+    return result;
+  }
+}
+
 const Chasing = superclass => class extends superclass {
   constructor({targetEntity = null ,...args}) {
     super({...args})
     this.targetEntity = targetEntity;
   }
 
-  calculatPath () {
-    let map = this.game.map
-    let isPassable = function (x, y) {
-      if (map[x + "," + y]) {
-        return (map[x + "," + y].type === 'GROUND');
-      } else {
-        return false
-      }
-    }
-    let astar = new ROT.Path.AStar(this.targetEntity.pos.x, this.targetEntity.pos.y, isPassable, {topology: 4});
-    let path = [];
-    astar.compute(this.pos.x, this.pos.y, function (x, y) {
-      path.push({x, y})
-    });
-
-    return path.length > 1 ? path[1] : this.pos;
-  }
-
   getAction(game) {
-    let targetPos = this.calculatPath();
+    let path = Helper.calculatPath(game, this.targetEntity.pos, this.pos);
+    let targetPos = path.length > 1 ? path[1] : this.pos;
+
     let result = new Action.Move({
       targetPos, 
       game, 
@@ -130,3 +141,5 @@ const Destructable = superclass => class extends superclass {
 export const Actor = pipe(Acting, Rendering)(Entity);
 export const Chaser = pipe(Acting, Rendering, Chasing)(Entity);
 export const Player = pipe(Acting, Rendering, Destructable, Playing)(Entity);
+
+export const Projectile = pipe(Acting, Rendering, Projecting)(Entity);

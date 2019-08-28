@@ -3,6 +3,7 @@ import * as ROT from 'rot-js';
 import * as Constant from './constants';
 import * as Action from './actions';
 import * as Helper from '../helper';
+import * as Entity from './entites';
 
 export class Game {
   constructor({
@@ -114,6 +115,35 @@ const die = (engine) => {
   actor.destroy();
 }
 
+const throwKunai = (engine, targetPos) => {
+  let actor = engine.actors[engine.currentActor];
+  let kunai = new Entity.Projectile({
+    game: engine.game,
+    targetPos,
+    pos: { x: actor.pos.x, y: actor.pos.y},
+    renderer: {
+      character: '>',
+      color: 'white',
+      background: '',
+    },
+    name: 'Kunai',
+    actions: [],
+    speed: 500,
+  })
+  engine.actors.push(kunai);
+  kunai.createPath(engine.game);
+  engine.game.placeActorsOnMap();
+  engine.game.draw();
+  actor.setNextAction(
+    new Action.Say({
+      message: `I'll get you with this kunai!`,
+      game: engine.game,
+      actor,
+      energyCost: Constant.ENERGY_THRESHOLD
+    })
+  )
+}
+
 export const handleKeyPress = (event, engine) => {
   if (!engine.isRunning) {
     let keyMap = {
@@ -122,6 +152,7 @@ export const handleKeyPress = (event, engine) => {
       s: () => walk(Constant.DIRECTIONS.S, engine),
       a: () => walk(Constant.DIRECTIONS.W, engine),
       k: () => die(engine),
+      t: () => throwKunai(engine, engine.actors[2].pos),
     };
 
     let code = event.key;
