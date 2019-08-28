@@ -4,6 +4,7 @@ import * as Engine from './engine';
 import * as Action from './actions';
 import * as Entity from './entites';
 import * as Game from './game';
+import * as Helper from '../helper';
 
 let ENGINE = new Engine.Engine();
 
@@ -16,7 +17,7 @@ let actor_3 = new Entity.Player({
   },
   name: 'Boomer',
   actions: [],
-  speed: 20,
+  speed: 500,
   durability: 4,
 })
 

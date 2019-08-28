@@ -27,3 +27,10 @@ export const calculatPath = (game, targetPos, currentPos, topology = 4) => {
 
   return path;
 }
+
+export const getRandomPos = (map) => {
+  let keys = Object.keys(map);
+  let key = getRandomInArray(keys).split(',');
+  let pos = { x: parseInt(key[0]), y: parseInt(key[1])}
+  return {coordinates: pos, text: key}
+}

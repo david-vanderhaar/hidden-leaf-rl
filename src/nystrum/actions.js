@@ -3,10 +3,11 @@ import * as Action from './actions';
 import * as Constant from './constants';
 
 export class Base {
-  constructor({game, actor, energyCost}) {
+  constructor({game, actor, energyCost, processDelay = 50}) {
     this.actor = actor
     this.game = game
     this.energyCost = energyCost
+    this.processDelay = processDelay
   }
 
   perform() {
@@ -20,9 +21,10 @@ export class Base {
 }
 
 export class Say extends Base {
-  constructor({message, ...args}) {
+  constructor({ message, processDelay = 0, ...args}) {
     super({...args});
     this.message = message
+    this.processDelay = processDelay
   }
   perform() {
     console.log(`${this.actor.name} says ${this.message}`);
@@ -35,9 +37,10 @@ export class Say extends Base {
 };
 
 export class Move extends Base {
-  constructor({targetPos, ...args}) {
+  constructor({ targetPos, processDelay = 25, ...args}) {
     super({...args});
     this.targetPos = targetPos
+    this.processDelay = processDelay
   }
   perform() {
     let success = false;

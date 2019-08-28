@@ -8,19 +8,45 @@ export class Engine {
     this.game = null;
   }
 
-  async process() {
+  async processV1() {
     let actor = this.actors[this.currentActor]
     actor.gainEnergy(actor.speed);
+    console.log('energy: ', actor.energy);
+    
     if (actor.hasEnoughEnergy()) {
       let action = actor.getAction(this.game);
       if (!action) { return false; } // if no action given, kick out to UI input
       while (true) {
         let result = action.perform();
         this.game.draw();
-        await Helper.delay(50);
+        await Helper.delay(action.processDelay);
         if (!result.success) return false;
         if (result.alternative === null) break;
         action = result.alternative;
+      }
+    }
+    this.currentActor = (this.currentActor + 1) % this.actors.length;
+    return true
+  }
+
+  async process() {
+    let actor = this.actors[this.currentActor]
+    let acting = true;
+    while (acting) {
+      if (actor.hasEnoughEnergy()) {
+        let action = actor.getAction(this.game);
+        if (!action) { return false; } // if no action given, kick out to UI input
+        while (true) {
+          let result = action.perform();
+          this.game.draw();
+          await Helper.delay(action.processDelay);
+          if (!result.success) return false;
+          if (result.alternative === null) break;
+          action = result.alternative;
+        }
+      } else {
+        actor.gainEnergy(actor.speed);
+        acting = false;
       }
     }
     this.currentActor = (this.currentActor + 1) % this.actors.length;

@@ -19,7 +19,7 @@ const Acting = superclass => class extends superclass {
     this.name = name;
     this.actions = actions;
     this.speed = speed;
-    this.energy = energy;
+    this.energy = speed;
   }
 
   getAction() {

@@ -85,6 +85,12 @@ export class Game {
     }
   }
 
+  addActor (actor) {
+    this.engine.actors.push(actor);
+    this.placeActorsOnMap(); // replace with placeActorOnMap
+    this.draw();
+  }
+
   initialize (presserRef) {
     this.engine.game = this;
     this.engine.actors.forEach((actor) => {
@@ -144,6 +150,26 @@ const throwKunai = (engine, targetPos) => {
   )
 }
 
+const addActor = (game) => {
+  let targetEntity = game.engine.actors[game.engine.currentActor]
+  let pos = Helper.getRandomPos(game.map).coordinates
+
+  let actor = new Entity.Chaser({
+    targetEntity,
+    pos,
+    renderer: {
+      character: '◉',
+      // character: '⛨',
+      color: 'white',
+      background: '',
+    },
+    name: 'Ross',
+    actions: [],
+    speed: 60,
+  })
+  game.addActor(actor);
+}
+
 export const handleKeyPress = (event, engine) => {
   if (!engine.isRunning) {
     let keyMap = {
@@ -153,6 +179,7 @@ export const handleKeyPress = (event, engine) => {
       a: () => walk(Constant.DIRECTIONS.W, engine),
       k: () => die(engine),
       t: () => throwKunai(engine, engine.actors[2].pos),
+      y: () => addActor(engine.game),
     };
 
     let code = event.key;
