@@ -9,7 +9,11 @@ export class Game {
   constructor({
     engine = null,
     map = {},
-    display = new ROT.Display({ fontSize: 24, bg: 'black' }),
+    display = new ROT.Display({ 
+      forceSquareRatio: true, 
+      fontSize: 24, 
+      bg: 'black' 
+    }),
     tileKey = Constant.TILE_KEY,
   }) {
     this.engine = engine;
@@ -164,6 +168,7 @@ const addActor = (game) => {
       background: '',
     },
     name: 'Ross',
+    game,
     actions: [],
     speed: 60,
   })
@@ -171,6 +176,7 @@ const addActor = (game) => {
 }
 
 export const handleKeyPress = (event, engine) => {
+  console.log(event.key)
   if (!engine.isRunning) {
     let keyMap = {
       w: () => walk(Constant.DIRECTIONS.N, engine),

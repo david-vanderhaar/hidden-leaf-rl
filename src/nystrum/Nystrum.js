@@ -17,8 +17,8 @@ let actor_3 = new Entity.Player({
   },
   name: 'Boomer',
   actions: [],
-  speed: 500,
-  durability: 4,
+  speed: 1000,
+  durability: 1,
 })
 
 let actor_1 = new Entity.Chaser({
@@ -50,8 +50,8 @@ let actor_2 = new Entity.Chaser({
 })
 
 ENGINE.actors.push(actor_3)
-ENGINE.actors.push(actor_1)
-ENGINE.actors.push(actor_2)
+// ENGINE.actors.push(actor_1)
+// ENGINE.actors.push(actor_2)
 
 let game = new Game.Game({engine: ENGINE})
 

@@ -34,3 +34,7 @@ export const getRandomPos = (map) => {
   let pos = { x: parseInt(key[0]), y: parseInt(key[1])}
   return {coordinates: pos, text: key}
 }
+
+export const getDestructableEntities = (entites) => {
+  return entites.filter((entity) => entity.hasOwnProperty('durability'));
+}

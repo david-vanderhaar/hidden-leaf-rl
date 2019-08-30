@@ -8,11 +8,9 @@ export class Engine {
     this.game = null;
   }
 
-  async processV1() {
+  async processV1 () { // a turn-based system using speed and round-robin
     let actor = this.actors[this.currentActor]
     actor.gainEnergy(actor.speed);
-    console.log('energy: ', actor.energy);
-    
     if (actor.hasEnoughEnergy()) {
       let action = actor.getAction(this.game);
       if (!action) { return false; } // if no action given, kick out to UI input
@@ -29,7 +27,7 @@ export class Engine {
     return true
   }
 
-  async process() {
+  async process() { // a turn-based system using speed and Action Points
     let actor = this.actors[this.currentActor]
     let acting = true;
     while (acting) {

@@ -3,7 +3,7 @@ import * as Action from './actions';
 import * as Constant from './constants';
 
 export class Base {
-  constructor({game, actor, energyCost, processDelay = 50}) {
+  constructor({game, actor, energyCost = 100, processDelay = 50}) {
     this.actor = actor
     this.game = game
     this.energyCost = energyCost
@@ -29,6 +29,22 @@ export class Say extends Base {
   perform() {
     console.log(`${this.actor.name} says ${this.message}`);
     this.actor.energy -= this.energyCost;
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
+export class DestroySelf extends Base {
+  constructor({processDelay = 0, ...args}) {
+    super({...args});
+    this.processDelay = processDelay
+  }
+  perform() {
+    console.log(`${this.actor.name} is self-destructing`);
+    this.actor.energy -= this.energyCost;
+    this.actor.destroy();
     return {
       success: true,
       alternative: null,

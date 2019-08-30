@@ -32,7 +32,7 @@ const Acting = superclass => class extends superclass {
   }
 
   hasEnoughEnergy() {
-    return this.energy >= 0;
+    return this.energy > 0;
   }
 }
 
@@ -92,6 +92,46 @@ const Projecting = superclass => class extends superclass {
   }
 }
 
+const OffensiveProjecting = (superclass) => class extends superclass {
+  constructor({path = [], targetPos = null, attackDamage = 1, ...args}) {
+    super({...args})
+    this.path = path;
+    this.targetPos = targetPos;
+    this.attackDamage = attackDamage;
+  }
+
+  createPath (game) {
+    let path = Helper.calculatPath(game, this.targetPos, this.pos, 8);
+    this.path = path;
+  }
+
+  getAction (game) {
+    let targetPos = this.path.length > 1 ? this.path[1] : this.pos;
+    
+    let result = new Action.Move({
+      targetPos, 
+      game, 
+      actor: this, 
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+    if (this.game.canOccupyPosition(targetPos)) {
+      this.path.shift();
+    } else {
+      let entities = Helper.getDestructableEntities(this.game.map[Helper.coordsToString(targetPos)].entities);
+      if (entities.length > 0) {
+        entities[0].decreaseDurability(this.attackDamage);
+      }
+      result = new Action.DestroySelf({
+        game,
+        actor: this,
+        energyCost: 100
+      });
+    }
+
+    return result;
+  }
+}
+
 const Chasing = superclass => class extends superclass {
   constructor({targetEntity = null ,...args}) {
     super({...args})
@@ -130,16 +170,30 @@ const Destructable = superclass => class extends superclass {
   }
 
   destroy () {
+    this.energy = 0;
     let tile = this.game.map[Helper.coordsToString(this.pos)];
     this.game.map[Helper.coordsToString(this.pos)].entities = tile.entities.filter((e) => e.id !== this.id);
     this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
     this.game.engine.currentActor = 0;
     this.game.draw()
   }
+  
+  // destroyV2 () {
+  //   for (let key in this.game.map) {
+  //     if (this.game.map[key].entities.length > 0) {
+  //       this.game.map[key].entities = this.game.map[key].entities.filter((e) => {
+  //         return (e.id !== this.id)
+  //       });
+  //     }
+  //   }
+  //   this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
+  //   this.game.engine.currentActor = 0;
+  //   this.game.draw()
+  // }
 }
 
 export const Actor = pipe(Acting, Rendering)(Entity);
-export const Chaser = pipe(Acting, Rendering, Chasing)(Entity);
+export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
 export const Player = pipe(Acting, Rendering, Destructable, Playing)(Entity);
 
-export const Projectile = pipe(Acting, Rendering, Projecting)(Entity);
+export const Projectile = pipe(Acting, Rendering, OffensiveProjecting, Destructable)(Entity);
