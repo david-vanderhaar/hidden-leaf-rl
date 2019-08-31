@@ -36,6 +36,23 @@ export class Say extends Base {
   }
 };
 
+export class DropItem extends Base {
+  constructor({ item, ...args }) {
+    super({ ...args });
+    this.item = item;
+  }
+  perform() {
+    console.log(`${this.actor.name} drops ${this.item.name}.`);
+    this.actor.removeFromContainer(this.item);
+    this.game.map[Helper.coordsToString(this.actor.pos)].entities.push(this.item);
+    this.actor.energy -= this.energyCost;
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
 export class DestroySelf extends Base {
   constructor({processDelay = 0, ...args}) {
     super({...args});
@@ -179,8 +196,9 @@ export class ThrowDestructable extends Move {
   perform () {
     let success = false;
     let alternative = null;
+    this.actor.passable = false;
     let move_result = super.perform();
-    if (move_result.success && !move_result.alternative) {
+    if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
       this.actor.path.shift();
       success = true;
     } else {

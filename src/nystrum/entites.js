@@ -6,10 +6,11 @@ import * as Action from './actions';
 import * as ROT from 'rot-js';
 
 export class Entity {
-  constructor({game = null}) {
+  constructor({ game = null, passable = false}) {
     let id = uuid();
     this.id = id;
     this.game = game;
+    this.passable = passable;
   }
 }
 
@@ -54,12 +55,18 @@ const Containing = superclass => class extends superclass {
     this.container = container;
   }
 
+  contains (itemType) {
+    let container = this.container;
+    let items = container.filter((item) => item.name === itemType);
+    return items.length > 0 ? items[0] : false;
+  }
+
   addToContainer (item) {
     this.container.push(item);
   }
   
-  removeFromContainer (id) {
-    this.container = this.container.filter((item) => item.id !== id);
+  removeFromContainer (item) {
+    this.container = this.container.filter((it) => it.id !== item.id);
   }
 }
 

@@ -4,6 +4,7 @@ import * as Constant from './constants';
 import * as Action from './actions';
 import * as Helper from '../helper';
 import * as Entity from './entites';
+import * as Item from './items';
 
 export class Game {
   constructor({
@@ -63,7 +64,8 @@ export class Game {
     let targetTile = this.map[Helper.coordsToString(pos)];
     if (targetTile) {
       let isOccupied = targetTile.entities.length > 0;
-      if (!isOccupied) {
+      let hasImpassableEntity = targetTile.entities.filter((entity) => !entity.passable).length > 0;
+      if (!hasImpassableEntity) {
         let tile = this.map[Helper.coordsToString(pos)];
         if (this.tileKey[tile.type].passable) {
           result = true;
@@ -182,6 +184,20 @@ const release = (engine, chargeCost) => {
   }))
 }
 
+const dropRandom = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  if (actor.container.length > 0) {
+    actor.setNextAction(new Action.DropItem({
+      item: Helper.getRandomInArray(actor.container),
+      game: engine.game,
+      actor,
+      energyCost: Constant.ENERGY_THRESHOLD
+    }))
+  } else {
+    console.log('nothing to drop.');
+  }
+}
+
 const die = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.destroy();
@@ -189,31 +205,27 @@ const die = (engine) => {
 
 const throwKunai = (engine, targetPos) => {
   let actor = engine.actors[engine.currentActor];
-  let kunai = new Entity.DestructiveProjectile({
-    game: engine.game,
-    targetPos,
-    pos: { x: actor.pos.x, y: actor.pos.y},
-    renderer: {
-      character: '>',
-      color: 'white',
-      background: '',
-    },
-    name: 'Kunai',
-    actions: [],
-    speed: 500,
-  })
-  engine.actors.push(kunai);
-  kunai.createPath(engine.game);
-  engine.game.placeActorsOnMap();
-  engine.game.draw();
-  actor.setNextAction(
-    new Action.Say({
-      message: `I'll get you with this kunai!`,
-      game: engine.game,
-      actor,
-      energyCost: Constant.ENERGY_THRESHOLD
-    })
-  )
+  let kunai = actor.contains(Item.TYPE.KUNAI);
+  if (kunai) {
+    kunai.game = engine.game;
+    kunai.pos = {...actor.pos};
+    kunai.targetPos = targetPos;
+    actor.removeFromContainer(kunai);
+    engine.actors.push(kunai);
+    kunai.createPath(engine.game);
+    engine.game.placeActorsOnMap();
+    engine.game.draw();
+    actor.setNextAction(
+      new Action.Say({
+        message: `I'll get you with this kunai!`,
+        game: engine.game,
+        actor,
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    )
+  } else {
+    console.log('I have no kunais left');
+  }
 }
 
 const addActor = (game) => {
@@ -224,8 +236,7 @@ const addActor = (game) => {
     targetEntity,
     pos,
     renderer: {
-      character: '◉',
-      // character: '⛨',
+      character: Helper.getRandomInArray(['◉', '⛨']),
       color: 'white',
       background: '',
     },
@@ -245,7 +256,8 @@ export const handleKeyPress = (event, engine) => {
       s: () => walk(Constant.DIRECTIONS.S, engine),
       a: () => walk(Constant.DIRECTIONS.W, engine),
       k: () => die(engine),
-      t: () => throwKunai(engine, engine.actors[2].pos),
+      i: () => dropRandom(engine),
+      t: () => throwKunai(engine, engine.actors[1].pos),
       y: () => addActor(engine.game),
       c: () => charge(engine, 1),
       // r: () => release(engine, 5),

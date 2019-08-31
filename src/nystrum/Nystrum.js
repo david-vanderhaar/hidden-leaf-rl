@@ -2,6 +2,7 @@ import React from 'react';
 import * as Constant from './constants';
 import * as Engine from './engine';
 import * as Action from './actions';
+import * as Item from './items';
 import * as Entity from './entites';
 import * as Game from './game';
 import * as Helper from '../helper';
@@ -19,6 +20,11 @@ let actor_3 = new Entity.Player({
   actions: [],
   speed: 500,
   durability: 1,
+  container: [
+    Item.kunai(ENGINE),
+    Item.kunai(ENGINE),
+    Item.kunai(ENGINE),
+  ]
 })
 
 ENGINE.actors.push(actor_3)
