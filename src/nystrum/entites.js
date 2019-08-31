@@ -48,6 +48,70 @@ const Rendering = superclass => class extends superclass {
   }
 }
 
+const Containing = superclass => class extends superclass {
+  constructor({container = [], ...args}) {
+    super({...args})
+    this.container = container;
+  }
+
+  addToContainer (item) {
+    this.container.push(item);
+  }
+  
+  removeFromContainer (id) {
+    this.container = this.container.filter((item) => item.id !== id);
+  }
+}
+
+// const Equiping = superclass => class extends superclass {
+//   constructor({container = [], ...args}) {
+//     super({...args})
+//     this.container = container;
+//   }
+
+//   addToContainer (item) {
+//     this.container.push(item);
+//   }
+  
+//   removeFromContainer (id) {
+//     this.container = this.container.filter((item) => item.id !== id);
+//   }
+// }
+
+const Charging = superclass => class extends superclass {
+  constructor({charge = 10, ...args}) {
+    super({...args})
+    this.charge = charge;
+    this.chargeMax = charge;
+  }
+
+  decreaseCharge(value) {
+    this.charge = Math.max(0, this.charge - value);
+  }
+  
+  increaseCharge(value) {
+    this.charge = Math.min(this.chargeMax, this.charge + value);
+  }
+}
+
+const Signing = superclass => class extends superclass {
+  constructor({...args}) {
+    super({...args})
+    this.signHistory = [];
+  }
+
+  addSign(sign) {
+    if (this.signHistory.length >= 4) {
+      this.signHistory.shift();
+    }
+    this.signHistory.push(sign);
+  }
+  
+  clearSigns() {
+    this.signHistory = [];
+  }
+}
+
 const Playing = superclass => class extends superclass {
   constructor({...args}) {
     super({...args})
@@ -73,12 +137,12 @@ const Projecting = superclass => class extends superclass {
   }
 
   createPath (game) {
-    let path = Helper.calculatPath(game, this.targetPos, this.pos, 8);
+    let path = Helper.calculatePath(game, this.targetPos, this.pos, 8);
     this.path = path;
   }
 
   getAction(game) {
-    let targetPos = this.path.length > 1 ? this.path[1] : this.pos;
+    let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     let result = new Action.Move({
       targetPos, 
       game, 
@@ -92,41 +156,29 @@ const Projecting = superclass => class extends superclass {
   }
 }
 
-const OffensiveProjecting = (superclass) => class extends superclass {
-  constructor({path = [], targetPos = null, attackDamage = 1, ...args}) {
+const DestructiveProjecting = (superclass) => class extends superclass {
+  constructor({path = [], targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
     this.path = path;
     this.targetPos = targetPos;
     this.attackDamage = attackDamage;
+    this.range = range;
   }
 
   createPath (game) {
-    let path = Helper.calculatPath(game, this.targetPos, this.pos, 8);
+    let path = Helper.calculatePathWithRange(game, this.targetPos, this.pos, 8, this.range);
     this.path = path;
   }
 
   getAction (game) {
-    let targetPos = this.path.length > 1 ? this.path[1] : this.pos;
+    let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     
-    let result = new Action.Move({
+    let result = new Action.ThrowDestructable({
       targetPos, 
       game, 
       actor: this, 
       energyCost: Constant.ENERGY_THRESHOLD
     });
-    if (this.game.canOccupyPosition(targetPos)) {
-      this.path.shift();
-    } else {
-      let entities = Helper.getDestructableEntities(this.game.map[Helper.coordsToString(targetPos)].entities);
-      if (entities.length > 0) {
-        entities[0].decreaseDurability(this.attackDamage);
-      }
-      result = new Action.DestroySelf({
-        game,
-        actor: this,
-        energyCost: 100
-      });
-    }
 
     return result;
   }
@@ -139,8 +191,8 @@ const Chasing = superclass => class extends superclass {
   }
 
   getAction(game) {
-    let path = Helper.calculatPath(game, this.targetEntity.pos, this.pos);
-    let targetPos = path.length > 1 ? path[1] : this.pos;
+    let path = Helper.calculatePath(game, this.targetEntity.pos, this.pos);
+    let targetPos = path.length > 0 ? path[0] : this.pos;
 
     let result = new Action.Move({
       targetPos, 
@@ -194,6 +246,6 @@ const Destructable = superclass => class extends superclass {
 
 export const Actor = pipe(Acting, Rendering)(Entity);
 export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
-export const Player = pipe(Acting, Rendering, Destructable, Playing)(Entity);
+export const Player = pipe(Acting, Rendering, Destructable, Charging, Signing, Containing, Playing)(Entity);
 
-export const Projectile = pipe(Acting, Rendering, OffensiveProjecting, Destructable)(Entity);
+export const DestructiveProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable)(Entity);

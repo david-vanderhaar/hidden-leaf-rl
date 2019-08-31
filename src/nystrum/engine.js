@@ -33,6 +33,8 @@ export class Engine {
     while (acting) {
       if (actor.hasEnoughEnergy()) {
         let action = actor.getAction(this.game);
+        console.log(action);
+        
         if (!action) { return false; } // if no action given, kick out to UI input
         while (true) {
           let result = action.perform();

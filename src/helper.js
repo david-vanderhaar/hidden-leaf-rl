@@ -10,7 +10,7 @@ export const getRandomInArray = (array) => {
 
 export const coordsToString = (coords) => `${coords.x},${coords.y}`
 
-export const calculatPath = (game, targetPos, currentPos, topology = 4) => {
+export const calculatePath = (game, targetPos, currentPos, topology = 4) => {
   let map = game.map
   let isPassable = function (x, y) {
     if (map[x + "," + y]) {
@@ -25,7 +25,12 @@ export const calculatPath = (game, targetPos, currentPos, topology = 4) => {
     path.push({ x, y })
   });
 
-  return path;
+  return path.slice(1);
+}
+
+export const calculatePathWithRange = (game, targetPos, currentPos, topology, range) => {
+  let path = calculatePath(game, targetPos, currentPos, topology);
+  return path.slice(0, range + 1);
 }
 
 export const getRandomPos = (map) => {

@@ -15,43 +15,13 @@ let actor_3 = new Entity.Player({
     color: 'orange',
     background: '',
   },
-  name: 'Boomer',
+  name: 'Player',
   actions: [],
-  speed: 1000,
+  speed: 500,
   durability: 1,
 })
 
-let actor_1 = new Entity.Chaser({
-  targetEntity: actor_3,
-  pos: { x: 10, y: 10 },
-  renderer: {
-    character: '◉',
-    // character: '⛨',
-    color: 'white',
-    background: '',
-  },
-  name: 'Ross',
-  actions: [],
-  speed: 50,
-})
-
-let actor_2 = new Entity.Chaser({
-  targetEntity: actor_3,
-  pos: { x: 4, y: 1 },
-  renderer: {
-    character: '◉',
-    // character: '⛨',
-    color: 'white',
-    background: '',
-  },
-  name: 'Bob',
-  actions: [],
-  speed: 500,
-})
-
 ENGINE.actors.push(actor_3)
-// ENGINE.actors.push(actor_1)
-// ENGINE.actors.push(actor_2)
 
 let game = new Game.Game({engine: ENGINE})
 

@@ -12,7 +12,7 @@ export class Game {
     display = new ROT.Display({ 
       forceSquareRatio: true, 
       fontSize: 24, 
-      bg: 'black' 
+      bg: '#363636' 
     }),
     tileKey = Constant.TILE_KEY,
   }) {
@@ -20,6 +20,15 @@ export class Game {
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
+  }
+
+  randomlyPlaceActorsOnMap() {
+    this.engine.actors.forEach((actor) => {
+      let pos = Helper.getRandomPos(this.map).coordinates
+      let tile = this.map[Helper.coordsToString(pos)]
+      actor.pos = {...pos}
+      tile.entities.push(actor);
+    })
   }
 
   placeActorsOnMap() {
@@ -42,11 +51,11 @@ export class Game {
       freeCells.push(key);
     }
     digger.create(digCallback.bind(this));
-    this.map[`10,11`] = {
+    this.map[`10,10`] = {
       type: 'WIN',
       entities:[],
     }
-    this.placeActorsOnMap()
+    this.randomlyPlaceActorsOnMap()
   }
 
   canOccupyPosition (pos) {
@@ -77,6 +86,16 @@ export class Game {
       let y = parseInt(parts[1]);
       let tile = this.map[key];
       let { character, foreground, background } = this.tileKey[tile.type]
+
+      // Proto code to handle tile animations
+      // let tileRenderer = this.tileKey[tile.type]
+      // if (tileRenderer.animation) {
+      //   let frame = Helper.getRandomInArray(tileRenderer.animation);
+      //   character = frame.character;
+      //   foreground = frame.foreground;
+      //   background = frame.background;
+      // }
+
       if (tile.entities.length > 0) {
         let entity = tile.entities[tile.entities.length - 1]
         character = entity.renderer.character
@@ -120,6 +139,49 @@ const walk = (direction, engine) => {
   }))
 }
 
+const sign = (sign, engine) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.Sign({
+    sign,
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
+const signRelease = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.SignRelease({
+    requiredSequence: [
+      Constant.HAND_SIGNS.Power,
+      Constant.HAND_SIGNS.Healing,
+    ],
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
+const charge = (engine, chargeAmount) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.Charge({
+    chargeAmount,
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
+const release = (engine, chargeCost) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.Release({
+    chargeCost,
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
 const die = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.destroy();
@@ -127,7 +189,7 @@ const die = (engine) => {
 
 const throwKunai = (engine, targetPos) => {
   let actor = engine.actors[engine.currentActor];
-  let kunai = new Entity.Projectile({
+  let kunai = new Entity.DestructiveProjectile({
     game: engine.game,
     targetPos,
     pos: { x: actor.pos.x, y: actor.pos.y},
@@ -176,7 +238,6 @@ const addActor = (game) => {
 }
 
 export const handleKeyPress = (event, engine) => {
-  console.log(event.key)
   if (!engine.isRunning) {
     let keyMap = {
       w: () => walk(Constant.DIRECTIONS.N, engine),
@@ -186,6 +247,12 @@ export const handleKeyPress = (event, engine) => {
       k: () => die(engine),
       t: () => throwKunai(engine, engine.actors[2].pos),
       y: () => addActor(engine.game),
+      c: () => charge(engine, 1),
+      // r: () => release(engine, 5),
+      '1': () => sign(Constant.HAND_SIGNS.Power, engine),
+      '2': () => sign(Constant.HAND_SIGNS.Healing, engine),
+      '3': () => sign(Constant.HAND_SIGNS.Absolute, engine),
+      r: () => signRelease(engine),
     };
 
     let code = event.key;
