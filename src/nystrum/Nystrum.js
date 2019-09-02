@@ -21,6 +21,7 @@ let actor_3 = new Entity.Player({
   speed: 500,
   durability: 1,
   container: [
+    Item.sword(ENGINE),
     Item.kunai(ENGINE),
     Item.kunai(ENGINE),
     Item.kunai(ENGINE),
@@ -30,6 +31,7 @@ let actor_3 = new Entity.Player({
 ENGINE.actors.push(actor_3)
 
 let game = new Game.Game({engine: ENGINE})
+
 
 class Nystrum extends React.Component {
   constructor(props) {

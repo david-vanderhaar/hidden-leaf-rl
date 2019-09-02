@@ -14,8 +14,27 @@ export class Entity {
   }
 }
 
+const Attacking = superclass => class extends superclass {
+  constructor({attackDamage = 1, ...args }) {
+    super({ ...args })
+    this.attackDamage = attackDamage;
+  }
+
+  getAttackDamage (additional = 0) {
+    return this.attackDamage + additional;
+  }
+}
+
+const Equipable = superclass => class extends superclass {
+  constructor({name = 'nameless', equipmentType = Constant.EQUIPMENT_TYPES.HAND, ...args }) {
+    super({ ...args })
+    this.name = name;
+    this.equipmentType = equipmentType;
+  }
+}
+
 const Acting = superclass => class extends superclass {
-  constructor({name, actions, speed, energy = 0, ...args}) {
+  constructor({name, actions = [], speed, energy = 0, ...args}) {
     super({...args})
     this.name = name;
     this.actions = actions;
@@ -71,28 +90,35 @@ const Containing = superclass => class extends superclass {
 }
 
 const Equiping = superclass => class extends superclass {
-  constructor({equiment = Constant.EQUIPMENT_LAYOUTS.human(), ...args}) {
+  constructor({equipment = Constant.EQUIPMENT_LAYOUTS.human(), ...args}) {
     super({...args})
-    this.equiment = equiment;
+    this.equipment = equipment;
+  }
+
+  getItemInSlot (slotName) {
+    let slot = this.equipment.find((slot) => slot.type === slotName);
+    if (!slot) { return false; }
+    if (!slot.item) { return false; }
+    return slot.item;
   }
 
   equip (slotName, item) {
-    let slot = this.equiment.find((slot) => slot.name === slotName);
-    if (slot.item) {
-      this.unequip(slot.name, slot.item);
-      this.equiment = this.equiment.map((equipmentSlot) => {
-        if (equipmentSlot.name === slotName) {
-          equipmentSlot.item = item;
-        }
-        return equipmentSlot;
-      })
-    }
+    let foundSlot = false;
+    this.equipment = this.equipment.map((equipmentSlot) => {
+      if (!foundSlot && equipmentSlot.type === slotName) {
+        equipmentSlot.item = item;
+        foundSlot = true;
+      }
+      return equipmentSlot;
+    })
   }
   
-  unequip(slotName) {
-    this.equiment = this.equiment.map((slot) => {
-      if (slot.name === slotName) {
-        slot.item = null;
+  unequip(item) {
+    this.equipment = this.equipment.map((slot) => {
+      if (slot.item) {
+        if (slot.item.id === item.id) {
+          slot.item = null;
+        }
       }
       return slot;
     })
@@ -267,6 +293,7 @@ const Destructable = superclass => class extends superclass {
 
 export const Actor = pipe(Acting, Rendering)(Entity);
 export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
-export const Player = pipe(Acting, Rendering, Destructable, Charging, Signing, Containing, Playing)(Entity);
+export const Player = pipe(Acting, Rendering, Destructable, Charging, Signing, Containing, Equiping, Attacking, Playing)(Entity);
 
+export const Weapon = pipe(Rendering, Equipable, Attacking)(Entity);
 export const DestructiveProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable)(Entity);

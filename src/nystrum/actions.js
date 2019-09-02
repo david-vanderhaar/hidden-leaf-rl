@@ -36,6 +36,84 @@ export class Say extends Base {
   }
 };
 
+export class EquipItemFromContainer extends Base {
+  // entities can only equip items from their container/inventory
+  constructor({ item, ...args }) {
+    super({ ...args });
+    this.item = item;
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    if (this.item.equipmentType) {
+      let itemInSlot = this.actor.getItemInSlot(this.item.equipmentType);
+      if (itemInSlot) {
+        this.actor.addToContainer(itemInSlot);
+      }
+      this.actor.removeFromContainer(this.item);
+      this.actor.equip(this.item.equipmentType, this.item);
+      console.log(`${this.actor.name} equips ${this.item.name}.`);
+      success = true;
+    }
+
+    this.actor.energy -= this.energyCost;
+    
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class EquipItemFromTile extends Base {
+  // entities can only equip items from their container/inventory
+  constructor({ item, ...args }) {
+    super({ ...args });
+    this.item = item;
+  }
+
+  perform () {
+    let success = false;
+    let alternative = null;
+    if (this.item.equipmentType) {
+      let itemInSlot = this.actor.getItemInSlot(this.item.equipmentType);
+      if (itemInSlot) {
+        this.game.map[Helper.coordsToString(this.actor.pos)].entities.push(itemInSlot);
+      }
+
+      let entities = this.game.map[Helper.coordsToString(this.actor.pos)].entities
+      this.game.map[Helper.coordsToString(this.actor.pos)].entities = entities.filter((it) => it.id !== this.item.id);
+      
+      this.actor.equip(this.item);
+      console.log(`${this.actor.name} equips ${this.item.name}.`);
+      success = true;
+    }
+
+    this.actor.energy -= this.energyCost;
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class UnequipItem extends Base {
+  constructor({ item, ...args }) {
+    super({ ...args });
+    this.item = item;
+  }
+  perform() {
+    console.log(`${this.actor.name} puts ${this.item.name} away.`);
+    this.actor.unequip(this.item);
+    this.actor.addToContainer(this.item);
+    this.actor.energy -= this.energyCost;
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
 export class DropItem extends Base {
   constructor({ item, ...args }) {
     super({ ...args });
@@ -191,12 +269,57 @@ export class Move extends Base {
       success = true;
     } else {
       success = true;
-      alternative = new Action.Say({
-        message: `Ooh I can\'t move there!`, 
+      alternative = new Action.Attack({
+        targetPos: this.targetPos,
         game: this.game, 
         actor: this.actor, 
         energyCost: Constant.ENERGY_THRESHOLD
       })
+      // alternative = new Action.Say({
+      //   message: `Ooh I can\'t move there!`, 
+      //   game: this.game, 
+      //   actor: this.actor, 
+      //   energyCost: Constant.ENERGY_THRESHOLD
+      // })
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class Attack extends Base {
+  constructor({ targetPos, processDelay = 25, ...args}) {
+    super({...args});
+    this.targetPos = targetPos
+    this.processDelay = processDelay
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    console.log(this.actor);
+    
+    if (!this.actor.hasOwnProperty('attackDamage')) { 
+      return { 
+        success: true, 
+        alternative: new Action.Say({
+          message: `Ooh I don\'t know how to attack`,
+          game: this.game,
+          actor: this.actor,
+        }), 
+      } 
+    }
+    let tile = this.game.map[Helper.coordsToString(this.targetPos)]
+    if (!tile) { return { success, alternative} }
+    let targets = Helper.getDestructableEntities(tile.entities);
+    if (targets.length > 0) {
+      let target = targets[0];
+      let damage = this.actor.getAttackDamage();
+      target.decreaseDurability(damage);
+      this.actor.energy -= this.energyCost;
+      success = true;
     }
 
     return {

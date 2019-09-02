@@ -218,6 +218,34 @@ const die = (engine) => {
   actor.destroy();
 }
 
+const equip = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let item = actor.container.find((item) => item.equipmentType === Constant.EQUIPMENT_TYPES.HAND);
+  if (item) {
+    actor.setNextAction(new Action.EquipItemFromContainer({
+      item,
+      game: engine.game,
+      actor,
+    }))
+  } else {
+    console.log('nothing to equip.');
+  }
+}
+
+const unequip = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let slot = actor.equipment.find((slot) => slot.item !== null);
+  if (slot) {
+    actor.setNextAction(new Action.UnequipItem({
+      item: slot.item,
+      game: engine.game,
+      actor,
+    }))
+  } else {
+    console.log('nothing to unequip.');
+  }
+}
+
 const throwKunai = (engine, targetPos) => {
   let actor = engine.actors[engine.currentActor];
   let kunai = actor.contains(Item.TYPE.KUNAI);
@@ -270,6 +298,8 @@ export const handleKeyPress = (event, engine) => {
       d: () => walk(Constant.DIRECTIONS.E, engine),
       s: () => walk(Constant.DIRECTIONS.S, engine),
       a: () => walk(Constant.DIRECTIONS.W, engine),
+      e: () => equip(engine),
+      q: () => unequip(engine),
       k: () => die(engine),
       i: () => dropRandom(engine),
       p: () => pickupRandom(engine),
