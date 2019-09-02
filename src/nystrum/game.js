@@ -198,6 +198,21 @@ const dropRandom = (engine) => {
   }
 }
 
+const pickupRandom = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let entities = engine.game.map[Helper.coordsToString(actor.pos)].entities.filter((e) => e.id !== actor.id);
+  if (entities.length > 0) {
+    actor.setNextAction(new Action.PickupItem({
+      item: Helper.getRandomInArray(entities),
+      game: engine.game,
+      actor,
+      energyCost: Constant.ENERGY_THRESHOLD
+    }))
+  } else {
+    console.log('nothing to pickup.');
+  }
+}
+
 const die = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.destroy();
@@ -257,6 +272,7 @@ export const handleKeyPress = (event, engine) => {
       a: () => walk(Constant.DIRECTIONS.W, engine),
       k: () => die(engine),
       i: () => dropRandom(engine),
+      p: () => pickupRandom(engine),
       t: () => throwKunai(engine, engine.actors[1].pos),
       y: () => addActor(engine.game),
       c: () => charge(engine, 1),

@@ -88,3 +88,24 @@ export const DIRECTIONS = {
   E: [1, 0],
   W: [-1, 0],
 }
+
+export const EQUIPMENT_TYPES = {
+  HEAD: 'HEAD',
+  TORSO: 'TORSO',
+  BACK: 'BACK',
+  HAND: 'HAND',
+  FEET: 'FEET',
+}
+
+export const EQUIPMENT_LAYOUTS = {
+  human: () => {
+    return [
+      {type: EQUIPMENT_TYPES.HEAD, name: 'head', item: null},
+      {type: EQUIPMENT_TYPES.TORSO, name: 'torso', item: null},
+      {type: EQUIPMENT_TYPES.BACK, name: 'back', item: null},
+      {type: EQUIPMENT_TYPES.HAND, name: 'left_hand', item: null},
+      {type: EQUIPMENT_TYPES.HAND, name: 'right_hand', item: null},
+      {type: EQUIPMENT_TYPES.FEET, name: 'feet', item: null},
+    ]
+  }
+}

@@ -70,20 +70,34 @@ const Containing = superclass => class extends superclass {
   }
 }
 
-// const Equiping = superclass => class extends superclass {
-//   constructor({container = [], ...args}) {
-//     super({...args})
-//     this.container = container;
-//   }
+const Equiping = superclass => class extends superclass {
+  constructor({equiment = Constant.EQUIPMENT_LAYOUTS.human(), ...args}) {
+    super({...args})
+    this.equiment = equiment;
+  }
 
-//   addToContainer (item) {
-//     this.container.push(item);
-//   }
+  equip (slotName, item) {
+    let slot = this.equiment.find((slot) => slot.name === slotName);
+    if (slot.item) {
+      this.unequip(slot.name, slot.item);
+      this.equiment = this.equiment.map((equipmentSlot) => {
+        if (equipmentSlot.name === slotName) {
+          equipmentSlot.item = item;
+        }
+        return equipmentSlot;
+      })
+    }
+  }
   
-//   removeFromContainer (id) {
-//     this.container = this.container.filter((item) => item.id !== id);
-//   }
-// }
+  unequip(slotName) {
+    this.equiment = this.equiment.map((slot) => {
+      if (slot.name === slotName) {
+        slot.item = null;
+      }
+      return slot;
+    })
+  }
+}
 
 const Charging = superclass => class extends superclass {
   constructor({charge = 10, ...args}) {

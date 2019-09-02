@@ -53,6 +53,24 @@ export class DropItem extends Base {
   }
 };
 
+export class PickupItem extends Base {
+  constructor({ item, ...args }) {
+    super({ ...args });
+    this.item = item;
+  }
+  perform() {
+    console.log(`${this.actor.name} picks up ${this.item.name}.`);
+    this.actor.addToContainer(this.item);
+    let entities = this.game.map[Helper.coordsToString(this.actor.pos)].entities
+    this.game.map[Helper.coordsToString(this.actor.pos)].entities = entities.filter((it) => it.id !== this.item.id);
+    this.actor.energy -= this.energyCost;
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
 export class DestroySelf extends Base {
   constructor({processDelay = 0, ...args}) {
     super({...args});
