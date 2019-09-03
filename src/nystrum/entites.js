@@ -3,20 +3,21 @@ import pipe from 'lodash/fp/pipe';
 import * as Helper from '../helper';
 import * as Constant from './constants';
 import * as Action from './actions';
-import * as ROT from 'rot-js';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
     let id = uuid();
+    this.entityTypes = ['Entity']
     this.id = id;
     this.game = game;
     this.passable = passable;
   }
 }
 
-const Attacking = superclass => class extends superclass {
+export const Attacking = superclass => class extends superclass {
   constructor({attackDamage = 1, ...args }) {
     super({ ...args })
+    this.entityTypes = this.entityTypes.concat('ATTACKING')
     this.attackDamage = attackDamage;
   }
 
@@ -25,9 +26,10 @@ const Attacking = superclass => class extends superclass {
   }
 }
 
-const Equipable = superclass => class extends superclass {
+export const Equipable = superclass => class extends superclass {
   constructor({name = 'nameless', equipmentType = Constant.EQUIPMENT_TYPES.HAND, ...args }) {
     super({ ...args })
+    this.entityTypes = this.entityTypes.concat('EQUIPABLE')
     this.name = name;
     this.equipmentType = equipmentType;
   }
@@ -36,6 +38,7 @@ const Equipable = superclass => class extends superclass {
 const Acting = superclass => class extends superclass {
   constructor({name, actions = [], speed, energy = 0, ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('ACTING')
     this.name = name;
     this.actions = actions;
     this.speed = speed;
@@ -59,6 +62,7 @@ const Acting = superclass => class extends superclass {
 const Rendering = superclass => class extends superclass {
   constructor({pos = {x: 0, y: 0}, renderer, ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('RENDERING')
     this.pos = pos;
     this.renderer = {...renderer};
   }
@@ -71,6 +75,7 @@ const Rendering = superclass => class extends superclass {
 const Containing = superclass => class extends superclass {
   constructor({container = [], ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('CONTAINING')
     this.container = container;
   }
 
@@ -92,10 +97,12 @@ const Containing = superclass => class extends superclass {
 const Equiping = superclass => class extends superclass {
   constructor({equipment = Constant.EQUIPMENT_LAYOUTS.human(), ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('EQUIPING')
     this.equipment = equipment;
   }
 
   getItemInSlot (slotName) {
+    if (this.equipment.filter((slot) => !slot.item && slot.type === slotName) <= 0) { return false }
     let slot = this.equipment.find((slot) => slot.type === slotName);
     if (!slot) { return false; }
     if (!slot.item) { return false; }
@@ -105,7 +112,7 @@ const Equiping = superclass => class extends superclass {
   equip (slotName, item) {
     let foundSlot = false;
     this.equipment = this.equipment.map((equipmentSlot) => {
-      if (!foundSlot && equipmentSlot.type === slotName) {
+      if (!foundSlot && equipmentSlot.type === slotName && !equipmentSlot.item) {
         equipmentSlot.item = item;
         foundSlot = true;
       }
@@ -128,6 +135,7 @@ const Equiping = superclass => class extends superclass {
 const Charging = superclass => class extends superclass {
   constructor({charge = 10, ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('CHARGING')
     this.charge = charge;
     this.chargeMax = charge;
   }
@@ -144,6 +152,7 @@ const Charging = superclass => class extends superclass {
 const Signing = superclass => class extends superclass {
   constructor({...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('SIGNING')
     this.signHistory = [];
   }
 
@@ -162,6 +171,7 @@ const Signing = superclass => class extends superclass {
 const Playing = superclass => class extends superclass {
   constructor({...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('PLAYING')
     this.nextAction = null;
   }
 
@@ -179,6 +189,7 @@ const Playing = superclass => class extends superclass {
 const Projecting = superclass => class extends superclass {
   constructor({path = [], targetPos = null ,...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('PROJECTING')
     this.path = path;
     this.targetPos = targetPos;
   }
@@ -203,9 +214,10 @@ const Projecting = superclass => class extends superclass {
   }
 }
 
-const DestructiveProjecting = (superclass) => class extends superclass {
+const DestructiveProjecting = superclass => class extends superclass {
   constructor({path = [], targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('DESTRUCTIVE_PROJECTING')
     this.path = path;
     this.targetPos = targetPos;
     this.attackDamage = attackDamage;
@@ -234,6 +246,7 @@ const DestructiveProjecting = (superclass) => class extends superclass {
 const Chasing = superclass => class extends superclass {
   constructor({targetEntity = null ,...args}) {
     super({...args})
+    this.entityTypes = this.entityTypes.concat('CHASING')
     this.targetEntity = targetEntity;
   }
 
@@ -254,6 +267,7 @@ const Chasing = superclass => class extends superclass {
 const Destructable = superclass => class extends superclass {
   constructor({durability = 1, ...args }) {
     super({ ...args })
+    this.entityTypes = this.entityTypes.concat('DESTRUCTABLE')
     this.durability = durability;
   }
 

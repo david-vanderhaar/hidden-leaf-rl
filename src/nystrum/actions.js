@@ -1,6 +1,7 @@
 import * as Helper from '../helper';
 import * as Action from './actions';
 import * as Constant from './constants';
+import * as Entity from './entites';
 
 export class Base {
   constructor({game, actor, energyCost = 100, processDelay = 50}) {
@@ -301,7 +302,7 @@ export class Attack extends Base {
     let alternative = null;
     console.log(this.actor);
     
-    if (!this.actor.hasOwnProperty('attackDamage')) { 
+    if (!this.actor.entityTypes.includes('ATTACKING')) { 
       return { 
         success: true, 
         alternative: new Action.Say({
@@ -317,6 +318,17 @@ export class Attack extends Base {
     if (targets.length > 0) {
       let target = targets[0];
       let damage = this.actor.getAttackDamage();
+      if (this.actor.entityTypes.includes('EQUIPING')) {
+        this.actor.equipment.map((slot) => {
+          if (slot.item) {
+            if (slot.item.entityTypes.includes('ATTACKING')) {
+              damage += slot.item.getAttackDamage();
+              
+            }
+          }
+        });
+      }
+      console.log(`${this.actor.name} does ${damage}.`);
       target.decreaseDurability(damage);
       this.actor.energy -= this.energyCost;
       success = true;
