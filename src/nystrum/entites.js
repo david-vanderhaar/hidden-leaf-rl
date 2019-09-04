@@ -102,7 +102,10 @@ const Equiping = superclass => class extends superclass {
   }
 
   getItemInSlot (slotName) {
-    if (this.equipment.filter((slot) => !slot.item && slot.type === slotName) <= 0) { return false }
+    let openSlots = this.equipment.filter((slot) => {
+      return (slot.item === null && slot.type === slotName)
+    })
+    if (openSlots.length > 0) { return false; }
     let slot = this.equipment.find((slot) => slot.type === slotName);
     if (!slot) { return false; }
     if (!slot.item) { return false; }
@@ -111,12 +114,12 @@ const Equiping = superclass => class extends superclass {
 
   equip (slotName, item) {
     let foundSlot = false;
-    this.equipment = this.equipment.map((equipmentSlot) => {
-      if (!foundSlot && equipmentSlot.type === slotName && !equipmentSlot.item) {
-        equipmentSlot.item = item;
+    this.equipment = this.equipment.map((slot) => {
+      if (!foundSlot && slot.type === slotName && slot.item === null) {
+        slot.item = item;
         foundSlot = true;
       }
-      return equipmentSlot;
+      return slot;
     })
   }
   

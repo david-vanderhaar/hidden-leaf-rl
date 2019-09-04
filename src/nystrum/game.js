@@ -286,6 +286,7 @@ const addActor = (game) => {
     name: 'Ross',
     game,
     actions: [],
+    durability: Helper.getRandomInArray([1, 2, 4, 8]),
     speed: 60,
   })
   game.addActor(actor);

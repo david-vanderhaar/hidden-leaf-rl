@@ -50,6 +50,7 @@ export class EquipItemFromContainer extends Base {
       let itemInSlot = this.actor.getItemInSlot(this.item.equipmentType);
       if (itemInSlot) {
         this.actor.addToContainer(itemInSlot);
+        this.actor.unequip(itemInSlot);
       }
       this.actor.removeFromContainer(this.item);
       this.actor.equip(this.item.equipmentType, this.item);
