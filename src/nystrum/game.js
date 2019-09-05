@@ -11,7 +11,7 @@ export class Game {
     engine = null,
     map = {},
     display = new ROT.Display({ 
-      forceSquareRatio: true, 
+      // forceSquareRatio: true, 
       fontSize: 24, 
       bg: '#363636' 
     }),
@@ -21,6 +21,7 @@ export class Game {
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
+    this.cursorIsActive = false;
   }
 
   randomlyPlaceActorsOnMap() {
@@ -37,6 +38,11 @@ export class Game {
       let tile = this.map[Helper.coordsToString(actor.pos)]
       tile.entities.push(actor);
     })
+  }
+
+  removeActorFromMap (actor) {
+    let tile = this.map[Helper.coordsToString(actor.pos)]
+    this.map[Helper.coordsToString(actor.pos)].entities = tile.entities.filter((ac) => ac.id !== actor.id);
   }
 
   createLevel () {
@@ -71,6 +77,16 @@ export class Game {
           result = true;
         }
       }
+    }
+
+    return result;
+  }
+
+  cursorCanOccupyPosition(pos) {
+    let result = false;
+    let targetTile = this.map[Helper.coordsToString(pos)];
+    if (targetTile) {
+      result = true;
     }
 
     return result;
@@ -116,6 +132,13 @@ export class Game {
     this.draw();
   }
 
+  removeActor (actor) {
+    this.engine.actors = this.engine.actors.filter((ac) => ac.id !== actor.id);
+    this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
+    this.removeActorFromMap(actor);
+    this.draw();
+  }
+
   initialize (presserRef) {
     this.engine.game = this;
     this.engine.actors.forEach((actor) => {
@@ -129,6 +152,18 @@ export class Game {
 }
 
 /************************** UI ********************************/
+const moveCursor = (direction, engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let newX = actor.pos.x + direction[0];
+  let newY = actor.pos.y + direction[1];
+  actor.setNextAction(new Action.UIMove({
+    targetPos: { x: newX, y: newY },
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
 const walk = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
   let newX = actor.pos.x + direction[0];
@@ -246,15 +281,19 @@ const unequip = (engine) => {
   }
 }
 
-const throwKunai = (engine, targetPos) => {
-  let actor = engine.actors[engine.currentActor];
+const throwKunai = (engine, actor) => {
+  let cursor = engine.actors[engine.currentActor];
+  cursor.active = false;
+  engine.game.cursorIsActive = false;
+  engine.game.removeActor(cursor);
   let kunai = actor.contains(Item.TYPE.KUNAI);
   if (kunai) {
     kunai.game = engine.game;
     kunai.pos = {...actor.pos};
-    kunai.targetPos = targetPos;
+    kunai.targetPos = {...cursor.pos};
     actor.removeFromContainer(kunai);
     engine.actors.push(kunai);
+    // engine.game.removeActor(cursor);
     kunai.createPath(engine.game);
     engine.game.placeActorsOnMap();
     engine.game.draw();
@@ -269,6 +308,27 @@ const throwKunai = (engine, targetPos) => {
   } else {
     console.log('I have no kunais left');
   }
+}
+
+const activateTargetCursor = (engine) => {
+  let game = engine.game;
+  game.cursorIsActive = true;
+  let currentActor = game.engine.actors[game.engine.currentActor]
+  let pos = currentActor.pos;
+
+  let cursor = new Entity.UISelector({
+    initiatedBy: currentActor,
+    pos,
+    renderer: {
+      character: '█',
+      color: 'white',
+      background: '',
+    },
+    name: 'Cursor',
+    game,
+  })
+  game.addActor(cursor);
+  game.engine.currentActor = game.engine.actors.length - 1
 }
 
 const addActor = (game) => {
@@ -294,25 +354,37 @@ const addActor = (game) => {
 
 export const handleKeyPress = (event, engine) => {
   if (!engine.isRunning) {
-    let keyMap = {
-      w: () => walk(Constant.DIRECTIONS.N, engine),
-      d: () => walk(Constant.DIRECTIONS.E, engine),
-      s: () => walk(Constant.DIRECTIONS.S, engine),
-      a: () => walk(Constant.DIRECTIONS.W, engine),
-      e: () => equip(engine),
-      q: () => unequip(engine),
-      k: () => die(engine),
-      i: () => dropRandom(engine),
-      p: () => pickupRandom(engine),
-      t: () => throwKunai(engine, engine.actors[1].pos),
-      y: () => addActor(engine.game),
-      c: () => charge(engine, 1),
-      // r: () => release(engine, 5),
-      '1': () => sign(Constant.HAND_SIGNS.Power, engine),
-      '2': () => sign(Constant.HAND_SIGNS.Healing, engine),
-      '3': () => sign(Constant.HAND_SIGNS.Absolute, engine),
-      r: () => signRelease(engine),
-    };
+    let keyMap = {};
+    if (engine.game.cursorIsActive) {
+      let cursor = engine.actors[engine.currentActor];
+      keyMap = {
+        w: () => moveCursor(Constant.DIRECTIONS.N, engine),
+        d: () => moveCursor(Constant.DIRECTIONS.E, engine),
+        s: () => moveCursor(Constant.DIRECTIONS.S, engine),
+        a: () => moveCursor(Constant.DIRECTIONS.W, engine),
+        t: () => throwKunai(engine, cursor.initiatedBy),
+      };
+    } else {
+      keyMap = {
+        w: () => walk(Constant.DIRECTIONS.N, engine),
+        d: () => walk(Constant.DIRECTIONS.E, engine),
+        s: () => walk(Constant.DIRECTIONS.S, engine),
+        a: () => walk(Constant.DIRECTIONS.W, engine),
+        e: () => equip(engine),
+        q: () => unequip(engine),
+        k: () => die(engine),
+        i: () => dropRandom(engine),
+        p: () => pickupRandom(engine),
+        t: () => activateTargetCursor(engine),
+        y: () => addActor(engine.game),
+        c: () => charge(engine, 1),
+        // r: () => release(engine, 5),
+        '1': () => sign(Constant.HAND_SIGNS.Power, engine),
+        '2': () => sign(Constant.HAND_SIGNS.Healing, engine),
+        '3': () => sign(Constant.HAND_SIGNS.Absolute, engine),
+        r: () => signRelease(engine),
+      };
+    } 
 
     let code = event.key;
     if (!(code in keyMap)) { return; }

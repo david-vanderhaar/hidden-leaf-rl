@@ -253,6 +253,31 @@ export class SignRelease extends Base {
   }
 };
 
+export class UIMove extends Base {
+  constructor({ targetPos, processDelay = 0, ...args}) {
+    super({...args});
+    this.targetPos = targetPos
+    this.processDelay = processDelay
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+
+    if (this.game.cursorCanOccupyPosition(this.targetPos)) {
+      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
+      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
+      this.actor.pos = this.targetPos
+      this.game.map[Helper.coordsToString(this.targetPos)].entities.push(this.actor);
+      success = true;
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
 export class Move extends Base {
   constructor({ targetPos, processDelay = 25, ...args}) {
     super({...args});
@@ -277,12 +302,6 @@ export class Move extends Base {
         actor: this.actor, 
         energyCost: Constant.ENERGY_THRESHOLD
       })
-      // alternative = new Action.Say({
-      //   message: `Ooh I can\'t move there!`, 
-      //   game: this.game, 
-      //   actor: this.actor, 
-      //   energyCost: Constant.ENERGY_THRESHOLD
-      // })
     }
 
     return {
@@ -301,7 +320,6 @@ export class Attack extends Base {
   perform() {
     let success = false;
     let alternative = null;
-    console.log(this.actor);
     
     if (!this.actor.entityTypes.includes('ATTACKING')) { 
       return { 

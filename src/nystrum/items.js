@@ -19,6 +19,7 @@ export const kunai = (engine, actor, targetPos) => new Entity.DestructiveProject
   },
   name: TYPE.KUNAI,
   speed: 500,
+  range: 10,
 })
 
 export const sword = (engine) => new Entity.Weapon({

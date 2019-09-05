@@ -14,6 +14,19 @@ export class Entity {
   }
 }
 
+const UI = superclass => class extends superclass {
+  constructor({ initiatedBy = null, ...args }) {
+    super({...args })
+    this.entityTypes = this.entityTypes.concat('UI');
+    this.initiatedBy = initiatedBy;
+    this.active = true;
+  }
+
+  hasEnoughEnergy() {
+    return this.active;
+  }
+}
+
 export const Attacking = superclass => class extends superclass {
   constructor({attackDamage = 1, ...args }) {
     super({ ...args })
@@ -307,6 +320,8 @@ const Destructable = superclass => class extends superclass {
   //   this.game.draw()
   // }
 }
+
+export const UISelector = pipe(Acting, Rendering, Playing, UI)(Entity);
 
 export const Actor = pipe(Acting, Rendering)(Entity);
 export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
