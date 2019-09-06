@@ -18,7 +18,6 @@ export class Game {
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
-    this.cursorIsActive = false;
   }
 
   randomlyPlaceActorsOnMap() {
@@ -48,8 +47,16 @@ export class Game {
     let digCallback = function (x, y, value) {
       if (value) { return; }
       let key = x + "," + y;
+      let type = 'GROUND';
+      let currentFrame = 0;
+
+      if (Constant.TILE_KEY[type].animation) {
+        currentFrame = Helper.getRandomInt(0, Constant.TILE_KEY[type].animation.length)
+      }
+
       this.map[key] = {
-        type: 'WATER',
+        type,
+        currentFrame,
         entities: [],
       };
       freeCells.push(key);
@@ -102,13 +109,15 @@ export class Game {
       let { character, foreground, background } = this.tileKey[tile.type]
 
       // Proto code to handle tile animations
-      let tileRenderer = this.tileKey[tile.type]
-      if (tileRenderer.animation) {
-        let frame = Helper.getRandomInArray(tileRenderer.animation);
-        character = frame.character;
-        foreground = frame.foreground;
-        background = frame.background;
-      }
+      // let tileRenderer = this.tileKey[tile.type]
+      // if (tileRenderer.animation) {
+      //   let frame = tileRenderer.animation[tile.currentFrame];
+        
+      //   character = frame.character;
+      //   foreground = frame.foreground;
+      //   background = frame.background;
+      //   tile.currentFrame = (tile.currentFrame + 1) % tileRenderer.animation.length;
+      // }
 
       if (tile.entities.length > 0) {
         let entity = tile.entities[tile.entities.length - 1]

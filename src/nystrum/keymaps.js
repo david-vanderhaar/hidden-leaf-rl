@@ -4,17 +4,57 @@ import * as Helper from '../helper';
 import * as Entity from './entites';
 import * as Item from './items';
 
+/******************** UI ********************/
 const moveCursor = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
   let newX = actor.pos.x + direction[0];
   let newY = actor.pos.y + direction[1];
-  actor.setNextAction(new Action.UIMove({
+  actor.setNextAction(new Action.CursorMove({
     targetPos: { x: newX, y: newY },
     game: engine.game,
     actor,
     energyCost: Constant.ENERGY_THRESHOLD
   }))
 }
+
+const throwKunai = (engine, actor) => {
+  let cursor = engine.actors[engine.currentActor];
+  cursor.active = false;
+  engine.game.removeActor(cursor);
+  let kunai = actor.contains(Item.TYPE.KUNAI);
+  if (kunai) {
+    kunai.game = engine.game;
+    kunai.pos = { ...actor.pos };
+    kunai.targetPos = { ...cursor.pos };
+    actor.removeFromContainer(kunai);
+    engine.actors.push(kunai);
+    kunai.createPath(engine.game);
+    engine.game.placeActorsOnMap();
+    engine.game.draw();
+    actor.setNextAction(
+      new Action.Say({
+        message: `I'll get you with this kunai!`,
+        game: engine.game,
+        actor,
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    )
+  } else {
+    console.log('I have no kunais left');
+  }
+}
+
+export const cursorToThrowItem = (engine, initiatedBy) => {
+  return {
+    w: () => moveCursor(Constant.DIRECTIONS.N, engine),
+    d: () => moveCursor(Constant.DIRECTIONS.E, engine),
+    s: () => moveCursor(Constant.DIRECTIONS.S, engine),
+    a: () => moveCursor(Constant.DIRECTIONS.W, engine),
+    t: () => throwKunai(engine, initiatedBy),
+  };
+}
+
+/******************** PLAYER ********************/
 
 const walk = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
@@ -105,6 +145,14 @@ const die = (engine) => {
   actor.destroy();
 }
 
+const cloneSelf = (engine) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.CloneSelf({
+    game: engine.game,
+    actor,
+  }))
+}
+
 const equip = (engine) => {
   let actor = engine.actors[engine.currentActor];
   let item = actor.container.find((item) => item.equipmentType === Constant.EQUIPMENT_TYPES.HAND);
@@ -133,37 +181,8 @@ const unequip = (engine) => {
   }
 }
 
-const throwKunai = (engine, actor) => {
-  let cursor = engine.actors[engine.currentActor];
-  cursor.active = false;
-  engine.game.cursorIsActive = false;
-  engine.game.removeActor(cursor);
-  let kunai = actor.contains(Item.TYPE.KUNAI);
-  if (kunai) {
-    kunai.game = engine.game;
-    kunai.pos = { ...actor.pos };
-    kunai.targetPos = { ...cursor.pos };
-    actor.removeFromContainer(kunai);
-    engine.actors.push(kunai);
-    kunai.createPath(engine.game);
-    engine.game.placeActorsOnMap();
-    engine.game.draw();
-    actor.setNextAction(
-      new Action.Say({
-        message: `I'll get you with this kunai!`,
-        game: engine.game,
-        actor,
-        energyCost: Constant.ENERGY_THRESHOLD
-      })
-    )
-  } else {
-    console.log('I have no kunais left');
-  }
-}
-
 const activateThrowCursor = (engine) => {
   let game = engine.game;
-  game.cursorIsActive = true;
   let currentActor = game.engine.actors[game.engine.currentActor]
   let pos = currentActor.pos;
 
@@ -204,16 +223,6 @@ const addActor = (game) => {
   game.addActor(actor);
 }
 
-export const cursorToThrowItem = (engine, initiatedBy) => {
-  return {
-    w: () => moveCursor(Constant.DIRECTIONS.N, engine),
-    d: () => moveCursor(Constant.DIRECTIONS.E, engine),
-    s: () => moveCursor(Constant.DIRECTIONS.S, engine),
-    a: () => moveCursor(Constant.DIRECTIONS.W, engine),
-    t: () => throwKunai(engine, initiatedBy),
-  };
-}
-
 export const player = (engine) => {
   return {
     w: () => walk(Constant.DIRECTIONS.N, engine),
@@ -222,7 +231,8 @@ export const player = (engine) => {
     a: () => walk(Constant.DIRECTIONS.W, engine),
     e: () => equip(engine),
     q: () => unequip(engine),
-    k: () => die(engine),
+    k: () => cloneSelf(engine),
+    // k: () => die(engine),
     i: () => dropRandom(engine),
     p: () => pickupRandom(engine),
     t: () => activateThrowCursor(engine),

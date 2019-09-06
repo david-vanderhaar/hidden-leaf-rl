@@ -8,6 +8,12 @@ export const getRandomInArray = (array) => {
   return array[Math.floor(Math.random() * array.length)];
 }
 
+export const getRandomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 export const coordsToString = (coords) => `${coords.x},${coords.y}`
 
 export const calculatePath = (game, targetPos, currentPos, topology = 4) => {

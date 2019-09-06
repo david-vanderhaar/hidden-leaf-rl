@@ -2,6 +2,8 @@ import * as Helper from '../helper';
 import * as Action from './actions';
 import * as Constant from './constants';
 import * as Entity from './entites';
+import { cloneDeep } from 'lodash';
+import uuid from 'uuid/v1';
 
 export class Base {
   constructor({game, actor, energyCost = 100, processDelay = 50}) {
@@ -167,6 +169,25 @@ export class DestroySelf extends Base {
   }
 };
 
+export class CloneSelf extends Base {
+  constructor({processDelay = 0, ...args}) {
+    super({...args});
+    this.processDelay = processDelay
+  }
+  perform() {
+    this.actor.energy -= this.energyCost;
+    console.log(`${this.actor.name} is cloning itself`);
+    let clone = cloneDeep(this.actor);
+    clone.game = this.actor.game;
+    clone.id = uuid();
+    this.game.addActor(clone);
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
 export class Charge extends Base {
   constructor({chargeAmount, ...args}) {
     super({...args});
@@ -253,7 +274,7 @@ export class SignRelease extends Base {
   }
 };
 
-export class UIMove extends Base {
+export class CursorMove extends Base {
   constructor({ targetPos, processDelay = 0, ...args}) {
     super({...args});
     this.targetPos = targetPos
