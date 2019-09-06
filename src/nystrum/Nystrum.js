@@ -1,11 +1,9 @@
 import React from 'react';
-import * as Constant from './constants';
+import * as Keymap from './keymaps';
 import * as Engine from './engine';
-import * as Action from './actions';
 import * as Item from './items';
 import * as Entity from './entites';
 import * as Game from './game';
-import * as Helper from '../helper';
 
 let ENGINE = new Engine.Engine();
 
@@ -27,7 +25,8 @@ let actor_3 = new Entity.Player({
     Item.kunai(ENGINE),
     Item.kunai(ENGINE),
     Item.kunai(ENGINE),
-  ]
+  ],
+  keyMap: Keymap.player(ENGINE),
 })
 
 ENGINE.actors.push(actor_3)

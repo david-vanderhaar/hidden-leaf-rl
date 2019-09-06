@@ -185,10 +185,11 @@ const Signing = superclass => class extends superclass {
 }
 
 const Playing = superclass => class extends superclass {
-  constructor({...args}) {
+  constructor({keyMap = {}, ...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('PLAYING')
     this.nextAction = null;
+    this.keyMap = keyMap;
   }
 
     setNextAction(action) {
@@ -321,7 +322,7 @@ const Destructable = superclass => class extends superclass {
   // }
 }
 
-export const UISelector = pipe(Acting, Rendering, Playing, UI)(Entity);
+export const UI_Cursor = pipe(Acting, Rendering, Playing, UI)(Entity);
 
 export const Actor = pipe(Acting, Rendering)(Entity);
 export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
