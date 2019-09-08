@@ -16,15 +16,14 @@ let actor_3 = new Entity.Player({
   },
   name: 'Player',
   actions: [],
-  speed: 500,
+  speed: 200,
   durability: 1,
   container: [
     Item.sword(ENGINE),
     Item.sword(ENGINE),
     Item.sword(ENGINE),
-    Item.kunai(ENGINE),
-    Item.kunai(ENGINE),
-    Item.kunai(ENGINE),
+    // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
+    ...Array(10).fill('').map(() => Item.fireball(ENGINE)),
   ],
   keyMap: Keymap.player(ENGINE),
 })

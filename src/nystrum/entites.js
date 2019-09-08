@@ -3,6 +3,7 @@ import pipe from 'lodash/fp/pipe';
 import * as Helper from '../helper';
 import * as Constant from './constants';
 import * as Action from './actions';
+import { cloneDeep } from 'lodash';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
@@ -231,6 +232,8 @@ const Projecting = superclass => class extends superclass {
   }
 }
 
+
+
 const DestructiveProjecting = superclass => class extends superclass {
   constructor({path = [], targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
@@ -256,6 +259,90 @@ const DestructiveProjecting = superclass => class extends superclass {
       energyCost: Constant.ENERGY_THRESHOLD
     });
 
+    return result;
+  }
+}
+
+const Cloning = superclass => class extends superclass {
+  constructor({isClone = false, clones = 0, cloneLimit = 1, clonePattern = [], ...args}) {
+    super({...args})
+    this.entityTypes = this.entityTypes.concat('CLONING')
+    this.isClone = isClone;
+    this.clones = clones;
+    this.cloneLimit = cloneLimit;
+    this.clonePattern = cloneDeep(clonePattern);
+    // this.clonePattern = [
+    //   {
+    //     x: 0,
+    //     y: 1,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: 1,
+    //     y: 1,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: 1,
+    //     y: 0,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: 1,
+    //     y: -1,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: 0,
+    //     y: -1,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: -1,
+    //     y: -1,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: -1,
+    //     y: 0,
+    //     taken: false,
+    //   },
+    //   {
+    //     x: -1,
+    //     y: 1,
+    //     taken: false,
+    //   },
+    // ];
+  }
+
+  getAction (game) {
+    let offset = this.clonePattern.find((pos) => !pos.taken);
+    if (!this.isClone && this.clones < this.cloneLimit && offset) {
+      offset.taken = true
+      let clone = cloneDeep(this);
+      clone.game = game;
+      clone.id = uuid();
+      if (this.hasOwnProperty('pos')) {
+        let referencePos = this.pos
+        clone.pos = {
+          x: referencePos.x + offset.x,
+          y: referencePos.y + offset.y
+        }
+      }
+      if (clone.hasOwnProperty('path')) {
+        clone.path = clone.path.map((pos) => {
+          return {
+            x: pos.x + offset.x,
+            y: pos.y + offset.y
+          }
+        })
+      }
+      clone.isClone = true
+      this.clones += 1
+      game.addActor(clone);
+    }
+
+    let result = super.getAction(game);
     return result;
   }
 }
@@ -330,3 +417,4 @@ export const Player = pipe(Acting, Rendering, Destructable, Charging, Signing, C
 
 export const Weapon = pipe(Rendering, Equipable, Attacking)(Entity);
 export const DestructiveProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable)(Entity);
+export const DestructiveCloudProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable, Cloning)(Entity);

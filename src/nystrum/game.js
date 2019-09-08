@@ -32,7 +32,11 @@ export class Game {
   placeActorsOnMap() {
     this.engine.actors.forEach((actor) => {
       let tile = this.map[Helper.coordsToString(actor.pos)]
-      tile.entities.push(actor);
+      if (tile) {
+        tile.entities.push(actor);
+      } else {
+        console.log(`could not place ${actor.id}: ${actor.name} on map`);
+      }
     })
   }
 
@@ -139,7 +143,7 @@ export class Game {
 
   removeActor (actor) {
     this.engine.actors = this.engine.actors.filter((ac) => ac.id !== actor.id);
-    this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
+    // this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
     this.removeActorFromMap(actor);
     this.draw();
   }

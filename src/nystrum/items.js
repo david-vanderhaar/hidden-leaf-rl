@@ -13,13 +13,32 @@ export const kunai = (engine, actor, targetPos) => new Entity.DestructiveProject
   passable: true,
   pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,
   renderer: {
-    character: '>',
+    // character: '>',
+    character: '🗡️',
     color: 'white',
     background: '',
   },
   name: TYPE.KUNAI,
   speed: 500,
   range: 10,
+})
+
+export const fireball = (engine, actor, targetPos) => new Entity.DestructiveCloudProjectile({
+  game: engine.game,
+  targetPos,
+  passable: true,
+  pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,
+  renderer: {
+    // character: '@',
+    character: '🔥',
+    color: 'wheat',
+    background: 'tomato',
+  },
+  name: TYPE.KUNAI,
+  speed: 100,
+  range: 10,
+  cloneLimit: 7,
+  clonePattern: Constant.CLONE_PATTERNS.square,
 })
 
 export const sword = (engine) => new Entity.Weapon({
@@ -29,7 +48,8 @@ export const sword = (engine) => new Entity.Weapon({
   attackDamage: 1,
   equipmentType: Constant.EQUIPMENT_TYPES.HAND,
   renderer: {
-    character: '|',
+    // character: '|',
+    character: '🗡️',
     color: 'white',
     background: '',
   },

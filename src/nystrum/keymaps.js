@@ -20,11 +20,18 @@ const moveCursor = (direction, engine) => {
 const throwKunai = (engine, actor) => {
   let cursor = engine.actors[engine.currentActor];
   cursor.active = false;
+  let throwDirection = {
+    x: Math.sign(cursor.pos.x - actor.pos.x),
+    y: Math.sign(cursor.pos.y - actor.pos.y),
+  }
   engine.game.removeActor(cursor);
   let kunai = actor.contains(Item.TYPE.KUNAI);
   if (kunai) {
     kunai.game = engine.game;
-    kunai.pos = { ...actor.pos };
+    kunai.pos = { 
+      x: actor.pos.x + throwDirection.x,  
+      y: actor.pos.y + throwDirection.y,  
+    };
     kunai.targetPos = { ...cursor.pos };
     actor.removeFromContainer(kunai);
     engine.actors.push(kunai);

@@ -109,3 +109,48 @@ export const EQUIPMENT_LAYOUTS = {
     ]
   }
 }
+
+export const CLONE_PATTERNS = {
+  square: [
+    {
+      x: 0,
+      y: 1,
+      taken: false,
+    },
+    {
+      x: 1,
+      y: 1,
+      taken: false,
+    },
+    {
+      x: 1,
+      y: 0,
+      taken: false,
+    },
+    {
+      x: 1,
+      y: -1,
+      taken: false,
+    },
+    {
+      x: 0,
+      y: -1,
+      taken: false,
+    },
+    {
+      x: -1,
+      y: -1,
+      taken: false,
+    },
+    {
+      x: -1,
+      y: 0,
+      taken: false,
+    },
+    {
+      x: -1,
+      y: 1,
+      taken: false,
+    },
+  ],
+}

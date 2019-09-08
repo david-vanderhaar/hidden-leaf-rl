@@ -323,6 +323,11 @@ export class Move extends Base {
         actor: this.actor, 
         energyCost: Constant.ENERGY_THRESHOLD
       })
+      // alternative = new Action.Say({
+      //   message: `Ooh I cant move there`,
+      //   game: this.game,
+      //   actor: this.actor,
+      // });
     }
 
     return {
@@ -381,6 +386,42 @@ export class Attack extends Base {
   }
 };
 
+// export class ThrowDestructable extends Move {
+//   constructor({ ...args }) {
+//     super({ ...args });
+//   }
+
+//   perform () {
+//     let success = false;
+//     let alternative = null;
+//     this.actor.passable = false;
+//     let move_result = super.perform();
+//     if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+//       this.actor.path.shift();
+//       success = true;
+//     } else {
+//       let tile = this.game.map[Helper.coordsToString(this.targetPos)];
+//       if (tile) {
+//         let entities = Helper.getDestructableEntities(tile.entities);
+//         if (entities.length > 0) {
+//           entities[0].decreaseDurability(this.actor.attackDamage);
+//         }
+//       }
+//       success = true;
+//       alternative = new Action.DestroySelf({
+//         game: this.game,
+//         actor: this.actor,
+//         energyCost: Constant.ENERGY_THRESHOLD,
+//       });
+//     }
+
+//     return {
+//       success,
+//       alternative,
+//     }
+//   }
+// }
+
 export class ThrowDestructable extends Move {
   constructor({ ...args }) {
     super({ ...args });
@@ -391,20 +432,28 @@ export class ThrowDestructable extends Move {
     let alternative = null;
     this.actor.passable = false;
     let move_result = super.perform();
-    if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+    // if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+    if (move_result.success) {
       this.actor.path.shift();
       success = true;
-    } else {
-      let entities = Helper.getDestructableEntities(this.game.map[Helper.coordsToString(this.targetPos)].entities);
-      if (entities.length > 0) {
-        entities[0].decreaseDurability(this.actor.attackDamage);
-      }
+    } 
+    if (this.actor.path.length === 0) {
       success = true;
       alternative = new Action.DestroySelf({
         game: this.game,
         actor: this.actor,
         energyCost: Constant.ENERGY_THRESHOLD,
       });
+    }
+    if (move_result.alternative) {
+      let tile = this.game.map[Helper.coordsToString(this.targetPos)];
+      if (tile) {
+        let entities = Helper.getDestructableEntities(tile.entities);
+        if (entities.length > 0) {
+          entities[0].decreaseDurability(this.actor.attackDamage);
+          // this.actor.decreaseDurability(this.actor.attackDamage);
+        }
+      }
     }
 
     return {
