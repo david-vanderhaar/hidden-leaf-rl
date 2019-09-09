@@ -5,7 +5,7 @@ import * as Item from './items';
 import * as Entity from './entites';
 import * as Game from './game';
 
-let ENGINE = new Engine.Engine();
+let ENGINE = new Engine.Engine({});
 
 let actor_3 = new Entity.Player({
   pos: { x: 23, y: 7 },
@@ -16,7 +16,7 @@ let actor_3 = new Entity.Player({
   },
   name: 'Player',
   actions: [],
-  speed: 200,
+  speed: 600,
   durability: 1,
   container: [
     Item.sword(ENGINE),
@@ -24,6 +24,7 @@ let actor_3 = new Entity.Player({
     Item.sword(ENGINE),
     // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
     ...Array(10).fill('').map(() => Item.fireball(ENGINE)),
+    // ...Array(10).fill('').map(() => Item.waterball(ENGINE)),
   ],
   keyMap: Keymap.player(ENGINE),
 })
@@ -31,7 +32,6 @@ let actor_3 = new Entity.Player({
 ENGINE.actors.push(actor_3)
 
 let game = new Game.Game({engine: ENGINE})
-
 
 class Nystrum extends React.Component {
   constructor(props) {

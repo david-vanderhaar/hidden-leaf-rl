@@ -51,13 +51,42 @@ const throwKunai = (engine, actor) => {
   }
 }
 
+const throwKunaiCloud = (engine, actor) => {
+  let cursor = engine.actors[engine.currentActor];
+  cursor.active = false;
+  let throwDirection = {
+    x: Math.sign(cursor.pos.x - actor.pos.x),
+    y: Math.sign(cursor.pos.y - actor.pos.y),
+  }
+  engine.game.removeActor(cursor);
+  let cloud = Item.kunaiCloud(engine, actor, {...cursor.pos});
+  if (cloud) {
+    cloud.pos = { 
+      x: actor.pos.x + throwDirection.x,  
+      y: actor.pos.y + throwDirection.y,  
+    };
+    engine.actors.push(cloud);
+    actor.setNextAction(
+      new Action.Say({
+        message: `I'll get you with these kunai!`,
+        game: engine.game,
+        actor,
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    )
+  } else {
+    console.log('I have no kunais left');
+  }
+}
+
 export const cursorToThrowItem = (engine, initiatedBy) => {
   return {
     w: () => moveCursor(Constant.DIRECTIONS.N, engine),
     d: () => moveCursor(Constant.DIRECTIONS.E, engine),
     s: () => moveCursor(Constant.DIRECTIONS.S, engine),
     a: () => moveCursor(Constant.DIRECTIONS.W, engine),
-    t: () => throwKunai(engine, initiatedBy),
+    t: () => throwKunaiCloud(engine, initiatedBy),
+    // t: () => throwKunai(engine, initiatedBy),
   };
 }
 

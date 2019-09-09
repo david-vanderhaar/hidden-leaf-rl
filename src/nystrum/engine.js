@@ -1,11 +1,16 @@
 import * as Helper from '../helper';
 
 export class Engine {
-  constructor() {
-    this.actors = [];
-    this.currentActor = 0;
-    this.isRunning = false;
-    this.game = null;
+  constructor({
+    actors = [],
+    currentActor = 0,
+    isRunning = false,
+    game = null,
+  }) {
+    this.actors = actors;
+    this.currentActor = currentActor;
+    this.isRunning = isRunning;
+    this.game = game;
   }
 
   async processV1 () { // a turn-based system using speed and round-robin
@@ -35,7 +40,7 @@ export class Engine {
         let action = actor.getAction(this.game);
         if (!action) { return false; } // if no action given, kick out to UI input
         while (true) {
-          let result = action.perform();
+          let result = await action.perform();
           this.game.draw();
           await Helper.delay(action.processDelay);
           if (!result.success) return false;
@@ -53,16 +58,46 @@ export class Engine {
 
   async start() {
     this.isRunning = true;
-    let i = 0
-    
     while (this.isRunning) {
       this.isRunning = await this.process();
     }
-    
-    // invoke UI input here, it should set next action of Hero and start() engine again.
   }
 
   stop() {
     this.isRunning = false;
+  }
+}
+
+export class CrankEngine extends Engine {
+  async process() { // a turn-based system using speed and Action Points
+    let actor = this.actors[this.currentActor]
+    console.log(actor);
+    
+    let acting = true;
+    while (acting) {
+      if (actor.hasEnoughEnergy()) {
+        let action = actor.getAction(this.game);
+        if (!action) { return false; } // if no action given, kick out to UI input
+        while (true) {
+          let result = await action.perform();
+          this.game.draw();
+          // await Helper.delay(action.processDelay);
+          if (!result.success) return false;
+          if (result.alternative === null) break;
+          action = result.alternative;
+        }
+      } else {
+        // actor.gainEnergy(actor.speed);
+        acting = false;
+      }
+    }
+    // this.currentActor = (this.currentActor + 1) % this.actors.length;
+    this.currentActor += 1;
+    if (this.currentActor + 1 >= this.actors.length) {
+      this.currentActor = 0;
+      this.actors.forEach((actor) => actor.gainEnergy(actor.speed));
+      return false;
+    }
+    return true
   }
 }

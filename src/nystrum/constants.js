@@ -112,45 +112,31 @@ export const EQUIPMENT_LAYOUTS = {
 
 export const CLONE_PATTERNS = {
   square: [
-    {
-      x: 0,
-      y: 1,
-      taken: false,
-    },
-    {
-      x: 1,
-      y: 1,
-      taken: false,
-    },
-    {
-      x: 1,
-      y: 0,
-      taken: false,
-    },
-    {
-      x: 1,
-      y: -1,
-      taken: false,
-    },
-    {
-      x: 0,
-      y: -1,
-      taken: false,
-    },
-    {
-      x: -1,
-      y: -1,
-      taken: false,
-    },
-    {
-      x: -1,
-      y: 0,
-      taken: false,
-    },
-    {
-      x: -1,
-      y: 1,
-      taken: false,
-    },
+    { x: 0, y: 1, taken: false, },
+    { x: 1, y: 1, taken: false, },
+    { x: 1, y: 0, taken: false, },
+    { x: 1, y: -1, taken: false, },
+    { x: 0, y: -1, taken: false, },
+    { x: -1, y: -1, taken: false, },
+    { x: -1, y: 0, taken: false, },
+    { x: -1, y: 1, taken: false, },
+  ],
+  bigSquare: [
+    { x: 0, y: 1, taken: false, },
+    { x: 1, y: 1, taken: false, },
+    { x: 1, y: 0, taken: false, },
+    { x: 1, y: -1, taken: false, },
+    { x: 0, y: -1, taken: false, },
+    { x: -1, y: -1, taken: false, },
+    { x: -1, y: 0, taken: false, },
+    { x: -1, y: 1, taken: false, },
+    { x: 0, y: 1, taken: false, },
+    { x: 2, y: 2, taken: false, },
+    { x: 2, y: 0, taken: false, },
+    { x: 2, y: -2, taken: false, },
+    { x: 0, y: -2, taken: false, },
+    { x: -2, y: -2, taken: false, },
+    { x: -2, y: 0, taken: false, },
+    { x: -2, y: 2, taken: false, },
   ],
 }

@@ -3,7 +3,8 @@ import pipe from 'lodash/fp/pipe';
 import * as Helper from '../helper';
 import * as Constant from './constants';
 import * as Action from './actions';
-import { cloneDeep } from 'lodash';
+import * as Engine from './engine';
+import { cloneDeep, cloneDeepWith } from 'lodash';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
@@ -13,6 +14,53 @@ export class Entity {
     this.game = game;
     this.passable = passable;
   }
+}
+
+const Parent = superclass => class extends superclass {
+  constructor({ children = [], engine = new Engine.CrankEngine({}), ...args }) {
+    super({...args })
+    this.entityTypes = this.entityTypes.concat('PARENT');
+    this.children = children;
+    this.engine = engine;
+    this.isInitialized = false;
+  }
+
+  destroyChild(child) {
+    child.energy = 0;
+    let tile = this.game.map[Helper.coordsToString(child.pos)];
+    this.game.map[Helper.coordsToString(child.pos)].entities = tile.entities.filter((e) => e.id !== child.id);
+    this.engine.actors = this.engine.actors.filter((e) => e.id !== child.id);
+    // this.game.engine.currentActor = 0;
+    this.game.draw()
+  }
+
+  initialize() {
+    this.isInitialized = true;
+    this.engine.game = this.game;
+    this.engine.actors = this.children;
+    this.engine.actors.forEach((actor) => {
+      actor.game = this.game;
+      actor.destroy = () => {this.destroyChild(actor)};
+      this.game.addActor(actor, this.engine);
+    });
+  }
+
+  getAction(game) {
+    // crank engine one turn
+    if (!this.isInitialized) {
+      this.initialize()
+    }
+
+    let result = new Action.CrankEngine({
+      game,
+      actor: this,
+      engine: this.engine,
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+
+    return result;
+  }
+
 }
 
 const UI = superclass => class extends superclass {
@@ -37,6 +85,31 @@ export const Attacking = superclass => class extends superclass {
 
   getAttackDamage (additional = 0) {
     return this.attackDamage + additional;
+  }
+
+  attack (targetPos) {
+    let success = false;
+    let tile = this.game.map[Helper.coordsToString(targetPos)]
+    if (!tile) { return success }
+    let targets = Helper.getDestructableEntities(tile.entities);
+    if (targets.length > 0) {
+      let target = targets[0];
+      let damage = this.getAttackDamage();
+      if (this.entityTypes.includes('EQUIPING')) {
+        this.equipment.map((slot) => {
+          if (slot.item) {
+            if (slot.item.entityTypes.includes('ATTACKING')) {
+              damage += slot.item.getAttackDamage();
+            }
+          }
+        });
+      }
+      console.log(`${this.name} does ${damage}.`);
+      target.decreaseDurability(damage);
+      success = true;
+    }
+
+    return success;
   }
 }
 
@@ -64,7 +137,7 @@ const Acting = superclass => class extends superclass {
     if (action) { return action }
   }
 
-  gainEnergy(value) {
+  gainEnergy(value = this.speed) {
     this.energy += value;
   }
 
@@ -205,7 +278,7 @@ const Playing = superclass => class extends superclass {
 }
 
 const Projecting = superclass => class extends superclass {
-  constructor({path = [], targetPos = null ,...args}) {
+  constructor({path = false, targetPos = null ,...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('PROJECTING')
     this.path = path;
@@ -218,6 +291,9 @@ const Projecting = superclass => class extends superclass {
   }
 
   getAction(game) {
+    if (!this.path) {
+      this.createPath(game);
+    }
     let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     let result = new Action.Move({
       targetPos, 
@@ -235,7 +311,7 @@ const Projecting = superclass => class extends superclass {
 
 
 const DestructiveProjecting = superclass => class extends superclass {
-  constructor({path = [], targetPos = null, attackDamage = 1, range = 3, ...args}) {
+  constructor({path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('DESTRUCTIVE_PROJECTING')
     this.path = path;
@@ -250,6 +326,10 @@ const DestructiveProjecting = superclass => class extends superclass {
   }
 
   getAction (game) {
+    if (!this.path) {
+      this.createPath(game);
+    }
+
     let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     
     let result = new Action.ThrowDestructable({
@@ -263,63 +343,69 @@ const DestructiveProjecting = superclass => class extends superclass {
   }
 }
 
-const Cloning = superclass => class extends superclass {
-  constructor({isClone = false, clones = 0, cloneLimit = 1, clonePattern = [], ...args}) {
+const GaseousDestructiveProjecting = superclass => class extends superclass {
+  constructor({path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
-    this.entityTypes = this.entityTypes.concat('CLONING')
+    this.entityTypes = this.entityTypes.concat('GASEOUS_DESTRUCTIVE_PROJECTING')
+    this.path = path;
+    this.targetPos = targetPos;
+    this.attackDamage = attackDamage;
+    this.range = range;
+  }
+
+  createPath (game) {
+    let path = Helper.calculatePathWithRange(game, this.targetPos, this.pos, 8, this.range);
+    this.path = path;
+  }
+
+  getAction (game) {
+    if (!this.path) {
+      this.createPath(game);
+    }
+    let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
+    
+    let result = new Action.ThrowDestructableGas({
+      targetPos, 
+      game, 
+      actor: this, 
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+
+    return result;
+  }
+}
+
+const Gaseous = superclass => class extends superclass {
+  constructor({
+    isClone = false,
+    cloneCount = 0,
+    clonePattern = Constant.CLONE_PATTERNS.square,
+    ...args
+  }) {
+    super({...args})
+    this.entityTypes = this.entityTypes.concat('GASEOUS')
     this.isClone = isClone;
-    this.clones = clones;
-    this.cloneLimit = cloneLimit;
+    this.cloneCount = cloneCount;
     this.clonePattern = cloneDeep(clonePattern);
-    // this.clonePattern = [
-    //   {
-    //     x: 0,
-    //     y: 1,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: 1,
-    //     y: 1,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: 1,
-    //     y: 0,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: 1,
-    //     y: -1,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: 0,
-    //     y: -1,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: -1,
-    //     y: -1,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: -1,
-    //     y: 0,
-    //     taken: false,
-    //   },
-    //   {
-    //     x: -1,
-    //     y: 1,
-    //     taken: false,
-    //   },
-    // ];
   }
 
   getAction (game) {
     let offset = this.clonePattern.find((pos) => !pos.taken);
-    if (!this.isClone && this.clones < this.cloneLimit && offset) {
+    if (!this.isClone && offset) {
       offset.taken = true
-      let clone = cloneDeep(this);
+      let clone = cloneDeepWith(this, (value, key) => {
+        switch (key) {
+          case 'id':
+          case 'game':
+          case 'engine':
+          case 'clones':
+            return null
+            break;
+          default:
+            return undefined
+            break;
+        }
+      });
       clone.game = game;
       clone.id = uuid();
       if (this.hasOwnProperty('pos')) {
@@ -338,7 +424,7 @@ const Cloning = superclass => class extends superclass {
         })
       }
       clone.isClone = true
-      this.clones += 1
+      this.cloneCount += 1
       game.addActor(clone);
     }
 
@@ -391,30 +477,67 @@ const Destructable = superclass => class extends superclass {
     let tile = this.game.map[Helper.coordsToString(this.pos)];
     this.game.map[Helper.coordsToString(this.pos)].entities = tile.entities.filter((e) => e.id !== this.id);
     this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
-    this.game.engine.currentActor = 0;
+    // this.game.engine.currentActor = 0;
     this.game.draw()
   }
-  
-  // destroyV2 () {
-  //   for (let key in this.game.map) {
-  //     if (this.game.map[key].entities.length > 0) {
-  //       this.game.map[key].entities = this.game.map[key].entities.filter((e) => {
-  //         return (e.id !== this.id)
-  //       });
-  //     }
-  //   }
-  //   this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
-  //   this.game.engine.currentActor = 0;
-  //   this.game.draw()
-  // }
 }
 
-export const UI_Cursor = pipe(Acting, Rendering, Playing, UI)(Entity);
+export const UI_Cursor = pipe(
+  Acting, 
+  Rendering, 
+  Playing, 
+  UI
+)(Entity);
 
-export const Actor = pipe(Acting, Rendering)(Entity);
-export const Chaser = pipe(Acting, Rendering, Chasing, Destructable)(Entity);
-export const Player = pipe(Acting, Rendering, Destructable, Charging, Signing, Containing, Equiping, Attacking, Playing)(Entity);
+export const Actor = pipe(
+  Acting, 
+  Rendering
+)(Entity);
 
-export const Weapon = pipe(Rendering, Equipable, Attacking)(Entity);
-export const DestructiveProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable)(Entity);
-export const DestructiveCloudProjectile = pipe(Acting, Rendering, DestructiveProjecting, Destructable, Cloning)(Entity);
+export const Chaser = pipe(
+  Acting, 
+  Rendering, 
+  Chasing, 
+  Destructable
+)(Entity);
+
+export const Player = pipe(
+  Acting, 
+  Rendering, 
+  Destructable, 
+  Charging, 
+  Signing, 
+  Containing, 
+  Equiping, 
+  Attacking, 
+  Playing
+)(Entity);
+
+export const Weapon = pipe(
+  Rendering, 
+  Equipable, 
+  Attacking
+)(Entity);
+
+export const DestructiveProjectile = pipe(
+  Acting, 
+  Rendering, 
+  Attacking, 
+  DestructiveProjecting, 
+  Destructable
+)(Entity);
+
+export const DestructiveCloudProjectile = pipe(
+  Acting, 
+  Rendering, 
+  Attacking, 
+  GaseousDestructiveProjecting, 
+  Destructable, 
+  Gaseous
+)(Entity);
+
+export const DestructiveCloudProjectileV2 = pipe(
+  Acting, 
+  Destructable,
+  Parent, 
+)(Entity);

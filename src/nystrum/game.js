@@ -40,6 +40,17 @@ export class Game {
     })
   }
 
+  placeActorOnMap(actor) {
+    let tile = this.map[Helper.coordsToString(actor.pos)]
+    if (tile) {
+      tile.entities.push(actor);
+      return true
+    } else {
+      console.log(`could not place ${actor.id}: ${actor.name} on map`);
+      return false
+    }
+  }
+
   removeActorFromMap (actor) {
     let tile = this.map[Helper.coordsToString(actor.pos)]
     this.map[Helper.coordsToString(actor.pos)].entities = tile.entities.filter((ac) => ac.id !== actor.id);
@@ -135,8 +146,14 @@ export class Game {
     }
   }
 
-  addActor (actor) {
-    this.engine.actors.push(actor);
+  addActor (actor, engine = this.engine) {
+    let isPlaced = this.placeActorOnMap(actor); // replace with placeActorOnMap
+    if (!isPlaced) { return false }
+    engine.actors.push(actor);
+    this.draw();
+  }
+
+  placeAndDrawActor (actor) {
     this.placeActorsOnMap(); // replace with placeActorOnMap
     this.draw();
   }

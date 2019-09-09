@@ -1,7 +1,6 @@
 import * as Helper from '../helper';
 import * as Action from './actions';
 import * as Constant from './constants';
-import * as Entity from './entites';
 import { cloneDeep } from 'lodash';
 import uuid from 'uuid/v1';
 
@@ -323,11 +322,6 @@ export class Move extends Base {
         actor: this.actor, 
         energyCost: Constant.ENERGY_THRESHOLD
       })
-      // alternative = new Action.Say({
-      //   message: `Ooh I cant move there`,
-      //   game: this.game,
-      //   actor: this.actor,
-      // });
     }
 
     return {
@@ -354,29 +348,13 @@ export class Attack extends Base {
           message: `Ooh I don\'t know how to attack`,
           game: this.game,
           actor: this.actor,
-        }), 
+        }),
       } 
     }
-    let tile = this.game.map[Helper.coordsToString(this.targetPos)]
-    if (!tile) { return { success, alternative} }
-    let targets = Helper.getDestructableEntities(tile.entities);
-    if (targets.length > 0) {
-      let target = targets[0];
-      let damage = this.actor.getAttackDamage();
-      if (this.actor.entityTypes.includes('EQUIPING')) {
-        this.actor.equipment.map((slot) => {
-          if (slot.item) {
-            if (slot.item.entityTypes.includes('ATTACKING')) {
-              damage += slot.item.getAttackDamage();
-              
-            }
-          }
-        });
-      }
-      console.log(`${this.actor.name} does ${damage}.`);
-      target.decreaseDurability(damage);
+    
+    success = this.actor.attack(this.targetPos);
+    if (success) {
       this.actor.energy -= this.energyCost;
-      success = true;
     }
 
     return {
@@ -385,42 +363,6 @@ export class Attack extends Base {
     }
   }
 };
-
-// export class ThrowDestructable extends Move {
-//   constructor({ ...args }) {
-//     super({ ...args });
-//   }
-
-//   perform () {
-//     let success = false;
-//     let alternative = null;
-//     this.actor.passable = false;
-//     let move_result = super.perform();
-//     if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
-//       this.actor.path.shift();
-//       success = true;
-//     } else {
-//       let tile = this.game.map[Helper.coordsToString(this.targetPos)];
-//       if (tile) {
-//         let entities = Helper.getDestructableEntities(tile.entities);
-//         if (entities.length > 0) {
-//           entities[0].decreaseDurability(this.actor.attackDamage);
-//         }
-//       }
-//       success = true;
-//       alternative = new Action.DestroySelf({
-//         game: this.game,
-//         actor: this.actor,
-//         energyCost: Constant.ENERGY_THRESHOLD,
-//       });
-//     }
-
-//     return {
-//       success,
-//       alternative,
-//     }
-//   }
-// }
 
 export class ThrowDestructable extends Move {
   constructor({ ...args }) {
@@ -432,7 +374,37 @@ export class ThrowDestructable extends Move {
     let alternative = null;
     this.actor.passable = false;
     let move_result = super.perform();
-    // if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+    if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+      this.actor.path.shift();
+      success = true;
+    } else {
+      success = true;
+      this.actor.attack(this.targetPos);
+      alternative = new Action.DestroySelf({
+        game: this.game,
+        actor: this.actor,
+        energyCost: Constant.ENERGY_THRESHOLD,
+      });
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+}
+
+export class ThrowDestructableGas extends Move {
+  constructor({ ...args }) {
+    super({ ...args });
+    this.processDelay = 0
+  }
+
+  perform () {
+    let success = false;
+    let alternative = null;
+    this.actor.passable = false;
+    let move_result = super.perform();
     if (move_result.success) {
       this.actor.path.shift();
       success = true;
@@ -443,17 +415,11 @@ export class ThrowDestructable extends Move {
         game: this.game,
         actor: this.actor,
         energyCost: Constant.ENERGY_THRESHOLD,
+        processDelay: 0,
       });
     }
     if (move_result.alternative) {
-      let tile = this.game.map[Helper.coordsToString(this.targetPos)];
-      if (tile) {
-        let entities = Helper.getDestructableEntities(tile.entities);
-        if (entities.length > 0) {
-          entities[0].decreaseDurability(this.actor.attackDamage);
-          // this.actor.decreaseDurability(this.actor.attackDamage);
-        }
-      }
+      this.actor.attack(this.targetPos)
     }
 
     return {
@@ -462,3 +428,33 @@ export class ThrowDestructable extends Move {
     }
   }
 }
+
+export class CrankEngine extends Base {
+  constructor({ engine, ...args }) {
+    super({ ...args });
+    this.engine = engine;
+    // this.processDelay = 0;
+  }
+  async perform() {
+    let success = true;
+    let alternative = null;
+
+    console.log(`${this.actor.name} is cranking its engine.`);
+    try {
+      await this.engine.start();
+      this.actor.energy -= this.energyCost;
+    } catch (error) {
+      console.log(error);
+      alternative = new Action.DestroySelf({
+        game: this.game,
+        actor: this.actor,
+        energyCost: Constant.ENERGY_THRESHOLD,
+      });
+    }
+    
+    return {
+      success,
+      alternative,
+    }
+  }
+};
