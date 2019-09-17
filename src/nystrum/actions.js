@@ -158,7 +158,7 @@ export class DestroySelf extends Base {
     this.processDelay = processDelay
   }
   perform() {
-    console.log(`${this.actor.name} is self-destructing`);
+    // console.log(`${this.actor.name} is self-destructing`);
     this.actor.energy -= this.energyCost;
     this.actor.destroy();
     return {
@@ -374,17 +374,30 @@ export class ThrowDestructable extends Move {
     let alternative = null;
     this.actor.passable = false;
     let move_result = super.perform();
-    if (this.actor.path.length > 0 && move_result.success && !move_result.alternative) {
+
+    if (move_result.success) {
       this.actor.path.shift();
       success = true;
-    } else {
+    }
+    if (this.actor.path.length === 0) {
       success = true;
-      this.actor.attack(this.targetPos);
       alternative = new Action.DestroySelf({
         game: this.game,
         actor: this.actor,
         energyCost: Constant.ENERGY_THRESHOLD,
+        processDelay: 0,
       });
+    }
+    if (move_result.alternative) {
+      let attackSuccess = this.actor.attack(this.targetPos);
+      if (attackSuccess) {
+        alternative = new Action.DestroySelf({
+          game: this.game,
+          actor: this.actor,
+          energyCost: Constant.ENERGY_THRESHOLD,
+          processDelay: 0,
+        });
+      }
     }
 
     return {
@@ -444,7 +457,6 @@ export class CrankEngine extends Base {
       await this.engine.start();
       this.actor.energy -= this.energyCost;
     } catch (error) {
-      console.log(error);
       alternative = new Action.DestroySelf({
         game: this.game,
         actor: this.actor,

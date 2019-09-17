@@ -71,8 +71,6 @@ export class Engine {
 export class CrankEngine extends Engine {
   async process() { // a turn-based system using speed and Action Points
     let actor = this.actors[this.currentActor]
-    console.log(actor);
-    
     let acting = true;
     while (acting) {
       if (actor.hasEnoughEnergy()) {

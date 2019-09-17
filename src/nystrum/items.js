@@ -7,26 +7,36 @@ export const TYPE = {
   SWORD: 'Sword',
 }
 
-export const kunaiCloud = (engine, actor, targetPos) => new Entity.DestructiveCloudProjectileV2({
-  game: engine.game,
-  passable: true,
-  speed: 500,
-  children: [...Array(3).fill('').map(() => {
-    let pos = {
-      x: targetPos.x + Helper.getRandomIntInclusive(-1, 1),
-      y: targetPos.y + Helper.getRandomIntInclusive(-1, 1),
+export const kunaiCloud = ({engine, actor, targetPos, throwDirection}) => {
+  let structure = Constant.CLONE_PATTERNS.bigSquare;
+
+  let children = structure.positions.map((slot) => {
+    let position = {
+      x: actor.pos.x + slot.x + (throwDirection.x * structure.x_offset),
+      y: actor.pos.y + slot.y + (throwDirection.y * structure.y_offset)
     }
-    // let pos = {...targetPos}
 
-    return kunai(engine, actor, pos)
-  })],
-})
+    let targetPosition = {
+      x: targetPos.x + slot.x,
+      y: targetPos.y + slot.y,
+    }
 
-export const kunai = (engine, actor, targetPos) => new Entity.DestructiveProjectile({
+    return kunai(engine, position, targetPosition);
+  })
+
+  return new Entity.DestructiveCloudProjectileV2({
+    game: engine.game,
+    passable: true,
+    speed: 500,
+    children,
+  })
+}
+
+export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
   game: engine.game,
   targetPos,
   passable: true,
-  pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,
+  pos: { x: pos.x, y: pos.y },
   renderer: {
     // character: '>',
     character: '🗡️',
@@ -39,26 +49,30 @@ export const kunai = (engine, actor, targetPos) => new Entity.DestructiveProject
   range: 30,
 })
 
-export const fireball = (engine, actor, targetPos) => new Entity.DestructiveCloudProjectile({
-  game: engine.game,
-  targetPos,
-  passable: true,
-  pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,
-  renderer: {
-    // character: '@',
-    character: '🔥',
-    color: 'wheat',
-    background: 'tomato',
-  },
-  name: TYPE.KUNAI,
-  speed: 100,
-  range: 10,
-  clonePattern: Constant.CLONE_PATTERNS.bigSquare,
-  // clonePattern: Constant.CLONE_PATTERNS.square,
-})
+export const fireball = (engine, actor, targetPos) => {
+  return new Entity.DestructiveCloudProjectile({
+    game: engine.game,
+    owner_id: actor ? actor.id : null,
+    targetPos,
+    passable: true,
+    pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,
+    renderer: {
+      // character: '@',
+      character: '🔥',
+      color: 'wheat',
+      background: 'tomato',
+    },
+    name: TYPE.KUNAI,
+    speed: 100,
+    range: 10,
+    clonePattern: Constant.CLONE_PATTERNS.bigSquare,
+    // clonePattern: Constant.CLONE_PATTERNS.square,
+  })
+}
 
 export const waterball = (engine, actor, targetPos) => new Entity.DestructiveCloudProjectile({
   game: engine.game,
+  owner_id: actor ? actor.id : null,
   targetPos,
   passable: true,
   pos: actor ? { x: actor.pos.x, y: actor.pos.y } : null,

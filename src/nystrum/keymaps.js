@@ -59,7 +59,12 @@ const throwKunaiCloud = (engine, actor) => {
     y: Math.sign(cursor.pos.y - actor.pos.y),
   }
   engine.game.removeActor(cursor);
-  let cloud = Item.kunaiCloud(engine, actor, {...cursor.pos});
+  let cloud = Item.kunaiCloud({
+    engine, 
+    actor, 
+    targetPos: {...cursor.pos},
+    throwDirection,
+  });
   if (cloud) {
     cloud.pos = { 
       x: actor.pos.x + throwDirection.x,  

@@ -34,6 +34,11 @@ const Parent = superclass => class extends superclass {
     this.game.draw()
   }
 
+  canAttack (entity) {
+    const childIds = this.children.map((child) => child.id); 
+    return !childIds.includes(entity.id)
+  }
+  
   initialize() {
     this.isInitialized = true;
     this.engine.game = this.game;
@@ -41,6 +46,8 @@ const Parent = superclass => class extends superclass {
     this.engine.actors.forEach((actor) => {
       actor.game = this.game;
       actor.destroy = () => {this.destroyChild(actor)};
+      actor.canAttack = this.canAttack.bind(this);
+      // actor.canAttack = (entity) => {this.canAttack(entity)};
       this.game.addActor(actor, this.engine);
     });
   }
@@ -87,6 +94,10 @@ export const Attacking = superclass => class extends superclass {
     return this.attackDamage + additional;
   }
 
+  canAttack (entity) {
+    return true;
+  }
+
   attack (targetPos) {
     let success = false;
     let tile = this.game.map[Helper.coordsToString(targetPos)]
@@ -94,19 +105,21 @@ export const Attacking = superclass => class extends superclass {
     let targets = Helper.getDestructableEntities(tile.entities);
     if (targets.length > 0) {
       let target = targets[0];
-      let damage = this.getAttackDamage();
-      if (this.entityTypes.includes('EQUIPING')) {
-        this.equipment.map((slot) => {
-          if (slot.item) {
-            if (slot.item.entityTypes.includes('ATTACKING')) {
-              damage += slot.item.getAttackDamage();
+      if (this.canAttack(target)) {
+        let damage = this.getAttackDamage();
+        if (this.entityTypes.includes('EQUIPING')) {
+          this.equipment.map((slot) => {
+            if (slot.item) {
+              if (slot.item.entityTypes.includes('ATTACKING')) {
+                damage += slot.item.getAttackDamage();
+              }
             }
-          }
-        });
+          });
+        }
+        console.log(`${this.name} does ${damage} to ${target.name}`);
+        target.decreaseDurability(damage);
+        success = true;
       }
-      console.log(`${this.name} does ${damage}.`);
-      target.decreaseDurability(damage);
-      success = true;
     }
 
     return success;
@@ -344,13 +357,22 @@ const DestructiveProjecting = superclass => class extends superclass {
 }
 
 const GaseousDestructiveProjecting = superclass => class extends superclass {
-  constructor({path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
+  constructor({owner_id = null, path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('GASEOUS_DESTRUCTIVE_PROJECTING')
     this.path = path;
     this.targetPos = targetPos;
     this.attackDamage = attackDamage;
     this.range = range;
+    this.owner_id = owner_id;
+  }
+
+  canAttack (entity) {
+    let success = super.canAttack();
+    if (success) {
+      success = this.owner_id === null || (entity.owner_id !== this.owner_id);
+    }
+    return success
   }
 
   createPath (game) {
@@ -390,7 +412,7 @@ const Gaseous = superclass => class extends superclass {
   }
 
   getAction (game) {
-    let offset = this.clonePattern.find((pos) => !pos.taken);
+    let offset = this.clonePattern.positions.find((pos) => !pos.taken);
     if (!this.isClone && offset) {
       offset.taken = true
       let clone = cloneDeepWith(this, (value, key) => {

@@ -18,16 +18,17 @@ let actor_3 = new Entity.Player({
   actions: [],
   speed: 600,
   durability: 1,
-  container: [
-    Item.sword(ENGINE),
-    Item.sword(ENGINE),
-    Item.sword(ENGINE),
-    // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
-    ...Array(10).fill('').map(() => Item.fireball(ENGINE)),
-    // ...Array(10).fill('').map(() => Item.waterball(ENGINE)),
-  ],
   keyMap: Keymap.player(ENGINE),
 })
+
+actor_3.container = [
+  Item.sword(ENGINE),
+  Item.sword(ENGINE),
+  Item.sword(ENGINE),
+  // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
+  ...Array(10).fill('').map(() => Item.fireball(ENGINE, actor_3)),
+  // ...Array(10).fill('').map(() => Item.waterball(ENGINE)),
+]
 
 ENGINE.actors.push(actor_3)
 
