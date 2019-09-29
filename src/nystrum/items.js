@@ -7,8 +7,16 @@ export const TYPE = {
   SWORD: 'Sword',
 }
 
-export const kunaiCloud = ({engine, actor, targetPos, throwDirection}) => {
-  let structure = Constant.CLONE_PATTERNS.bigSquare;
+const createProjectileCloud = ({ 
+  engine, 
+  actor, 
+  targetPos, 
+  throwDirection,
+  speed,
+  structureType,
+  createProjectile,
+}) => {
+  let structure = Constant.CLONE_PATTERNS[structureType];
 
   let children = structure.positions.map((slot) => {
     let position = {
@@ -21,16 +29,46 @@ export const kunaiCloud = ({engine, actor, targetPos, throwDirection}) => {
       y: targetPos.y + slot.y,
     }
 
-    return kunai(engine, position, targetPosition);
+    return createProjectile(engine, position, targetPosition);
   })
 
   return new Entity.DestructiveCloudProjectileV2({
     game: engine.game,
     passable: true,
-    speed: 500,
+    speed,
     children,
   })
 }
+
+export const kunaiCloud = ({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+}) => createProjectileCloud({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+  speed: 500,
+  structureType: 'square',
+  createProjectile: kunai,
+})
+
+export const fireballCloud = ({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+}) => createProjectileCloud({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+  speed: 500,
+  structureType: 'square',
+  createProjectile: fireball,
+})
 
 export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
   game: engine.game,
@@ -49,7 +87,24 @@ export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectil
   range: 30,
 })
 
-export const fireball = (engine, actor, targetPos) => {
+export const fireball = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
+  game: engine.game,
+  targetPos,
+  passable: true,
+  pos: { x: pos.x, y: pos.y },
+  renderer: {
+    // character: '>',
+    character: '🔥',
+    color: 'wheat',
+    background: 'tomato',
+  },
+  name: TYPE.KUNAI,
+  speed: 100,
+  energy: 0,
+  range: 30,
+})
+
+export const fireballGas = (engine, actor, targetPos) => {
   return new Entity.DestructiveCloudProjectile({
     game: engine.game,
     owner_id: actor ? actor.id : null,

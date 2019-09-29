@@ -62,7 +62,7 @@ const Parent = superclass => class extends superclass {
       game,
       actor: this,
       engine: this.engine,
-      energyCost: Constant.ENERGY_THRESHOLD
+      energyCost: Constant.ENERGY_THRESHOLD,
     });
 
     return result;

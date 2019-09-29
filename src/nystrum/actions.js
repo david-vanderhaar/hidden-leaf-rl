@@ -446,7 +446,6 @@ export class CrankEngine extends Base {
   constructor({ engine, ...args }) {
     super({ ...args });
     this.engine = engine;
-    // this.processDelay = 0;
   }
   async perform() {
     let success = true;
