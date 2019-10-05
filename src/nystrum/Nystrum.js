@@ -1,56 +1,56 @@
 import React from 'react';
-import * as Keymap from './keymaps';
-import * as Engine from './engine';
-import * as Item from './items';
-import * as Entity from './entites';
-import * as Game from './game';
-
-let ENGINE = new Engine.Engine({});
-
-let actor_3 = new Entity.Player({
-  pos: { x: 23, y: 7 },
-  renderer: {
-    character: '❂',
-    color: 'orange',
-    background: '',
-  },
-  name: 'Player',
-  actions: [],
-  speed: 600,
-  durability: 1,
-  keyMap: Keymap.player(ENGINE),
-})
-
-actor_3.container = [
-  Item.sword(ENGINE),
-  Item.sword(ENGINE),
-  Item.sword(ENGINE),
-  // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
-  ...Array(10).fill('').map(() => Item.fireballGas(ENGINE, actor_3)),
-  // ...Array(10).fill('').map(() => Item.waterball(ENGINE)),
-]
-
-ENGINE.actors.push(actor_3)
-
-let game = new Game.Game({engine: ENGINE})
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { SCREENS } from './Screen/constants';
+import Level from './Screen/Level';
+import Title from './Screen/Title';
 
 class Nystrum extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.presserRef = React.createRef();
+  constructor() {
+    super();
+    this.state = {
+      activeScreen: SCREENS.LEVEL,
+    };
   }
 
-  async componentDidMount () {
-    game.initialize(this.presserRef)
-    ENGINE.start()
+  setActiveScreen (activeScreen) {
+    this.setState({activeScreen})
+  }
+
+  getActiveScreen () {
+    const titleScreen = <Title 
+      key={SCREENS.TITLE} 
+      setActiveScreen={this.setActiveScreen.bind(this)}
+    />
+    const levelScreen = <Level 
+      key={SCREENS.LEVEL} 
+      setActiveScreen={this.setActiveScreen.bind(this)}
+    />
+
+    switch (this.state.activeScreen) {
+      case SCREENS.TITLE:
+        return titleScreen
+      case SCREENS.LEVEL:
+        return levelScreen
+      default:
+        return titleScreen
+    }
   }
 
   render() {
+    const activeScreen = this.getActiveScreen();
     return (
       <div className="Nystrum">
-        <h2>Nystrum</h2>
-        { Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE) }
+        <ReactCSSTransitionGroup
+          transitionName="fade"
+          transitionAppear={true}
+          transitionEnter={true}
+          transitionLeave={true}
+          transitionAppearTimeout={500}
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={300}
+        >
+          { activeScreen }
+        </ReactCSSTransitionGroup>
       </div>
     );
   }

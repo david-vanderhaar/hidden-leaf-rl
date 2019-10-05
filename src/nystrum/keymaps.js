@@ -265,13 +265,24 @@ const addActor = (game) => {
   game.addActor(actor);
 }
 
+const toggleInventory = (engine) => {
+  let currentActor = engine.actors[engine.currentActor]
+  // engine.game.showUI = !engine.game.showUI; 
+  if (!engine.game.visibleInventory) {
+    engine.game.visibleInventory = currentActor.container; 
+  } else {
+    engine.game.visibleInventory = null;
+  }
+}
+
 export const player = (engine) => {
   return {
     w: () => walk(Constant.DIRECTIONS.N, engine),
     d: () => walk(Constant.DIRECTIONS.E, engine),
     s: () => walk(Constant.DIRECTIONS.S, engine),
     a: () => walk(Constant.DIRECTIONS.W, engine),
-    e: () => equip(engine),
+    // e: () => equip(engine),
+    e: () => toggleInventory(engine),
     q: () => unequip(engine),
     k: () => cloneSelf(engine),
     // k: () => die(engine),

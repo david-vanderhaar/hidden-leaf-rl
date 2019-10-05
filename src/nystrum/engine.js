@@ -60,6 +60,7 @@ export class Engine {
     this.isRunning = true;
     while (this.isRunning) {
       this.isRunning = await this.process();
+      await this.game.updateReact(this.game);
     }
   }
 

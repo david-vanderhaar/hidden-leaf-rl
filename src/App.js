@@ -6,7 +6,7 @@ import Original from './original/Original';
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
+      <div className="App container-fluid">
         <Nystrum />
         {/* <Original /> */}
       </div>

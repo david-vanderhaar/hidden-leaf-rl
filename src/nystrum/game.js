@@ -8,7 +8,9 @@ export class Game {
     engine = null,
     map = {},
     display = new ROT.Display({ 
-      // forceSquareRatio: true, 
+      // forceSquareRatio: true,
+      width: 90,
+      // height: 100,
       fontSize: 24, 
       bg: '#363636' 
     }),
