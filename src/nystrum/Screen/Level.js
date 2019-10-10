@@ -5,6 +5,7 @@ import * as Engine from '../engine';
 import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Game from '../game';
+import Inventory from '../UI/Inventory';
 
 let ENGINE = new Engine.Engine({});
 
@@ -48,7 +49,7 @@ class Level extends React.Component {
 
   async componentDidMount() {
     game.initialize(this.presserRef)
-    game.updateReact = (newGameState) => this.setState({newGameState})
+    game.updateReact = (newGameState) => { this.setState({game: newGameState}) }
     ENGINE.start()
   }
 
@@ -57,13 +58,9 @@ class Level extends React.Component {
       <div className="Level">
         <div className='flow-text'>Chunin Exams</div>
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
-        {
-          this.state.game.visibleInventory && (
-            this.state.game.visibleInventory.map((item, index) => {
-              return <div key={index} className='flow-text'>{item.name}</div>
-            })
-          )
-        }
+        <Inventory 
+          inventory={this.state.game.visibleInventory}
+        />
         {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
       </div>
     );

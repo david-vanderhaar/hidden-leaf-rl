@@ -59,8 +59,8 @@ const throwKunaiCloud = (engine, actor) => {
     y: Math.sign(cursor.pos.y - actor.pos.y),
   }
   engine.game.removeActor(cursor);
-  // let cloud = Item.fireballCloud({
-  let cloud = Item.kunaiCloud({
+  let cloud = Item.fireballCloud({
+  // let cloud = Item.kunaiCloud({
     engine, 
     actor, 
     targetPos: {...cursor.pos},
@@ -94,6 +94,28 @@ export const cursorToThrowItem = (engine, initiatedBy) => {
     t: () => throwKunaiCloud(engine, initiatedBy),
     // t: () => throwKunai(engine, initiatedBy),
   };
+}
+
+export const inventory = (engine, initiatedBy) => {
+  let currentUiActor = engine.actors[engine.currentActor];
+  let keymap = {};
+
+  initiatedBy.container.map((item, index) => {
+    keymap[index] = () => {
+      console.log(`setting action for ${initiatedBy.name} to equip ${item.name}`);
+      initiatedBy.setNextAction(new Action.EquipItemFromContainer({
+        item,
+        game: engine.game,
+        actor: initiatedBy,
+      }))
+      engine.game.removeActor(currentUiActor);
+      engine.currentActor = engine.actors.length - 1;
+      engine.game.visibleInventory = null;
+    }
+    return true;
+  })
+
+  return keymap;
 }
 
 /******************** PLAYER ********************/
@@ -223,27 +245,6 @@ const unequip = (engine) => {
   }
 }
 
-const activateThrowCursor = (engine) => {
-  let game = engine.game;
-  let currentActor = game.engine.actors[game.engine.currentActor]
-  let pos = currentActor.pos;
-
-  let cursor = new Entity.UI_Cursor({
-    initiatedBy: currentActor,
-    pos,
-    renderer: {
-      character: '█',
-      color: 'white',
-      background: '',
-    },
-    name: 'Cursor',
-    game,
-    keyMap: cursorToThrowItem(engine, currentActor),
-  })
-  game.addActor(cursor);
-  game.engine.currentActor = game.engine.actors.length - 1
-}
-
 const addActor = (game) => {
   let targetEntity = game.engine.actors[game.engine.currentActor]
   let pos = Helper.getRandomPos(game.map).coordinates
@@ -265,6 +266,48 @@ const addActor = (game) => {
   game.addActor(actor);
 }
 
+const activateThrowCursor = (engine) => {
+  let game = engine.game;
+  let currentActor = game.engine.actors[game.engine.currentActor]
+  let pos = currentActor.pos;
+
+  let cursor = new Entity.UI_Cursor({
+    initiatedBy: currentActor,
+    pos,
+    renderer: {
+      character: '█',
+      color: 'white',
+      background: '',
+    },
+    name: 'Cursor',
+    game,
+    keyMap: cursorToThrowItem(engine, currentActor),
+  })
+  game.addActor(cursor);
+  game.engine.currentActor = game.engine.actors.length - 1
+}
+
+const activateInventory = (engine) => {
+  let currentActor = engine.actors[engine.currentActor]
+  engine.game.visibleInventory = currentActor.container; 
+
+  let ui = new Entity.UI_Inventory({
+    initiatedBy: currentActor,
+    pos: {...currentActor.pos},
+    renderer: {
+      character: 'I',
+      color: 'white',
+      background: '',
+    },
+    name: 'Inventory',
+    game: engine.game,
+    // keyMap: inventory(engine, currentActor),
+  })
+  engine.game.addActor(ui);
+  engine.currentActor = engine.actors.length - 1
+  ui.keyMap = inventory(engine, currentActor);
+}
+
 const toggleInventory = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   // engine.game.showUI = !engine.game.showUI; 
@@ -282,7 +325,8 @@ export const player = (engine) => {
     s: () => walk(Constant.DIRECTIONS.S, engine),
     a: () => walk(Constant.DIRECTIONS.W, engine),
     // e: () => equip(engine),
-    e: () => toggleInventory(engine),
+    // e: () => toggleInventory(engine),
+    e: () => activateInventory(engine),
     q: () => unequip(engine),
     k: () => cloneSelf(engine),
     // k: () => die(engine),

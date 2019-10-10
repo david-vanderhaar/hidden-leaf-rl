@@ -511,6 +511,13 @@ export const UI_Cursor = pipe(
   UI
 )(Entity);
 
+export const UI_Inventory = pipe(
+  Acting, 
+  Rendering,
+  Playing, 
+  UI
+)(Entity);
+
 export const Actor = pipe(
   Acting, 
   Rendering

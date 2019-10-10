@@ -162,7 +162,9 @@ export class Game {
 
   removeActor (actor) {
     this.engine.actors = this.engine.actors.filter((ac) => ac.id !== actor.id);
+    // this.engine.currentActor = this.engine.actors.length - 1;
     // this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
+    // this.engine.currentActor = (this.engine.currentActor + 1) % this.engine.actors.length;
     this.removeActorFromMap(actor);
     this.draw();
   }
