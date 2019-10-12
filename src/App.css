@@ -24,6 +24,14 @@
   color: #61dafb;
 }
 
+.Inventory {
+  text-align: left;
+}
+
+.Inventory__button {
+  background-color: #363636
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

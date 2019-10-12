@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from './Button';
 
 class Inventory extends React.Component {
   render() {
@@ -7,12 +8,11 @@ class Inventory extends React.Component {
         {
           this.props.inventory && (
             this.props.inventory.map((item, index) => {
-              return <button 
-                key={index} 
-                onClick={() => null} 
-                className='btn'>
-                  {item.name}
-                </button>
+              return (
+                <Button key={index} onClick={() => null}>
+                  {index} {item.name} {item.renderer.character}
+                </Button>
+              )
             })
           )
         }

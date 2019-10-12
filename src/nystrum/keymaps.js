@@ -96,9 +96,17 @@ export const cursorToThrowItem = (engine, initiatedBy) => {
   };
 }
 
-export const inventory = (engine, initiatedBy) => {
+const closeInventory = (engine) => {
   let currentUiActor = engine.actors[engine.currentActor];
-  let keymap = {};
+  engine.game.removeActor(currentUiActor);
+  engine.currentActor = engine.actors.length - 1;
+  engine.game.visibleInventory = null;
+}
+
+export const inventory = (engine, initiatedBy) => {
+  let keymap = {
+    e: () => closeInventory(engine),
+  };
 
   initiatedBy.container.map((item, index) => {
     keymap[index] = () => {
@@ -108,9 +116,7 @@ export const inventory = (engine, initiatedBy) => {
         game: engine.game,
         actor: initiatedBy,
       }))
-      engine.game.removeActor(currentUiActor);
-      engine.currentActor = engine.actors.length - 1;
-      engine.game.visibleInventory = null;
+      closeInventory(engine);
     }
     return true;
   })

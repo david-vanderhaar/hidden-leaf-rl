@@ -58,10 +58,10 @@ class Level extends React.Component {
       <div className="Level">
         <div className='flow-text'>Chunin Exams</div>
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
-        <Inventory 
-          inventory={this.state.game.visibleInventory}
-        />
-        {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
+        <div className='row'>
+          <Inventory inventory={this.state.game.visibleInventory} />
+          {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
+        </div>
       </div>
     );
   }
