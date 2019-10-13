@@ -97,27 +97,27 @@ export const cursorToThrowItem = (engine, initiatedBy) => {
   return {
     w: {
       activate: () => moveCursor(Constant.DIRECTIONS.N, engine),
-      label: 'foo',
+      label: 'move',
     },
     d: {
       activate: () => moveCursor(Constant.DIRECTIONS.E, engine),
-      label: 'foo',
+      label: 'move',
     },
     s: {
       activate: () => moveCursor(Constant.DIRECTIONS.S, engine),
-      label: 'foo',
+      label: 'move',
     },
     a: {
       activate: () => moveCursor(Constant.DIRECTIONS.W, engine),
-      label: 'foo',
+      label: 'move',
     },
     t: {
       activate: () => throwKunaiCloud(engine, initiatedBy),
-      label: 'foo',
+      label: 'Throw Cloud',
     },
     y: {
       activate: () => throwKunai(engine, initiatedBy),
-      label: 'foo',
+      label: 'Throw Kunai',
     },
   };
 }
@@ -363,67 +363,67 @@ export const player = (engine) => {
   return {
     w: {
       activate: () => walk(Constant.DIRECTIONS.N, engine),
-      label: 'foo',
+      label: 'walk',
     },
     d: {
       activate: () => walk(Constant.DIRECTIONS.E, engine),
-      label: 'foo',
+      label: 'walk',
     },
     s: {
       activate: () => walk(Constant.DIRECTIONS.S, engine),
-      label: 'foo',
+      label: 'walk',
     },
     a: {
       activate: () => walk(Constant.DIRECTIONS.W, engine),
-      label: 'foo',
+      label: 'walk',
     },
     e: {
       activate: () => activateInventory(engine),
-      label: 'foo',
+      label: 'Open Inventory',
     },
     q: {
       activate: () => unequip(engine),
-      label: 'foo',
+      label: 'Unequip',
     },
     k: {
       activate: () => cloneSelf(engine),
-      label: 'foo',
+      label: 'Clone Self',
     },
     i: {
       activate: () => dropRandom(engine),
-      label: 'foo',
+      label: 'Drop Random',
     },
     p: {
       activate: () => pickupRandom(engine),
-      label: 'foo',
+      label: 'Pickup',
     },
     t: {
       activate: () => activateThrowCursor(engine),
-      label: 'foo',
+      label: 'Throw',
     },
     y: {
       activate: () => addActor(engine.game),
-      label: 'foo',
+      label: 'Add NPC',
     },
     c: {
       activate: () => charge(engine, 1),
-      label: 'foo',
+      label: 'Charge',
     },
     '1': {
       activate: () => sign(Constant.HAND_SIGNS.Power, engine),
-      label: 'foo',
+      label: 'Sign - Power',
     },
     '2': {
       activate: () => sign(Constant.HAND_SIGNS.Healing, engine),
-      label: 'foo',
+      label: 'Sign - Healing',
     },
     '3': {
       activate: () => sign(Constant.HAND_SIGNS.Absolute, engine),
-      label: 'foo',
+      label: 'Sign - Absolution',
     },
     r: {
       activate: () => signRelease(engine),
-      label: 'foo',
+      label: 'Release',
     },
   };
 }
