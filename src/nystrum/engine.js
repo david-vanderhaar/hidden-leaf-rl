@@ -60,6 +60,11 @@ export class Engine {
     this.isRunning = true;
     while (this.isRunning) {
       this.isRunning = await this.process();
+
+    }
+    let actor = this.actors[this.currentActor]
+    if (actor.keymap) {
+      this.game.visibleKeymap = actor.keymap;
     }
     await this.game.updateReact(this.game);
   }

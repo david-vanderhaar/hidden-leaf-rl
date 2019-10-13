@@ -12,7 +12,7 @@ export class Game {
       width: 90,
       // height: 100,
       fontSize: 24, 
-      bg: '#363636' 
+      bg: '#424242' 
     }),
     tileKey = Constant.TILE_KEY,
   }) {
@@ -185,10 +185,10 @@ export class Game {
 export const handleKeyPress = (event, engine) => {
   if (!engine.isRunning) {
     let actor = engine.actors[engine.currentActor];
-    let keyMap = actor.keyMap;
+    let keymap = actor.keymap;
     let code = event.key;
-    if (!(code in keyMap)) { return; }
-    keyMap[code]();
+    if (!(code in keymap)) { return; }
+    keymap[code]['activate']();
     engine.start()
   }
   return;

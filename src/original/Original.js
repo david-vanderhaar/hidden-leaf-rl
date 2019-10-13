@@ -109,7 +109,7 @@ class Original extends React.Component {
   }
 
   handleKeyPress = (event, world, entity) => {
-    let keyMap = {
+    let keymap = {
       w: 0,
       d: 1,
       s: 2,
@@ -117,7 +117,7 @@ class Original extends React.Component {
     };
 
     let code = event.key;
-    let dir = ROT.DIRS[4][keyMap[code]];
+    let dir = ROT.DIRS[4][keymap[code]];
     if (code === 't') {
       kunai.sendEvent(kunai, 'MOVE', {
         currentPos: kunai.components.body.pos,
@@ -128,7 +128,7 @@ class Original extends React.Component {
       })
       return kunai.sendEvent(kunai, 'THROW', { direction: { x: 1, y: 0 } })
     }
-    if (!(code in keyMap)) { return; }
+    if (!(code in keymap)) { return; }
     let newX = entity.components.body.pos.x + dir[0];
     let newY = entity.components.body.pos.y + dir[1];
 

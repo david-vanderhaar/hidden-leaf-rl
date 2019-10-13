@@ -272,11 +272,11 @@ const Signing = superclass => class extends superclass {
 }
 
 const Playing = superclass => class extends superclass {
-  constructor({keyMap = {}, ...args}) {
+  constructor({keymap = {}, ...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('PLAYING')
     this.nextAction = null;
-    this.keyMap = keyMap;
+    this.keymap = keymap;
   }
 
     setNextAction(action) {

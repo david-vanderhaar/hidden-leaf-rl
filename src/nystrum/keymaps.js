@@ -4,6 +4,14 @@ import * as Helper from '../helper';
 import * as Entity from './entites';
 import * as Item from './items';
 
+/******************** Helper ********************/
+const addAlphabeticallyToKeymap = (keymap, obj) => {
+  let alphabetAllowed = Constant.ALPHABET.filter((letter) => {
+    return !Object.keys(keymap).includes(letter);
+  });
+  keymap[alphabetAllowed[0]] = obj;
+}
+
 /******************** UI ********************/
 const moveCursor = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
@@ -87,12 +95,30 @@ const throwKunaiCloud = (engine, actor) => {
 
 export const cursorToThrowItem = (engine, initiatedBy) => {
   return {
-    w: () => moveCursor(Constant.DIRECTIONS.N, engine),
-    d: () => moveCursor(Constant.DIRECTIONS.E, engine),
-    s: () => moveCursor(Constant.DIRECTIONS.S, engine),
-    a: () => moveCursor(Constant.DIRECTIONS.W, engine),
-    t: () => throwKunaiCloud(engine, initiatedBy),
-    // t: () => throwKunai(engine, initiatedBy),
+    w: {
+      activate: () => moveCursor(Constant.DIRECTIONS.N, engine),
+      label: 'foo',
+    },
+    d: {
+      activate: () => moveCursor(Constant.DIRECTIONS.E, engine),
+      label: 'foo',
+    },
+    s: {
+      activate: () => moveCursor(Constant.DIRECTIONS.S, engine),
+      label: 'foo',
+    },
+    a: {
+      activate: () => moveCursor(Constant.DIRECTIONS.W, engine),
+      label: 'foo',
+    },
+    t: {
+      activate: () => throwKunaiCloud(engine, initiatedBy),
+      label: 'foo',
+    },
+    y: {
+      activate: () => throwKunai(engine, initiatedBy),
+      label: 'foo',
+    },
   };
 }
 
@@ -105,11 +131,18 @@ const closeInventory = (engine) => {
 
 export const inventory = (engine, initiatedBy) => {
   let keymap = {
-    e: () => closeInventory(engine),
+    e: {
+      activate: () => closeInventory(engine),
+      label: 'Close',
+    }
   };
 
   initiatedBy.container.map((item, index) => {
-    keymap[index] = () => {
+    let obj = {
+      activate: null,
+      label: ''
+    }
+    obj['activate'] = () => {
       console.log(`setting action for ${initiatedBy.name} to equip ${item.name}`);
       initiatedBy.setNextAction(new Action.EquipItemFromContainer({
         item,
@@ -118,6 +151,8 @@ export const inventory = (engine, initiatedBy) => {
       }))
       closeInventory(engine);
     }
+    obj['label'] = `Equip ${item.name}`;
+    addAlphabeticallyToKeymap(keymap, obj);
     return true;
   })
 
@@ -287,7 +322,7 @@ const activateThrowCursor = (engine) => {
     },
     name: 'Cursor',
     game,
-    keyMap: cursorToThrowItem(engine, currentActor),
+    keymap: cursorToThrowItem(engine, currentActor),
   })
   game.addActor(cursor);
   game.engine.currentActor = game.engine.actors.length - 1
@@ -307,11 +342,11 @@ const activateInventory = (engine) => {
     },
     name: 'Inventory',
     game: engine.game,
-    // keyMap: inventory(engine, currentActor),
+    // keymap: inventory(engine, currentActor),
   })
   engine.game.addActor(ui);
   engine.currentActor = engine.actors.length - 1
-  ui.keyMap = inventory(engine, currentActor);
+  ui.keymap = inventory(engine, currentActor);
 }
 
 const toggleInventory = (engine) => {
@@ -326,25 +361,69 @@ const toggleInventory = (engine) => {
 
 export const player = (engine) => {
   return {
-    w: () => walk(Constant.DIRECTIONS.N, engine),
-    d: () => walk(Constant.DIRECTIONS.E, engine),
-    s: () => walk(Constant.DIRECTIONS.S, engine),
-    a: () => walk(Constant.DIRECTIONS.W, engine),
-    // e: () => equip(engine),
-    // e: () => toggleInventory(engine),
-    e: () => activateInventory(engine),
-    q: () => unequip(engine),
-    k: () => cloneSelf(engine),
-    // k: () => die(engine),
-    i: () => dropRandom(engine),
-    p: () => pickupRandom(engine),
-    t: () => activateThrowCursor(engine),
-    y: () => addActor(engine.game),
-    c: () => charge(engine, 1),
-    // r: () => release(engine, 5),
-    '1': () => sign(Constant.HAND_SIGNS.Power, engine),
-    '2': () => sign(Constant.HAND_SIGNS.Healing, engine),
-    '3': () => sign(Constant.HAND_SIGNS.Absolute, engine),
-    r: () => signRelease(engine),
+    w: {
+      activate: () => walk(Constant.DIRECTIONS.N, engine),
+      label: 'foo',
+    },
+    d: {
+      activate: () => walk(Constant.DIRECTIONS.E, engine),
+      label: 'foo',
+    },
+    s: {
+      activate: () => walk(Constant.DIRECTIONS.S, engine),
+      label: 'foo',
+    },
+    a: {
+      activate: () => walk(Constant.DIRECTIONS.W, engine),
+      label: 'foo',
+    },
+    e: {
+      activate: () => activateInventory(engine),
+      label: 'foo',
+    },
+    q: {
+      activate: () => unequip(engine),
+      label: 'foo',
+    },
+    k: {
+      activate: () => cloneSelf(engine),
+      label: 'foo',
+    },
+    i: {
+      activate: () => dropRandom(engine),
+      label: 'foo',
+    },
+    p: {
+      activate: () => pickupRandom(engine),
+      label: 'foo',
+    },
+    t: {
+      activate: () => activateThrowCursor(engine),
+      label: 'foo',
+    },
+    y: {
+      activate: () => addActor(engine.game),
+      label: 'foo',
+    },
+    c: {
+      activate: () => charge(engine, 1),
+      label: 'foo',
+    },
+    '1': {
+      activate: () => sign(Constant.HAND_SIGNS.Power, engine),
+      label: 'foo',
+    },
+    '2': {
+      activate: () => sign(Constant.HAND_SIGNS.Healing, engine),
+      label: 'foo',
+    },
+    '3': {
+      activate: () => sign(Constant.HAND_SIGNS.Absolute, engine),
+      label: 'foo',
+    },
+    r: {
+      activate: () => signRelease(engine),
+      label: 'foo',
+    },
   };
 }

@@ -6,6 +6,7 @@ import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Game from '../game';
 import Inventory from '../UI/Inventory';
+import KeymapUI from '../UI/Keymap';
 
 let ENGINE = new Engine.Engine({});
 
@@ -20,7 +21,7 @@ let actor_3 = new Entity.Player({
   actions: [],
   speed: 600,
   durability: 1,
-  keyMap: Keymap.player(ENGINE),
+  keymap: Keymap.player(ENGINE),
 })
 
 actor_3.container = [
@@ -60,6 +61,7 @@ class Level extends React.Component {
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
         <div className='row'>
           <Inventory inventory={this.state.game.visibleInventory} />
+          <KeymapUI keymap={this.state.game.visibleKeymap} />
           {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
         </div>
       </div>

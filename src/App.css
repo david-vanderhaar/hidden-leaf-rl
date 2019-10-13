@@ -1,6 +1,8 @@
 .App {
   text-align: center;
   outline: none;
+  background-color: #424242;
+  color: #eee;
 }
 
 .App-logo {
@@ -24,12 +26,36 @@
   color: #61dafb;
 }
 
+#display:focus {
+  /* outline: none; */
+}
+
+.UI {
+  
+}
+
+.Keymap {
+  position: absolute;
+  width: 200px;
+  border: solid;
+  background-color: #424242;
+  text-align: center;
+  top: 0px;
+  left: 0px;
+}
+
 .Inventory {
-  text-align: left;
+  position: absolute;
+  width: 200px;
+  border: solid;
+  background-color: #424242;
+  text-align: center;
+  top: 0px;
+  left: 200px;
 }
 
 .Inventory__button {
-  background-color: #363636
+  background-color: #424242;
 }
 
 @keyframes App-logo-spin {

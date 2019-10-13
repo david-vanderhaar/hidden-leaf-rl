@@ -4,7 +4,8 @@ import Button from './Button';
 class Inventory extends React.Component {
   render() {
     return (
-      <div className="Inventory">
+      <div className="Inventory UI">
+        <div className='flow-text'>Inventory</div>
         {
           this.props.inventory && (
             this.props.inventory.map((item, index) => {

@@ -2,25 +2,25 @@ export const ENERGY_THRESHOLD = 100;
 
 export const TILE_KEY = {
   'GROUND': {
-    background: '#363636',
+    background: '#424242',
     character: '',
     passable: true,
   },
   'WATER': {
     animation: [
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#9dc3d3', character: '░', passable: false,},
-      { background: '#363636', foreground: '#8aa', character: '▒', passable: false, },
-      { background: '#363636', foreground: '#8aa', character: '▓', passable: false, },
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},
+      { background: '#424242', foreground: '#8aa', character: '▒', passable: false, },
+      { background: '#424242', foreground: '#8aa', character: '▓', passable: false, },
     ],
     background: '#9dc3d3',
     character: '░',
@@ -150,3 +150,5 @@ export const CLONE_PATTERNS = {
     ],
   }
 }
+
+export const ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
