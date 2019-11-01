@@ -504,16 +504,9 @@ const Destructable = superclass => class extends superclass {
   }
 }
 
-export const UI_Cursor = pipe(
+export const UI_Actor = pipe(
   Acting, 
   Rendering, 
-  Playing, 
-  UI
-)(Entity);
-
-export const UI_Inventory = pipe(
-  Acting, 
-  Rendering,
   Playing, 
   UI
 )(Entity);

@@ -60,7 +60,7 @@ class Level extends React.Component {
         <div className='flow-text'>Chunin Exams</div>
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
         <div className='row'>
-          {/* <Inventory inventory={this.state.game.visibleInventory} /> */}
+          <Inventory inventory={this.state.game.visibleInventory} />
           <KeymapUI keymap={this.state.game.visibleKeymap} />
           {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
         </div>

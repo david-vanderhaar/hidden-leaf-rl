@@ -129,7 +129,7 @@ const closeInventory = (engine) => {
   engine.game.visibleInventory = null;
 }
 
-export const inventory = (engine, initiatedBy) => {
+export const keymapEquipFromInventory = (engine, initiatedBy) => {
   let keymap = {
     e: {
       activate: () => closeInventory(engine),
@@ -152,6 +152,37 @@ export const inventory = (engine, initiatedBy) => {
       closeInventory(engine);
     }
     obj['label'] = `Equip ${item.name}`;
+    addAlphabeticallyToKeymap(keymap, obj);
+    return true;
+  })
+
+  return keymap;
+}
+
+export const keymapDropFromInventory = (engine, initiatedBy) => {
+  let keymap = {
+    e: {
+      activate: () => closeInventory(engine),
+      label: 'Close',
+    }
+  };
+
+  initiatedBy.container.map((item, index) => {
+    let obj = {
+      activate: null,
+      label: ''
+    }
+    obj['activate'] = () => {
+      console.log(`setting action for ${initiatedBy.name} to drop ${item.name}`);
+      initiatedBy.setNextAction(new Action.DropItem({
+        item,
+        game: engine.game,
+        actor: initiatedBy,
+        energyCost: Constant.ENERGY_THRESHOLD
+      }));
+      closeInventory(engine);
+    }
+    obj['label'] = `Drop ${item.name}`;
     addAlphabeticallyToKeymap(keymap, obj);
     return true;
   })
@@ -312,7 +343,7 @@ const activateThrowCursor = (engine) => {
   let currentActor = game.engine.actors[game.engine.currentActor]
   let pos = currentActor.pos;
 
-  let cursor = new Entity.UI_Cursor({
+  let cursor = new Entity.UI_Actor({
     initiatedBy: currentActor,
     pos,
     renderer: {
@@ -332,7 +363,7 @@ const activateInventory = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   engine.game.visibleInventory = currentActor.container; 
 
-  let ui = new Entity.UI_Inventory({
+  let ui = new Entity.UI_Actor({
     initiatedBy: currentActor,
     pos: {...currentActor.pos},
     renderer: {
@@ -342,11 +373,31 @@ const activateInventory = (engine) => {
     },
     name: 'Inventory',
     game: engine.game,
-    // keymap: inventory(engine, currentActor),
+    // keymap: keymapEquipFromInventory(engine, currentActor),
   })
   engine.game.addActor(ui);
   engine.currentActor = engine.actors.length - 1
-  ui.keymap = inventory(engine, currentActor);
+  ui.keymap = keymapEquipFromInventory(engine, currentActor);
+}
+
+const activateDrop = (engine) => {
+  let currentActor = engine.actors[engine.currentActor]
+  engine.game.visibleInventory = currentActor.container; 
+
+  let ui = new Entity.UI_Actor({
+    initiatedBy: currentActor,
+    pos: {...currentActor.pos},
+    renderer: {
+      character: 'D',
+      color: 'white',
+      background: '',
+    },
+    name: 'Drop',
+    game: engine.game,
+  })
+  engine.game.addActor(ui);
+  engine.currentActor = engine.actors.length - 1
+  ui.keymap = keymapDropFromInventory(engine, currentActor);
 }
 
 const toggleInventory = (engine) => {
@@ -389,9 +440,9 @@ export const player = (engine) => {
       activate: () => cloneSelf(engine),
       label: 'Clone Self',
     },
-    i: {
-      activate: () => dropRandom(engine),
-      label: 'Drop Random',
+    g: {
+      activate: () => activateDrop(engine),
+      label: 'Drop Item',
     },
     p: {
       activate: () => pickupRandom(engine),
