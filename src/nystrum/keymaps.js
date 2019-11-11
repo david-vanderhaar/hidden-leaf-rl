@@ -93,7 +93,7 @@ const throwKunaiCloud = (engine, actor) => {
   }
 }
 
-export const cursorToThrowItem = (engine, initiatedBy) => {
+export const keymapCursorToThrowItem = (engine, initiatedBy) => {
   return {
     w: {
       activate: () => moveCursor(Constant.DIRECTIONS.N, engine),
@@ -131,7 +131,8 @@ const closeInventory = (engine) => {
 
 export const keymapEquipFromInventory = (engine, initiatedBy) => {
   let keymap = {
-    e: {
+    Escape: {
+    // e: {
       activate: () => closeInventory(engine),
       label: 'Close',
     }
@@ -161,7 +162,8 @@ export const keymapEquipFromInventory = (engine, initiatedBy) => {
 
 export const keymapDropFromInventory = (engine, initiatedBy) => {
   let keymap = {
-    e: {
+    Escape: {
+    // g: {
       activate: () => closeInventory(engine),
       label: 'Close',
     }
@@ -353,7 +355,7 @@ const activateThrowCursor = (engine) => {
     },
     name: 'Cursor',
     game,
-    keymap: cursorToThrowItem(engine, currentActor),
+    keymap: keymapCursorToThrowItem(engine, currentActor),
   })
   game.addActor(cursor);
   game.engine.currentActor = game.engine.actors.length - 1
@@ -428,7 +430,7 @@ export const player = (engine) => {
       activate: () => walk(Constant.DIRECTIONS.W, engine),
       label: 'walk',
     },
-    e: {
+    i: {
       activate: () => activateInventory(engine),
       label: 'Open Inventory',
     },
