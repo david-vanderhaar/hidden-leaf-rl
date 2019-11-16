@@ -23,7 +23,7 @@ export class Base {
 }
 
 export class Say extends Base {
-  constructor({ message, processDelay = 0, ...args}) {
+  constructor({ message, processDelay = 50, ...args}) {
     super({...args});
     this.message = message
     this.processDelay = processDelay
@@ -31,6 +31,28 @@ export class Say extends Base {
   perform() {
     console.log(`${this.actor.name} says ${this.message}`);
     this.actor.energy -= this.energyCost;
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
+export class SayManyThings extends Base {
+  constructor({ messages, processDelay = 50, ...args}) {
+    super({...args});
+    this.messages = messages
+    this.processDelay = processDelay
+  }
+  perform() {
+    let message = this.messages.shift();
+    if (message) {
+      console.log(`${this.actor.name} says ${message}`);
+      this.actor.energy -= this.energyCost;
+    }
+    if (this.messages.length) {
+      this.actor.setNextAction(this);
+    }
     return {
       success: true,
       alternative: null,
@@ -318,6 +340,46 @@ export class Move extends Base {
       success = true;
       alternative = new Action.Attack({
         targetPos: this.targetPos,
+        game: this.game, 
+        actor: this.actor, 
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class MoveMultiple extends Base {
+  constructor({ direction, stepCount, processDelay = 25, ...args}) {
+    super({...args});
+    this.direction = direction;
+    this.stepCount = stepCount;
+    this.processDelay = processDelay;
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    let newX = this.actor.pos.x + this.direction[0];
+    let newY = this.actor.pos.y + this.direction[1];
+    let targetPos = { x: newX, y: newY };
+    
+    if (this.stepCount > 0 && this.game.canOccupyPosition(targetPos)) {
+      this.stepCount -= 1;
+      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
+      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
+      this.actor.pos = targetPos
+      this.game.map[Helper.coordsToString(targetPos)].entities.push(this.actor);
+      this.actor.energy -= this.energyCost;
+      this.actor.setNextAction(this);
+      success = true;
+    } else {
+      success = true;
+      alternative = new Action.Attack({
+        targetPos: targetPos,
         game: this.game, 
         actor: this.actor, 
         energyCost: Constant.ENERGY_THRESHOLD

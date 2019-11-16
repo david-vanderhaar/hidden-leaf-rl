@@ -108,7 +108,7 @@ export const Attacking = superclass => class extends superclass {
       if (this.canAttack(target)) {
         let damage = this.getAttackDamage();
         if (this.entityTypes.includes('EQUIPING')) {
-          this.equipment.map((slot) => {
+          this.equipment.forEach((slot) => {
             if (slot.item) {
               if (slot.item.entityTypes.includes('ATTACKING')) {
                 damage += slot.item.getAttackDamage();

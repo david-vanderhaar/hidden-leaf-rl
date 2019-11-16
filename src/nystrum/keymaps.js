@@ -129,6 +129,43 @@ const closeInventory = (engine) => {
   engine.game.visibleInventory = null;
 }
 
+const closeEquipment = (engine) => {
+  let currentUiActor = engine.actors[engine.currentActor];
+  engine.game.removeActor(currentUiActor);
+  engine.currentActor = engine.actors.length - 1;
+  engine.game.visibleEquipment = null;
+}
+
+export const keymapEquipment = (engine, initiatedBy) => {
+  let keymap = {
+    Escape: {
+      activate: () => closeEquipment(engine),
+      label: 'Close',
+    }
+  };
+
+  initiatedBy.equipment.filter((slot) => slot.item).map((slot) => {
+    let obj = {
+      activate: null,
+      label: ''
+    }
+    obj['activate'] = () => {
+      console.log(`setting action for ${initiatedBy.name} to unequip ${slot.item.name}`);
+      initiatedBy.setNextAction(new Action.UnequipItem({
+        item: slot.item,
+        game: engine.game,
+        actor: initiatedBy,
+      }))
+      closeEquipment(engine);
+    }
+    obj['label'] = `Unequip ${slot.name}`;
+    addAlphabeticallyToKeymap(keymap, obj);
+    return true;
+  })
+
+  return keymap;
+}
+
 export const keymapEquipFromInventory = (engine, initiatedBy) => {
   let keymap = {
     Escape: {
@@ -200,6 +237,17 @@ const walk = (direction, engine) => {
   let newY = actor.pos.y + direction[1];
   actor.setNextAction(new Action.Move({
     targetPos: { x: newX, y: newY },
+    game: engine.game,
+    actor,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
+const tackle = (direction, stepCount, engine) => {
+  let actor = engine.actors[engine.currentActor];
+  actor.setNextAction(new Action.MoveMultiple({
+    direction,
+    stepCount,
     game: engine.game,
     actor,
     energyCost: Constant.ENERGY_THRESHOLD
@@ -382,6 +430,26 @@ const activateInventory = (engine) => {
   ui.keymap = keymapEquipFromInventory(engine, currentActor);
 }
 
+const activateEquipment = (engine) => {
+  let currentActor = engine.actors[engine.currentActor]
+  engine.game.visibleEquipment = currentActor.equipment; 
+
+  let ui = new Entity.UI_Actor({
+    initiatedBy: currentActor,
+    pos: {...currentActor.pos},
+    renderer: {
+      character: 'E',
+      color: 'white',
+      background: '',
+    },
+    name: 'Equipment',
+    game: engine.game,
+  })
+  engine.game.addActor(ui);
+  engine.currentActor = engine.actors.length - 1
+  ui.keymap = keymapEquipment(engine, currentActor);
+}
+
 const activateDrop = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   engine.game.visibleInventory = currentActor.container; 
@@ -419,9 +487,13 @@ export const player = (engine) => {
       label: 'walk',
     },
     d: {
-      activate: () => walk(Constant.DIRECTIONS.E, engine),
-      label: 'walk',
+      activate: () => tackle(Constant.DIRECTIONS.E, 3, engine),
+      label: 'tackle',
     },
+    // d: {
+    //   activate: () => walk(Constant.DIRECTIONS.E, engine),
+    //   label: 'walk',
+    // },
     s: {
       activate: () => walk(Constant.DIRECTIONS.S, engine),
       label: 'walk',
@@ -435,8 +507,8 @@ export const player = (engine) => {
       label: 'Open Inventory',
     },
     q: {
-      activate: () => unequip(engine),
-      label: 'Unequip',
+      activate: () => activateEquipment(engine),
+      label: 'Open Equipment',
     },
     k: {
       activate: () => cloneSelf(engine),
@@ -473,6 +545,17 @@ export const player = (engine) => {
     '3': {
       activate: () => sign(Constant.HAND_SIGNS.Absolute, engine),
       label: 'Sign - Absolution',
+    },
+    '4': {
+      activate: () => {
+        let actor = engine.actors[engine.currentActor];
+        actor.setNextAction(new Action.SayManyThings({
+          game: engine.game,
+          actor,
+          messages: ['I say one thing.', 'then another.'],
+        }))
+      },
+      label: 'Talk',
     },
     r: {
       activate: () => signRelease(engine),

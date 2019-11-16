@@ -5,35 +5,17 @@ import * as Engine from '../engine';
 import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Game from '../game';
+import Equipment from '../UI/Equipment';
 import Inventory from '../UI/Inventory';
 import KeymapUI from '../UI/Keymap';
+import RockLee from '../Characters/RockLee';
+import NarutoUzumaki from '../Characters/NarutoUzumaki';
 
 let ENGINE = new Engine.Engine({});
 
-let actor_3 = new Entity.Player({
-  pos: { x: 23, y: 7 },
-  renderer: {
-    character: '❂',
-    color: 'orange',
-    background: '',
-  },
-  name: 'Player',
-  actions: [],
-  speed: 600,
-  durability: 1,
-  keymap: Keymap.player(ENGINE),
-})
-
-actor_3.container = [
-  Item.sword(ENGINE),
-  Item.sword(ENGINE),
-  Item.sword(ENGINE),
-  // ...Array(10).fill('').map(() => Item.kunai(ENGINE)),
-  ...Array(10).fill('').map(() => Item.fireballGas(ENGINE, actor_3)),
-  // ...Array(10).fill('').map(() => Item.waterball(ENGINE)),
-]
-
-ENGINE.actors.push(actor_3)
+let actor = NarutoUzumaki(ENGINE);
+// let actor = RockLee(ENGINE);
+ENGINE.actors.push(actor)
 
 let game = new Game.Game({ engine: ENGINE })
 
@@ -60,6 +42,7 @@ class Level extends React.Component {
         <div className='flow-text'>Chunin Exams</div>
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
         <div className='row'>
+          <Equipment equipment={this.state.game.visibleEquipment} />
           <Inventory inventory={this.state.game.visibleInventory} />
           <KeymapUI keymap={this.state.game.visibleKeymap} />
           {Game.DisplayElement(this.presserRef, Game.handleKeyPress, ENGINE)}
