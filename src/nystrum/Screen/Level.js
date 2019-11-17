@@ -1,9 +1,6 @@
 import React from 'react';
 import { SCREENS } from './constants';
-import * as Keymap from '../keymaps';
 import * as Engine from '../engine';
-import * as Item from '../items';
-import * as Entity from '../entites';
 import * as Game from '../game';
 import Equipment from '../UI/Equipment';
 import Inventory from '../UI/Inventory';
@@ -13,8 +10,8 @@ import NarutoUzumaki from '../Characters/NarutoUzumaki';
 
 let ENGINE = new Engine.Engine({});
 
-let actor = NarutoUzumaki(ENGINE);
-// let actor = RockLee(ENGINE);
+// let actor = NarutoUzumaki(ENGINE);
+let actor = RockLee(ENGINE);
 ENGINE.actors.push(actor)
 
 let game = new Game.Game({ engine: ENGINE })

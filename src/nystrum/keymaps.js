@@ -231,7 +231,7 @@ export const keymapDropFromInventory = (engine, initiatedBy) => {
 
 /******************** PLAYER ********************/
 
-const walk = (direction, engine) => {
+export const walk = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
   let newX = actor.pos.x + direction[0];
   let newY = actor.pos.y + direction[1];
@@ -243,7 +243,7 @@ const walk = (direction, engine) => {
   }))
 }
 
-const tackle = (direction, stepCount, engine) => {
+export const tackle = (direction, stepCount, engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.MoveMultiple({
     direction,
@@ -254,7 +254,7 @@ const tackle = (direction, stepCount, engine) => {
   }))
 }
 
-const sign = (sign, engine) => {
+export const sign = (sign, engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.Sign({
     sign,
@@ -264,7 +264,7 @@ const sign = (sign, engine) => {
   }))
 }
 
-const signRelease = (engine) => {
+export const signRelease = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.SignRelease({
     requiredSequence: [
@@ -277,7 +277,7 @@ const signRelease = (engine) => {
   }))
 }
 
-const charge = (engine, chargeAmount) => {
+export const charge = (engine, chargeAmount) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.Charge({
     chargeAmount,
@@ -287,7 +287,7 @@ const charge = (engine, chargeAmount) => {
   }))
 }
 
-const release = (engine, chargeCost) => {
+export const release = (engine, chargeCost) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.Release({
     chargeCost,
@@ -297,21 +297,7 @@ const release = (engine, chargeCost) => {
   }))
 }
 
-const dropRandom = (engine) => {
-  let actor = engine.actors[engine.currentActor];
-  if (actor.container.length > 0) {
-    actor.setNextAction(new Action.DropItem({
-      item: Helper.getRandomInArray(actor.container),
-      game: engine.game,
-      actor,
-      energyCost: Constant.ENERGY_THRESHOLD
-    }))
-  } else {
-    console.log('nothing to drop.');
-  }
-}
-
-const pickupRandom = (engine) => {
+export const pickupRandom = (engine) => {
   let actor = engine.actors[engine.currentActor];
   let entities = engine.game.map[Helper.coordsToString(actor.pos)].entities.filter((e) => e.id !== actor.id);
   if (entities.length > 0) {
@@ -326,12 +312,12 @@ const pickupRandom = (engine) => {
   }
 }
 
-const die = (engine) => {
+export const die = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.destroy();
 }
 
-const cloneSelf = (engine) => {
+export const cloneSelf = (engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.CloneSelf({
     game: engine.game,
@@ -339,35 +325,7 @@ const cloneSelf = (engine) => {
   }))
 }
 
-const equip = (engine) => {
-  let actor = engine.actors[engine.currentActor];
-  let item = actor.container.find((item) => item.equipmentType === Constant.EQUIPMENT_TYPES.HAND);
-  if (item) {
-    actor.setNextAction(new Action.EquipItemFromContainer({
-      item,
-      game: engine.game,
-      actor,
-    }))
-  } else {
-    console.log('nothing to equip.');
-  }
-}
-
-const unequip = (engine) => {
-  let actor = engine.actors[engine.currentActor];
-  let slot = actor.equipment.find((slot) => slot.item !== null);
-  if (slot) {
-    actor.setNextAction(new Action.UnequipItem({
-      item: slot.item,
-      game: engine.game,
-      actor,
-    }))
-  } else {
-    console.log('nothing to unequip.');
-  }
-}
-
-const addActor = (game) => {
+export const addActor = (game) => {
   let targetEntity = game.engine.actors[game.engine.currentActor]
   let pos = Helper.getRandomPos(game.map).coordinates
 
@@ -388,7 +346,7 @@ const addActor = (game) => {
   game.addActor(actor);
 }
 
-const activateThrowCursor = (engine) => {
+export const activateThrowCursor = (engine) => {
   let game = engine.game;
   let currentActor = game.engine.actors[game.engine.currentActor]
   let pos = currentActor.pos;
@@ -409,7 +367,7 @@ const activateThrowCursor = (engine) => {
   game.engine.currentActor = game.engine.actors.length - 1
 }
 
-const activateInventory = (engine) => {
+export const activateInventory = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   engine.game.visibleInventory = currentActor.container; 
 
@@ -430,7 +388,7 @@ const activateInventory = (engine) => {
   ui.keymap = keymapEquipFromInventory(engine, currentActor);
 }
 
-const activateEquipment = (engine) => {
+export const activateEquipment = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   engine.game.visibleEquipment = currentActor.equipment; 
 
@@ -450,7 +408,7 @@ const activateEquipment = (engine) => {
   ui.keymap = keymapEquipment(engine, currentActor);
 }
 
-const activateDrop = (engine) => {
+export const activateDrop = (engine) => {
   let currentActor = engine.actors[engine.currentActor]
   engine.game.visibleInventory = currentActor.container; 
 
@@ -470,16 +428,6 @@ const activateDrop = (engine) => {
   ui.keymap = keymapDropFromInventory(engine, currentActor);
 }
 
-const toggleInventory = (engine) => {
-  let currentActor = engine.actors[engine.currentActor]
-  // engine.game.showUI = !engine.game.showUI; 
-  if (!engine.game.visibleInventory) {
-    engine.game.visibleInventory = currentActor.container; 
-  } else {
-    engine.game.visibleInventory = null;
-  }
-}
-
 export const player = (engine) => {
   return {
     w: {
@@ -490,10 +438,10 @@ export const player = (engine) => {
       activate: () => tackle(Constant.DIRECTIONS.E, 3, engine),
       label: 'tackle',
     },
-    // d: {
-    //   activate: () => walk(Constant.DIRECTIONS.E, engine),
-    //   label: 'walk',
-    // },
+    d: {
+      activate: () => walk(Constant.DIRECTIONS.E, engine),
+      label: 'walk',
+    },
     s: {
       activate: () => walk(Constant.DIRECTIONS.S, engine),
       label: 'walk',
