@@ -5,6 +5,7 @@ import * as Constant from './constants';
 import * as Action from './actions';
 import * as Engine from './engine';
 import { cloneDeep, cloneDeepWith } from 'lodash';
+import { access } from 'fs';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
@@ -98,7 +99,7 @@ export const Attacking = superclass => class extends superclass {
     return true;
   }
 
-  attack (targetPos) {
+  attack (targetPos, additional = 0) {
     let success = false;
     let tile = this.game.map[Helper.coordsToString(targetPos)]
     if (!tile) { return success }
@@ -106,7 +107,7 @@ export const Attacking = superclass => class extends superclass {
     if (targets.length > 0) {
       let target = targets[0];
       if (this.canAttack(target)) {
-        let damage = this.getAttackDamage();
+        let damage = this.getAttackDamage(additional);
         if (this.entityTypes.includes('EQUIPING')) {
           this.equipment.forEach((slot) => {
             if (slot.item) {

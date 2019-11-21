@@ -435,10 +435,6 @@ export const player = (engine) => {
       label: 'walk',
     },
     d: {
-      activate: () => tackle(Constant.DIRECTIONS.E, 3, engine),
-      label: 'tackle',
-    },
-    d: {
       activate: () => walk(Constant.DIRECTIONS.E, engine),
       label: 'walk',
     },

@@ -393,6 +393,42 @@ export class MoveMultiple extends Base {
   }
 };
 
+export class Tackle extends MoveMultiple {
+  constructor({ direction, stepCount, additionalAttackDamage = 0, processDelay = 25, ...args}) {
+    super({...args});
+    this.direction = direction;
+    this.stepCount = stepCount;
+    this.additionalAttackDamage = additionalAttackDamage;
+    this.processDelay = processDelay;
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    let newX = this.actor.pos.x + this.direction[0];
+    let newY = this.actor.pos.y + this.direction[1];
+    let targetPos = { x: newX, y: newY };
+    
+    if (this.stepCount > 0 && this.game.canOccupyPosition(targetPos)) {
+      this.stepCount -= 1;
+      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
+      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
+      this.actor.pos = targetPos
+      this.game.map[Helper.coordsToString(targetPos)].entities.push(this.actor);
+      this.actor.energy -= this.energyCost;
+      this.actor.setNextAction(this);
+      success = true;
+    } else {
+      success = true;
+      this.actor.attack(targetPos, this.additionalAttackDamage);
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
 export class Attack extends Base {
   constructor({ targetPos, processDelay = 25, ...args}) {
     super({...args});

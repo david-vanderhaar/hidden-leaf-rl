@@ -3,10 +3,23 @@ import * as Keymap from '../keymaps';
 import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
+import * as Action from '../actions';
 
 export default function (engine) {
   // define keymap helpers
-  const keymapLeafWindHurricane = (engine, initiatedBy, previousKeymap) => {
+  const flyingLotus = (direction, stepCount, speedModifier, additionalAttackDamage, engine) => {
+    let actor = engine.actors[engine.currentActor];
+    actor.setNextAction(new Action.Tackle({
+      direction,
+      stepCount,
+      game: engine.game,
+      actor,
+      additionalAttackDamage,
+      energyCost: Math.floor(Constant.ENERGY_THRESHOLD / speedModifier),
+    }))
+  }
+
+  const keymapFlyingLotus = (engine, initiatedBy, previousKeymap) => {
     const goToPreviousKeymap = () => initiatedBy.keymap = previousKeymap;
     return {
       Escape: {
@@ -15,28 +28,28 @@ export default function (engine) {
       },
       w: {
         activate: () => {
-          Keymap.tackle(Constant.DIRECTIONS.N, 10, engine);
+          flyingLotus(Constant.DIRECTIONS.N, 10, 2, 10, engine);
           goToPreviousKeymap();
         },
         label: 'activate N',
       },
       d: {
         activate: () => {
-          Keymap.tackle(Constant.DIRECTIONS.E, 10, engine);
+          flyingLotus(Constant.DIRECTIONS.E, 10, 2, 10, engine);
           goToPreviousKeymap();
         },
         label: 'activate E',
       },
       s: {
         activate: () => {
-          Keymap.tackle(Constant.DIRECTIONS.S, 10, engine);
+          flyingLotus(Constant.DIRECTIONS.S, 10, 2, 10, engine);
           goToPreviousKeymap();
         },
         label: 'activate S',
       },
       a: {
         activate: () => {
-          Keymap.tackle(Constant.DIRECTIONS.W, 10, engine);
+          flyingLotus(Constant.DIRECTIONS.W, 10, 2, 10, engine);
           goToPreviousKeymap();
         },
         label: 'activate W',
@@ -44,9 +57,9 @@ export default function (engine) {
     };
   }
 
-  const activateLeafWindHurricane = (engine) => {
+  const activateFlyingLotus = (engine) => {
     let currentActor = engine.actors[engine.currentActor]
-    currentActor.keymap = keymapLeafWindHurricane(engine, currentActor, {...currentActor.keymap});
+    currentActor.keymap = keymapFlyingLotus(engine, currentActor, {...currentActor.keymap});
   }
   
   // define keymap
@@ -69,8 +82,8 @@ export default function (engine) {
         label: 'walk',
       },
       l: {
-        activate: () => activateLeafWindHurricane(engine),
-        label: 'Leaf Wind Hurricane',
+        activate: () => activateFlyingLotus(engine),
+        label: 'Flying Lotus',
       },
       i: {
         activate: () => Keymap.activateInventory(engine),
