@@ -171,6 +171,35 @@ const Rendering = superclass => class extends superclass {
   getPosition () {
     return this.pos;
   }
+
+  move (targetPos) {
+    let success = false;
+    if (this.game.canOccupyPosition(targetPos)) {
+      let tile = this.game.map[Helper.coordsToString(this.pos)]
+      this.game.map[Helper.coordsToString(this.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.id) }
+      this.pos = targetPos
+      this.game.map[Helper.coordsToString(targetPos)].entities.push(this);
+      success = true;
+    }
+    return success;
+  }
+
+  shove (targetPos, direction) {
+    let success = false;
+    let targetTile = this.game.map[Helper.coordsToString(targetPos)];
+    if (targetTile) {
+      targetTile.entities.map((entity) => { 
+        if (!entity.passable) {
+          let newX = entity.pos.x + direction[0];
+          let newY = entity.pos.y + direction[1];
+          let newPos = { x: newX, y: newY };
+          entity.move(newPos);
+        }
+      });
+    }
+    success = this.move(targetPos);
+    return success;
+  }
 }
 
 const Containing = superclass => class extends superclass {

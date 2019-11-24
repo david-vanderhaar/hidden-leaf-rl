@@ -329,11 +329,8 @@ export class Move extends Base {
   perform() {
     let success = false;
     let alternative = null;
-    if (this.game.canOccupyPosition(this.targetPos)) {
-      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
-      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
-      this.actor.pos = this.targetPos
-      this.game.map[Helper.coordsToString(this.targetPos)].entities.push(this.actor);
+    let moveSuccess = this.actor.move(this.targetPos);
+    if (moveSuccess) {
       this.actor.energy -= this.energyCost;
       success = true;
     } else {
@@ -367,12 +364,8 @@ export class MoveMultiple extends Base {
     let newY = this.actor.pos.y + this.direction[1];
     let targetPos = { x: newX, y: newY };
     
-    if (this.stepCount > 0 && this.game.canOccupyPosition(targetPos)) {
+    if (this.stepCount > 0 && this.actor.move(targetPos)) {
       this.stepCount -= 1;
-      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
-      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
-      this.actor.pos = targetPos
-      this.game.map[Helper.coordsToString(targetPos)].entities.push(this.actor);
       this.actor.energy -= this.energyCost;
       this.actor.setNextAction(this);
       success = true;
@@ -408,12 +401,8 @@ export class Tackle extends MoveMultiple {
     let newY = this.actor.pos.y + this.direction[1];
     let targetPos = { x: newX, y: newY };
     
-    if (this.stepCount > 0 && this.game.canOccupyPosition(targetPos)) {
+    if (this.stepCount > 0 && this.actor.shove(targetPos, this.direction)) {
       this.stepCount -= 1;
-      let tile = this.game.map[Helper.coordsToString(this.actor.pos)]
-      this.game.map[Helper.coordsToString(this.actor.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.actor.id) }
-      this.actor.pos = targetPos
-      this.game.map[Helper.coordsToString(targetPos)].entities.push(this.actor);
       this.actor.energy -= this.energyCost;
       this.actor.setNextAction(this);
       success = true;
