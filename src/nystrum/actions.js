@@ -22,6 +22,23 @@ export class Base {
   }
 }
 
+export class AddStatusEffect extends Base {
+  constructor({ effect, processDelay = 0, ...args }) {
+    super({ ...args });
+    this.effect = effect
+    this.processDelay = processDelay
+  }
+
+  perform() {
+    this.actor.energy -= this.energyCost;
+    this.game.engine.addStatusEffect(this.effect);
+    return {
+      success: true,
+      alternative: null,
+    }
+  }
+};
+
 export class Say extends Base {
   constructor({ message, processDelay = 50, ...args}) {
     super({...args});

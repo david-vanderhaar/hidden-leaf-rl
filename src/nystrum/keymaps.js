@@ -341,7 +341,7 @@ export const addActor = (game) => {
     game,
     actions: [],
     durability: Helper.getRandomInArray([1, 2, 4, 8]),
-    speed: 60,
+    speed: 100,
   })
   game.addActor(actor);
 }

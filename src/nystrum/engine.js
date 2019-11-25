@@ -2,11 +2,13 @@ import * as Helper from '../helper';
 
 export class Engine {
   constructor({
+    statusEffects = [],
     actors = [],
     currentActor = 0,
     isRunning = false,
     game = null,
   }) {
+    this.statusEffects = statusEffects;
     this.actors = actors;
     this.currentActor = currentActor;
     this.isRunning = isRunning;
@@ -36,9 +38,11 @@ export class Engine {
     let actor = this.actors[this.currentActor]
     let acting = true;
     while (acting) {
+      let timePassed = 0;
       if (actor.hasEnoughEnergy()) {
         let action = actor.getAction(this.game);
         if (!action) { return false; } // if no action given, kick out to UI input
+        timePassed += action.energyCost;
         while (true) {
           let result = await action.perform();
           this.game.draw();
@@ -47,6 +51,8 @@ export class Engine {
           if (result.alternative === null) break;
           action = result.alternative;
         }
+        console.log(timePassed);
+        this.processStatusEffects(timePassed);
       } else {
         actor.gainEnergy(actor.speed);
         acting = false;
@@ -71,6 +77,41 @@ export class Engine {
   
   stop() {
     this.isRunning = false;
+  }
+
+  addStatusEffect(effect) {
+    effect.onStart();
+    this.statusEffects.push(effect)
+  }
+
+  removeStatusEffectById (id) {
+    this.statusEffects = this.statusEffects.filter((effect) => {
+      if (effect.id !== id) return true;
+      effect.onStop();
+      return false;
+    });
+  }
+
+  removeDeadStatusEffects() {
+    this.statusEffects = this.statusEffects.filter((effect) =>{
+      if (effect.lifespan >= 0 && effect.timeToLive <= 0) {
+        effect.onStop();
+        return false;
+      }
+      return true;
+    });
+  }
+
+  processStatusEffects (timePassed) {
+    this.statusEffects.forEach((effect) => {
+      effect.timeSinceLastStep += timePassed;
+      effect.timeToLive -= timePassed;
+      if (effect.timeSinceLastStep >= effect.stepInterval) {
+        effect.onStep();
+        effect.timeSinceLastStep = 0;
+      } 
+    });
+    this.removeDeadStatusEffects();
   }
 }
 

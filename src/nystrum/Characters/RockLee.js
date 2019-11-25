@@ -4,6 +4,7 @@ import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Action from '../actions';
+import * as StatusEffect from '../statusEffects';
 
 export default function (engine) {
   // define keymap helpers
@@ -62,6 +63,31 @@ export default function (engine) {
     currentActor.keymap = keymapFlyingLotus(engine, currentActor, {...currentActor.keymap});
   }
   
+  const removeWraps = (engine, speedBoost = 600) => {
+    let currentActor = engine.actors[engine.currentActor];
+    let effect = new StatusEffect.Base({
+      game: engine.game,
+      actor: currentActor,
+      name: 'Removed wraps (weights)',
+      lifespan: 1000,
+      stepInterval: 100,
+      onStart: () => {
+        currentActor.speed += speedBoost;
+        currentActor.energy += speedBoost;
+        console.log(`${currentActor.name} removed weighted wraps.`);
+      },
+      onStop: () => {
+        currentActor.speed -= speedBoost;
+        console.log(`${currentActor.name} rewrapped weights.`);
+      },
+    });
+    currentActor.setNextAction(new Action.AddStatusEffect({
+      effect,
+      actor: currentActor,
+      game: engine.game,
+    }));
+  }
+  
   // define keymap
   const keymap = (engine) => {
     return {
@@ -84,6 +110,10 @@ export default function (engine) {
       l: {
         activate: () => activateFlyingLotus(engine),
         label: 'Flying Lotus',
+      },
+      k: {
+        activate: () => removeWraps(engine, 200),
+        label: 'Remove wraps',
       },
       i: {
         activate: () => Keymap.activateInventory(engine),
