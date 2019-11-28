@@ -5,6 +5,7 @@ export class Base {
     name = 'Effect', 
     lifespan = 100,
     stepInterval = 100,
+    allowDuplicates = true,
     onStart = () => null,
     onStep = () => null,
     onStop = () => null,
@@ -15,6 +16,7 @@ export class Base {
     this.lifespan = lifespan
     this.timeToLive = lifespan
     this.stepInterval = stepInterval
+    this.allowDuplicates = allowDuplicates
     this.timeSinceLastStep = 0;
     this.onStart = onStart
     this.onStep = onStep

@@ -51,7 +51,6 @@ export class Engine {
           if (result.alternative === null) break;
           action = result.alternative;
         }
-        console.log(timePassed);
         this.processStatusEffects(timePassed);
       } else {
         actor.gainEnergy(actor.speed);
@@ -79,9 +78,19 @@ export class Engine {
     this.isRunning = false;
   }
 
-  addStatusEffect(effect) {
-    effect.onStart();
-    this.statusEffects.push(effect)
+  addStatusEffect(newEffect) {
+    if (!newEffect.allowDuplicates) {
+      if (this.statusEffects.filter((effect) => (
+        effect.actor.id === newEffect.actor.id &&
+        effect.name === newEffect.name
+      )).length > 0) {
+        console.log(`${newEffect.name} cannot be applied twice to ${newEffect.actor.name}`);
+        return false;
+      };
+    }
+    newEffect.onStart();
+    this.statusEffects.push(newEffect)
+    return true;
   }
 
   removeStatusEffectById (id) {

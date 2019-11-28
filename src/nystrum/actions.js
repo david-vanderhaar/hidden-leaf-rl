@@ -30,10 +30,10 @@ export class AddStatusEffect extends Base {
   }
 
   perform() {
-    this.actor.energy -= this.energyCost;
-    this.game.engine.addStatusEffect(this.effect);
+    let success = this.game.engine.addStatusEffect(this.effect);
+    if (success) this.actor.energy -= this.energyCost;
     return {
-      success: true,
+      success,
       alternative: null,
     }
   }
@@ -457,6 +457,42 @@ export class Attack extends Base {
     }
     
     success = this.actor.attack(this.targetPos);
+    if (success) {
+      this.actor.energy -= this.energyCost;
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class MultiTargetAttack extends Base {
+  constructor({ targetPositions, processDelay = 25, ...args }) {
+    super({ ...args });
+    this.targetPositions = targetPositions
+    this.processDelay = processDelay
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+
+    if (!this.actor.entityTypes.includes('ATTACKING')) {
+      return {
+        success: true,
+        alternative: new Action.Say({
+          message: `Ooh I don\'t know how to attack`,
+          game: this.game,
+          actor: this.actor,
+        }),
+      }
+    }
+    this.targetPositions.forEach((targetPos) => {
+      let attackSuccess = this.actor.attack(targetPos);
+      if (attackSuccess) success = true;
+    })
+
     if (success) {
       this.actor.energy -= this.energyCost;
     }
