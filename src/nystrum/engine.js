@@ -100,6 +100,14 @@ export class Engine {
       return false;
     });
   }
+  
+  removeStatusEffectByActorId (actorId) {
+    this.statusEffects = this.statusEffects.filter((effect) => {
+      if (effect.actor.id !== actorId) return true;
+      effect.onStop();
+      return false;
+    });
+  }
 
   removeDeadStatusEffects() {
     this.statusEffects = this.statusEffects.filter((effect) =>{

@@ -5,6 +5,7 @@ import * as Helper from '../helper';
 export const TYPE = {
   KUNAI: 'Kunai',
   SWORD: 'Sword',
+  BARRIER: 'Barrier',
 }
 
 const createProjectileCloud = ({ 
@@ -80,6 +81,23 @@ export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectil
     character: '🗡️',
     color: 'white',
     background: '',
+  },
+  name: TYPE.KUNAI,
+  speed: 100,
+  energy: 0,
+  range: 30,
+})
+
+export const sandShuriken = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
+  game: engine.game,
+  targetPos,
+  passable: true,
+  pos: { x: pos.x, y: pos.y },
+  renderer: {
+    // character: '>',
+    character: '✦️',
+    color: '#A89078',
+    background: '#D8C0A8',
   },
   name: TYPE.KUNAI,
   speed: 100,

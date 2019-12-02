@@ -89,6 +89,18 @@ export const DIRECTIONS = {
   W: [-1, 0],
 }
 
+export const getDirectionKey = (direction) => {
+  let directionString = `${direction}`;
+  switch (directionString) {
+    case `[0, -1]`:
+      return 'N';
+      break;
+  
+    default:
+      break;
+  }
+}
+
 export const EQUIPMENT_TYPES = {
   HEAD: 'HEAD',
   TORSO: 'TORSO',

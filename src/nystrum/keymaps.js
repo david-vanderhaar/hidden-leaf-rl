@@ -329,7 +329,7 @@ export const addActor = (game) => {
   let targetEntity = game.engine.actors[game.engine.currentActor]
   let pos = Helper.getRandomPos(game.map).coordinates
 
-  let actor = new Entity.Chaser({
+  let actor = new Entity.Bandit({
     targetEntity,
     pos,
     renderer: {

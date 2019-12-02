@@ -7,11 +7,13 @@ import Inventory from '../UI/Inventory';
 import KeymapUI from '../UI/Keymap';
 import RockLee from '../Characters/RockLee';
 import NarutoUzumaki from '../Characters/NarutoUzumaki';
+import Gaara from '../Characters/Gaara';
 
 let ENGINE = new Engine.Engine({});
 
 // let actor = NarutoUzumaki(ENGINE);
-let actor = RockLee(ENGINE);
+// let actor = RockLee(ENGINE);
+let actor = Gaara(ENGINE);
 ENGINE.actors.push(actor)
 
 let game = new Game.Game({ engine: ENGINE })

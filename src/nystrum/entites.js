@@ -375,7 +375,7 @@ const DestructiveProjecting = superclass => class extends superclass {
 
     let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     
-    let result = new Action.ThrowDestructable({
+    let result = new Action.ThrowProjectile({
       targetPos, 
       game, 
       actor: this, 
@@ -416,7 +416,7 @@ const GaseousDestructiveProjecting = superclass => class extends superclass {
     }
     let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
     
-    let result = new Action.ThrowDestructableGas({
+    let result = new Action.ThrowProjectileGas({
       targetPos, 
       game, 
       actor: this, 
@@ -529,6 +529,7 @@ const Destructable = superclass => class extends superclass {
     let tile = this.game.map[Helper.coordsToString(this.pos)];
     this.game.map[Helper.coordsToString(this.pos)].entities = tile.entities.filter((e) => e.id !== this.id);
     this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
+    this.game.engine.removeStatusEffectByActorId(this.id);
     // this.game.engine.currentActor = 0;
     this.game.draw()
   }
@@ -546,11 +547,24 @@ export const Actor = pipe(
   Rendering
 )(Entity);
 
+export const Wall = pipe(
+  Rendering,
+  Destructable,
+)(Entity);
+
 export const Chaser = pipe(
   Acting, 
   Rendering, 
   Chasing, 
   Destructable
+)(Entity);
+
+export const Bandit = pipe(
+  Acting, 
+  Rendering, 
+  Chasing, 
+  Destructable,
+  Attacking,
 )(Entity);
 
 export const Player = pipe(

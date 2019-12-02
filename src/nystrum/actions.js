@@ -337,6 +337,64 @@ export class CursorMove extends Base {
   }
 };
 
+export class PlaceItem extends Base {
+  constructor({ targetPos, entity, processDelay = 25, ...args}) {
+    super({...args});
+    this.targetPos = targetPos
+    this.processDelay = processDelay
+    this.entity = entity
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    
+    if (this.game.canOccupyPosition(this.targetPos)) {
+      this.entity.pos = this.targetPos;
+      success = this.game.placeActorOnMap(this.entity)
+    }
+      
+    if (success) {
+      this.actor.energy -= this.energyCost;
+    }
+    
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class PlaceItems extends PlaceItem {
+  constructor({targetPositions = [], ...args}) {
+    super({...args});
+    this.targetPositions = targetPositions
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    console.log('actor ', this.actor.pos);
+    this.targetPositions.forEach((targetPos) => {
+      console.log('target ', targetPos);
+      
+      if (this.game.canOccupyPosition(targetPos)) {
+        let clone = cloneDeep(this.entity);
+        clone.game = this.game;
+        clone.id = uuid();
+        clone.pos = targetPos;
+        let placementSuccess = this.game.placeActorOnMap(clone);
+        if (placementSuccess) success = true;
+      }
+    });
+
+    if (success) this.actor.energy -= this.energyCost;
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
 export class Move extends Base {
   constructor({ targetPos, processDelay = 25, ...args}) {
     super({...args});
@@ -504,7 +562,7 @@ export class MultiTargetAttack extends Base {
   }
 };
 
-export class ThrowDestructable extends Move {
+export class ThrowProjectile extends Move {
   constructor({ ...args }) {
     super({ ...args });
   }
@@ -547,7 +605,7 @@ export class ThrowDestructable extends Move {
   }
 }
 
-export class ThrowDestructableGas extends Move {
+export class ThrowProjectileGas extends Move {
   constructor({ ...args }) {
     super({ ...args });
     this.processDelay = 0

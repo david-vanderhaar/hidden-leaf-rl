@@ -79,7 +79,6 @@ export default function (engine) {
         direction = Constant.DIRECTIONS[Helper.getRandomInArray(Object.keys(Constant.DIRECTIONS))];
       }
       console.log(count);
-      
     }
 
     let newX = actor.pos.x + direction[0];
@@ -162,6 +161,43 @@ export default function (engine) {
       actor: currentActor,
       game: engine.game,
     }));
+  }
+
+  const openInnerGate = (engine) => {
+    let currentActor = engine.actors[engine.currentActor];
+    let nextGate = currentActor.setNextGate();
+    if (nextGate) {
+      let effect = new StatusEffect.Base({
+        game: engine.game,
+        actor: currentActor,
+        name: nextGate.name,
+        lifespan: -1,
+        stepInterval: 100,
+        allowDuplicates: false,
+        onStart: () => {
+          currentActor.speed += nextGate.speedBuff;
+          currentActor.energy += nextGate.speedBuff;
+          currentActor.attackDamage += nextGate.damageBuff;
+          console.log(`${currentActor.name} opened the ${nextGate.name}.`);
+          let nextGateToLabel = currentActor.getNextGate();
+          if (nextGateToLabel) {
+            currentActor.keymap.o.label = nextGateToLabel.name;
+          } else {
+            delete currentActor.keymap.o;
+          }
+        },
+        onStep: () => {
+          currentActor.decreaseDurability(nextGate.durabilityDebuff);
+          currentActor.decreaseDurability(0);
+          console.log(`${currentActor.name} suffers ${nextGate.durabilityDebuff} damage from physical stress.`)
+        },
+      });
+      currentActor.setNextAction(new Action.AddStatusEffect({
+        effect,
+        actor: currentActor,
+        game: engine.game,
+      }));
+    }
   }
   
   const drunkenFist = (engine, damageBuff = 1) => {
@@ -257,6 +293,10 @@ export default function (engine) {
         activate: () => leafWhirlwind(engine),
         label: 'Leaf Whirlwind',
       },
+      o: {
+        activate: () => openInnerGate(engine),
+        label: 'Gate of Opening',
+      },
       i: {
         activate: () => Keymap.activateInventory(engine),
         label: 'Open Inventory',
@@ -285,7 +325,80 @@ export default function (engine) {
     };
   }
   // instantiate class
-  let actor = new Entity.Player({
+  class RockLee extends Entity.Player {
+    constructor({ currentGate = null, gates = [], ...args }) {
+      super({ ...args })
+      this.currentGate = currentGate;
+      this.gates = [
+        {
+          name: 'Gate of Opening',
+          damageBuff: 1,
+          speedBuff: 100,
+          durabilityDebuff: 1,
+        },
+        {
+          name: 'Gate of Healing',
+          damageBuff: 1,
+          speedBuff: 100,
+          durabilityDebuff: 1,
+        },
+        {
+          name: 'Gate of Life',
+          damageBuff: 1,
+          speedBuff: 100,
+          durabilityDebuff: 1,
+        },
+        {
+          name: 'Gate of Pain',
+          damageBuff: 1,
+          speedBuff: 100,
+          durabilityDebuff: 1,
+        },
+        {
+          name: 'Gate of Limit',
+          damageBuff: 1,
+          speedBuff: 100,
+          durabilityDebuff: 1,
+        },
+      ];
+    }
+
+    setNextGate () {
+      let currentGate = this.currentGate;
+      let nextGate = null;
+      if (!currentGate) {
+        nextGate =  this.gates[0];
+        this.currentGate = {...nextGate};
+      } else {
+        let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
+        console.log('next gate index ', nextGateIndex);
+        
+        if (this.gates.length > nextGateIndex) { 
+          nextGate = this.gates[nextGateIndex];
+          this.currentGate = {...nextGate};
+        }
+      }
+      return nextGate;
+    }
+
+    getNextGate () {
+      let currentGate = this.currentGate;
+      let nextGate = null;
+      if (!currentGate) {
+        nextGate =  this.gates[0];
+      } else {
+        let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
+        console.log('next gate index ', nextGateIndex);
+        
+        if (this.gates.length > nextGateIndex) { 
+          nextGate = this.gates[nextGateIndex];
+        }
+      }
+      return nextGate;
+    }
+  }
+
+  let actor = new RockLee({
     pos: { x: 23, y: 7 },
     renderer: {
       character: 'R',
@@ -295,7 +408,7 @@ export default function (engine) {
     name: 'Rock Lee',
     actions: [],
     speed: 600,
-    durability: 1,
+    durability: 10,
     keymap: keymap(engine),
   })
 
