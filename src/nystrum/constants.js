@@ -91,14 +91,14 @@ export const DIRECTIONS = {
 
 export const getDirectionKey = (direction) => {
   let directionString = `${direction}`;
-  switch (directionString) {
-    case `[0, -1]`:
-      return 'N';
-      break;
-  
-    default:
-      break;
-  }
+  let keys = Object.keys(DIRECTIONS);
+  let result = false
+  keys.forEach((key) => {
+    if (`${DIRECTIONS[key]}` === directionString) {
+      result = key
+    }
+  })
+  return result
 }
 
 export const EQUIPMENT_TYPES = {

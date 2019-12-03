@@ -21,60 +21,78 @@ export default function (engine) {
     durability: 3,
   })
 
-  const sandWall = (engine, direction) => {
+  const sandWall = (direction, engine) => {
     let actor = engine.actors[engine.currentActor];
     let targetPositions = [];
-    switch (Constant.getDirectionKey(direction)) {
+    let directionKey = Constant.getDirectionKey(direction);
+    switch (directionKey) {
       case 'N':
-        
+        targetPositions = targetPositions.concat([
+          {
+            x: actor.pos.x - 1,
+            y: actor.pos.y - 1,
+          },
+          {
+            x: actor.pos.x,
+            y: actor.pos.y - 1,
+          },
+          {
+            x: actor.pos.x + 1,
+            y: actor.pos.y - 1,
+          },
+        ]);
         break;
       case 'S':
-        
+        targetPositions = targetPositions.concat([
+          {
+            x: actor.pos.x - 1,
+            y: actor.pos.y + 1,
+          },
+          {
+            x: actor.pos.x,
+            y: actor.pos.y + 1,
+          },
+          {
+            x: actor.pos.x + 1,
+            y: actor.pos.y + 1,
+          },
+        ]);
         break;
       case 'E':
-        
+        targetPositions = targetPositions.concat([
+          {
+            x: actor.pos.x + 1,
+            y: actor.pos.y - 1,
+          },
+          {
+            x: actor.pos.x + 1,
+            y: actor.pos.y,
+          },
+          {
+            x: actor.pos.x + 1,
+            y: actor.pos.y + 1,
+          },
+        ]);
         break;
       case 'W':
-        
+        targetPositions = targetPositions.concat([
+          {
+            x: actor.pos.x - 1,
+            y: actor.pos.y - 1,
+          },
+          {
+            x: actor.pos.x - 1,
+            y: actor.pos.y,
+          },
+          {
+            x: actor.pos.x - 1,
+            y: actor.pos.y + 1,
+          },
+        ]);
         break;
-    
       default:
         break;
     }
-    let targetPositions = [
-      // {
-      //   x: actor.pos.x - 1,
-      //   y: actor.pos.y - 1,
-      // },
-      {
-        x: actor.pos.x,
-        y: actor.pos.y - 1,
-      },
-      // {
-      //   x: actor.pos.x + 1,
-      //   y: actor.pos.y - 1,
-      // },
-      {
-        x: actor.pos.x - 1,
-        y: actor.pos.y,
-      },
-      {
-        x: actor.pos.x + 1,
-        y: actor.pos.y,
-      },
-      // {
-      //   x: actor.pos.x - 1,
-      //   y: actor.pos.y + 1,
-      // },
-      {
-        x: actor.pos.x,
-        y: actor.pos.y + 1,
-      },
-      // {
-      //   x: actor.pos.x + 1,
-      //   y: actor.pos.y + 1,
-      // },
-    ]
     actor.setNextAction(new Action.PlaceItems({
       targetPositions,
       entity: createSandWall(engine, { ...actor.pos }),
@@ -83,6 +101,50 @@ export default function (engine) {
       energyCost: Constant.ENERGY_THRESHOLD
     }))
   }
+
+  const keymapSandWall = (engine, initiatedBy, previousKeymap) => {
+    const goToPreviousKeymap = () => initiatedBy.keymap = previousKeymap;
+    return {
+      Escape: {
+        activate: goToPreviousKeymap,
+        label: 'Close',
+      },
+      w: {
+        activate: () => {
+          sandWall(Constant.DIRECTIONS.N, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate N',
+      },
+      d: {
+        activate: () => {
+          sandWall(Constant.DIRECTIONS.E, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate E',
+      },
+      s: {
+        activate: () => {
+          sandWall(Constant.DIRECTIONS.S, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate S',
+      },
+      a: {
+        activate: () => {
+          sandWall(Constant.DIRECTIONS.W, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate W',
+      },
+    };
+  }
+
+  const activateSandWall = (engine) => {
+    let currentActor = engine.actors[engine.currentActor]
+    currentActor.keymap = keymapSandWall(engine, currentActor, { ...currentActor.keymap });
+  }
+
   // define keymap
   const keymap = (engine) => {
     return {
@@ -115,7 +177,7 @@ export default function (engine) {
         label: 'Sand Skin',
       },
       h: {
-        activate: () => sandWall(engine),
+        activate: () => activateSandWall(engine),
         label: 'Sand Wall',
       },
       o: {
