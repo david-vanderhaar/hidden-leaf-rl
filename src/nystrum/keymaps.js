@@ -13,7 +13,7 @@ const addAlphabeticallyToKeymap = (keymap, obj) => {
 }
 
 /******************** UI ********************/
-const moveCursor = (direction, engine) => {
+export const moveCursor = (direction, engine) => {
   let actor = engine.actors[engine.currentActor];
   let newX = actor.pos.x + direction[0];
   let newY = actor.pos.y + direction[1];

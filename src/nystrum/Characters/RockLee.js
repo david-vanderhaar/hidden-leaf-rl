@@ -408,7 +408,7 @@ export default function (engine) {
     name: 'Rock Lee',
     actions: [],
     speed: 600,
-    durability: 10,
+    durability: 100,
     keymap: keymap(engine),
   })
 

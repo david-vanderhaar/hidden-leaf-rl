@@ -141,9 +141,9 @@ export class CrankEngine extends Engine {
         let action = actor.getAction(this.game);
         if (!action) { return false; } // if no action given, kick out to UI input
         while (true) {
+          await Helper.delay(action.processDelay);
           let result = await action.perform();
           this.game.draw();
-          // await Helper.delay(action.processDelay);
           if (!result.success) return false;
           if (result.alternative === null) break;
           action = result.alternative;

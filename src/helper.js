@@ -55,3 +55,20 @@ export const getRandomPos = (map) => {
 export const getDestructableEntities = (entites) => {
   return entites.filter((entity) => entity.hasOwnProperty('durability'));
 }
+
+const getGranularity = (radius) => {
+  let result = (2 / 3) * (Math.pow(radius, 3) - (9 * Math.pow(radius, 2)) + (32 * radius) - 18)
+  return result
+}
+
+export const getPointsOnCircumference = (centerX = 0, centerY = 0, r = 3) => {
+  const n = getGranularity(r);
+  let list = [];
+  for (let i = 0; i < n; i++) {
+    let x = Math.round(centerX + (Math.cos(2 * Math.PI / n * i) * r))
+    let y = Math.round(centerY + (Math.sin(2 * Math.PI / n * i) * r))
+    list.push({ x, y });
+  }
+  console.table(list);
+  return list
+}

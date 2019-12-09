@@ -4,9 +4,11 @@ import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Action from '../actions';
+import * as StatusEffect from '../statusEffects';
 
 // create class
 export default function (engine) {
+  // ------------ SAND WALL ----------------------
   const createSandWall = (engine, pos) => new Entity.Wall({
     game: engine.game,
     passable: false,
@@ -139,10 +141,118 @@ export default function (engine) {
       },
     };
   }
-
+  
   const activateSandWall = (engine) => {
     let currentActor = engine.actors[engine.currentActor]
     currentActor.keymap = keymapSandWall(engine, currentActor, { ...currentActor.keymap });
+  }
+
+  // ------------ SAND TOMB ----------------------
+  const triggerSandTomb = (engine, actor) => {
+    let cursor = engine.actors[engine.currentActor];
+    let cloud = Item.sandTomb({
+      engine,
+      actor,
+      targetPos: { ...cursor.pos },
+    });
+    if (cloud) {
+      actor.setNextAction(
+        new Action.PlaceActor({
+          targetPos: {...cursor.pos},
+          entity: cloud,
+          game: engine.game,
+          actor,
+          energyCost: Constant.ENERGY_THRESHOLD
+        })
+      )
+    }
+  }
+
+  const keymapSandTomb = (engine, initiatedBy, previousKeymap) => {
+    const goToPreviousKeymap = () => {
+      let cursor = engine.actors[engine.currentActor];
+      cursor.active = false;
+      engine.game.removeActor(cursor);
+    };
+    return {
+      Escape: {
+        activate: goToPreviousKeymap,
+        label: 'Close',
+      },
+      w: {
+        activate: () => Keymap.moveCursor(Constant.DIRECTIONS.N, engine),
+        label: 'move',
+      },
+      d: {
+        activate: () => Keymap.moveCursor(Constant.DIRECTIONS.E, engine),
+        label: 'move',
+      },
+      s: {
+        activate: () => Keymap.moveCursor(Constant.DIRECTIONS.S, engine),
+        label: 'move',
+      },
+      a: {
+        activate: () => Keymap.moveCursor(Constant.DIRECTIONS.W, engine),
+        label: 'move',
+      },
+      k: {
+        activate: () => {
+          triggerSandTomb(engine, initiatedBy);
+          goToPreviousKeymap();
+        },
+        label: 'activate'
+      },
+    };
+  }
+
+  const activateSandTomb = (engine) => {
+    let currentActor = engine.actors[engine.currentActor]
+    let game = engine.game;
+    let pos = currentActor.pos;
+
+    let cursor = new Entity.UI_Actor({
+      initiatedBy: currentActor,
+      pos,
+      renderer: {
+        character: '█',
+        color: 'white',
+        background: '',
+      },
+      name: 'Cursor',
+      game,
+      keymap: keymapSandTomb(engine, currentActor, { ...currentActor.keymap }),
+    })
+    game.addActor(cursor);
+    game.engine.currentActor = game.engine.actors.length - 1
+  }
+
+  // ------------ SAND SKIN ----------------------
+
+  const sandSkin = (engine, durabilityBuff = 1) => {
+    let currentActor = engine.actors[engine.currentActor];
+    let effect = new StatusEffect.Base({
+      game: engine.game,
+      actor: currentActor,
+      name: 'Sand Skin',
+      lifespan: 1000,
+      stepInterval: 100,
+      allowDuplicates: false,
+      onStart: () => {
+        currentActor.durability += durabilityBuff;
+        console.log(`${currentActor.name} was enveloped in hardened sand.`);
+        currentActor.renderer.background = '#A89078'
+      },
+      onStop: () => {
+        currentActor.durability = Math.max(1, currentActor.durability - durabilityBuff);
+        console.log(`${currentActor.name}'s hardened sand skin fell away.`);
+        currentActor.renderer.background = '#603030';
+      },
+    });
+    currentActor.setNextAction(new Action.AddStatusEffect({
+      effect,
+      actor: currentActor,
+      game: engine.game,
+    }));
   }
 
   // define keymap
@@ -169,11 +279,11 @@ export default function (engine) {
         label: 'Sand Clone',
       },
       k: {
-        activate: () => null,
+        activate: () => activateSandTomb(engine),
         label: 'Sand Tomb',
       },
       j: {
-        activate: () => null,
+        activate: () => sandSkin(engine, 10),
         label: 'Sand Skin',
       },
       h: {
@@ -182,7 +292,7 @@ export default function (engine) {
       },
       o: {
         activate: () => null,
-        label: 'Sand Volley',
+        label: 'Sand Pulse',
       },
       i: {
         activate: () => Keymap.activateInventory(engine),
@@ -228,7 +338,8 @@ export default function (engine) {
   })
 
   actor.container = [
-    ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    // ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
   ]
 
   return actor;

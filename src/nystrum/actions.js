@@ -337,6 +337,33 @@ export class CursorMove extends Base {
   }
 };
 
+export class PlaceActor extends Base {
+  constructor({ targetPos, entity, ...args}) {
+    super({...args});
+    this.targetPos = targetPos
+    this.entity = entity
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    
+    if (this.game.canOccupyPosition(this.targetPos)) {
+      this.entity.pos = this.targetPos;
+      this.game.engine.actors.push(this.entity);
+      success = true;
+    }
+      
+    if (success) {
+      this.actor.energy -= this.energyCost;
+    }
+    
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
 export class PlaceItem extends Base {
   constructor({ targetPos, entity, processDelay = 25, ...args}) {
     super({...args});
@@ -450,6 +477,37 @@ export class MoveMultiple extends Base {
         targetPos: targetPos,
         game: this.game, 
         actor: this.actor, 
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
+export class Shove extends Base {
+  constructor({ targetPos, direction, ...args }) {
+    super({ ...args });
+    this.targetPos = targetPos
+    this.direction = direction
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    let moveSuccess = this.actor.shove(this.targetPos, this.direction)
+    
+    if (moveSuccess) {
+      this.actor.energy -= this.energyCost;
+      success = true;
+    } else {
+      success = true;
+      alternative = new Action.Attack({
+        targetPos: this.targetPos,
+        game: this.game,
+        actor: this.actor,
         energyCost: Constant.ENERGY_THRESHOLD
       })
     }
@@ -654,6 +712,8 @@ export class CrankEngine extends Base {
       await this.engine.start();
       this.actor.energy -= this.energyCost;
     } catch (error) {
+      console.log('CrankEngine');
+      console.log(error);
       alternative = new Action.DestroySelf({
         game: this.game,
         actor: this.actor,

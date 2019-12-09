@@ -64,6 +64,7 @@ const Parent = superclass => class extends superclass {
       actor: this,
       engine: this.engine,
       energyCost: Constant.ENERGY_THRESHOLD,
+      processDelay: 10
     });
 
     return result;
@@ -137,7 +138,7 @@ export const Equipable = superclass => class extends superclass {
 }
 
 const Acting = superclass => class extends superclass {
-  constructor({name, actions = [], speed, energy = 0, ...args}) {
+  constructor({name, actions = [], speed = 100, energy = 0, ...args}) {
     super({...args})
     this.entityTypes = this.entityTypes.concat('ACTING')
     this.name = name;
@@ -185,6 +186,8 @@ const Rendering = superclass => class extends superclass {
   }
 
   shove (targetPos, direction) {
+    console.log('direction ', direction);
+    
     let success = false;
     let targetTile = this.game.map[Helper.coordsToString(targetPos)];
     if (targetTile) {
@@ -193,6 +196,9 @@ const Rendering = superclass => class extends superclass {
           let newX = entity.pos.x + direction[0];
           let newY = entity.pos.y + direction[1];
           let newPos = { x: newX, y: newY };
+          console.log(entity.pos);
+          console.log(newPos);
+          
           entity.move(newPos);
         }
       });
@@ -506,6 +512,51 @@ const Chasing = superclass => class extends superclass {
   }
 }
 
+const Pushing = superclass => class extends superclass {
+  constructor({ path = false, targetPos = null, ...args }) {
+    super({ ...args })
+    this.entityTypes = this.entityTypes.concat('PUSHING')
+    this.path = path;
+    this.targetPos = targetPos;
+  }
+
+  createPath(game) {
+    let path = Helper.calculatePath(game, this.targetPos, this.pos, 8);
+    this.path = path;
+  }
+
+  getAction(game) {
+    if (!this.path) {
+      this.createPath(game);
+    }
+    let targetPos = this.path.length > 0 ? this.path[0] : this.pos;
+    let direction = [
+      targetPos.x - this.pos.x ,
+      targetPos.y - this.pos.y ,
+    ]
+    if (direction[0] === 0 && direction[1] === 0) {
+      return new Action.DestroySelf({
+        game: game,
+        actor: this,
+        energyCost: Constant.ENERGY_THRESHOLD,
+        processDelay: 0,
+      });
+    }
+    let result = new Action.Shove({
+      targetPos,
+      direction,
+      game,
+      actor: this,
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+    if (this.game.canOccupyPosition(targetPos)) {
+      this.path.shift();
+    }
+
+    return result;
+  }
+}
+
 const Destructable = superclass => class extends superclass {
   constructor({durability = 1, ...args }) {
     super({ ...args })
@@ -549,6 +600,13 @@ export const Actor = pipe(
 
 export const Wall = pipe(
   Rendering,
+  Destructable,
+)(Entity);
+
+export const MovingWall = pipe(
+  Acting,
+  Rendering,
+  Pushing,
   Destructable,
 )(Entity);
 

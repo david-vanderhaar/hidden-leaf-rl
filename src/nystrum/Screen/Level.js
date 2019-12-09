@@ -21,8 +21,6 @@ let game = new Game.Game({ engine: ENGINE })
 class Level extends React.Component {
   constructor(props) {
     super(props);
-    console.log(game.showUI);
-    
     this.state = {
       game: game,
     };

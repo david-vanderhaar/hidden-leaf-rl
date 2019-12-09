@@ -153,6 +153,7 @@ export class Game {
     if (!isPlaced) { return false }
     engine.actors.push(actor);
     this.draw();
+    return true
   }
 
   placeAndDrawActor (actor) {
@@ -162,10 +163,14 @@ export class Game {
 
   removeActor (actor) {
     this.engine.actors = this.engine.actors.filter((ac) => ac.id !== actor.id);
-    // this.engine.currentActor = this.engine.actors.length - 1;
+    console.log(this.engine.currentActor);
+    console.log(this.engine.actors.length);
+    this.engine.currentActor = this.engine.actors.length - 1; // should remove need for this line
     // this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
     // this.engine.currentActor = (this.engine.currentActor + 1) % this.engine.actors.length;
     this.removeActorFromMap(actor);
+    console.log('remove actor');
+    console.log(actor);
     this.draw();
   }
 

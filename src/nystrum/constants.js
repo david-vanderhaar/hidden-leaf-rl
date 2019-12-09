@@ -1,3 +1,5 @@
+import * as Helper from '../helper'
+
 export const ENERGY_THRESHOLD = 100;
 
 export const TILE_KEY = {
@@ -123,6 +125,15 @@ export const EQUIPMENT_LAYOUTS = {
 }
 
 export const CLONE_PATTERNS = {
+  verticalLine: {
+    x_offset: 1,
+    y_offset: 1,
+    positions: [
+      { x: 0, y: 0, taken: false, },
+      { x: 0, y: 1, taken: false, },
+      { x: 0, y: -1, taken: false, },
+    ]
+  },
   square: {
     x_offset: 1,
     y_offset: 1,
@@ -137,7 +148,7 @@ export const CLONE_PATTERNS = {
       { x: -1, y: 0, taken: false, },
       { x: -1, y: 1, taken: false, },
     ]
-},
+  },
   bigSquare: {
     x_offset: 2,
     y_offset: 2,
@@ -160,7 +171,12 @@ export const CLONE_PATTERNS = {
       { x: -2, y: 0, taken: false, },
       { x: -2, y: 2, taken: false, },
     ],
-  }
+  },
+  circle: {
+    x_offset: 0,
+    y_offset: 0,
+    positions: Helper.getPointsOnCircumference(0, 0, 2)
+  },
 }
 
 export const ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
