@@ -243,6 +243,19 @@ export const walk = (direction, engine) => {
   }))
 }
 
+export const push = (direction, engine) => {
+  let actor = engine.actors[engine.currentActor];
+  let newX = actor.pos.x + direction[0];
+  let newY = actor.pos.y + direction[1];
+  actor.setNextAction(new Action.Shove({
+    targetPos: { x: newX, y: newY },
+    game: engine.game,
+    actor,
+    direction,
+    energyCost: Constant.ENERGY_THRESHOLD
+  }))
+}
+
 export const tackle = (direction, stepCount, engine) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.MoveMultiple({
@@ -317,11 +330,12 @@ export const die = (engine) => {
   actor.destroy();
 }
 
-export const cloneSelf = (engine) => {
+export const cloneSelf = (engine, cloneOverrides = []) => {
   let actor = engine.actors[engine.currentActor];
   actor.setNextAction(new Action.CloneSelf({
     game: engine.game,
     actor,
+    cloneArgs: cloneOverrides,
   }))
 }
 

@@ -134,6 +134,16 @@ export const CLONE_PATTERNS = {
       { x: 0, y: -1, taken: false, },
     ]
   },
+  smallSquare: {
+    x_offset: 1,
+    y_offset: 1,
+    positions: [
+      { x: 0, y: 0, taken: false, },
+      { x: 0, y: 1, taken: false, },
+      { x: 1, y: 1, taken: false, },
+      { x: 1, y: 0, taken: false, },
+    ]
+  },
   square: {
     x_offset: 1,
     y_offset: 1,

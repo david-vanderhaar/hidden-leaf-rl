@@ -5,6 +5,7 @@ import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Action from '../actions';
 import * as StatusEffect from '../statusEffects';
+import { cloneDeep } from 'lodash';
 
 // create class
 export default function (engine) {
@@ -147,9 +148,84 @@ export default function (engine) {
     currentActor.keymap = keymapSandWall(engine, currentActor, { ...currentActor.keymap });
   }
 
+  // ------------ SAND PULSE ----------------------
+  const triggerSandPulse = (direction, actor, engine) => {
+    let cloud = Item.sandWallPulse({
+      engine,
+      actor,
+      throwDirection: {
+        x: direction[0],
+        y: direction[1],
+      },
+      targetPos: { 
+        x: actor.pos.x + (direction[0] * 10),
+        y: actor.pos.y + (direction[1] * 10),
+      },
+    });
+    
+    if (cloud) {
+      actor.setNextAction(
+        new Action.PlaceActor({
+          targetPos: {
+            x: actor.pos.x + direction[0],
+            y: actor.pos.y + direction[1],
+          },
+          entity: cloud,
+          game: engine.game,
+          actor,
+          energyCost: Constant.ENERGY_THRESHOLD
+        })
+      )
+    }
+  }
+
+  const keymapSandPulse = (engine, initiatedBy, previousKeymap) => {
+    const goToPreviousKeymap = () => initiatedBy.keymap = previousKeymap;
+    return {
+      Escape: {
+        activate: goToPreviousKeymap,
+        label: 'Close',
+      },
+      w: {
+        activate: () => {
+          triggerSandPulse(Constant.DIRECTIONS.N, initiatedBy, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate N',
+      },
+      d: {
+        activate: () => {
+          triggerSandPulse(Constant.DIRECTIONS.E, initiatedBy, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate E',
+      },
+      s: {
+        activate: () => {
+          triggerSandPulse(Constant.DIRECTIONS.S, initiatedBy, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate S',
+      },
+      a: {
+        activate: () => {
+          triggerSandPulse(Constant.DIRECTIONS.W, initiatedBy, engine);
+          goToPreviousKeymap();
+        },
+        label: 'activate W',
+      },
+    };
+  }
+
+  const activateSandPulse = (engine) => {
+    let currentActor = engine.actors[engine.currentActor]
+    currentActor.keymap = keymapSandPulse(engine, currentActor, { ...currentActor.keymap });
+  }
+
   // ------------ SAND TOMB ----------------------
   const triggerSandTomb = (engine, actor) => {
     let cursor = engine.actors[engine.currentActor];
+    // let cloud = Item.sandBurst({
     let cloud = Item.sandTomb({
       engine,
       actor,
@@ -255,6 +331,30 @@ export default function (engine) {
     }));
   }
 
+  // ------------ SAND CLONE ----------------------
+  const sandClone = (engine) => {
+    let actor = engine.actors[engine.currentActor];
+    let cloneKeymap = cloneDeep(actor.keymap);
+    delete cloneKeymap['j'];
+    delete cloneKeymap['k'];
+    delete cloneKeymap['l'];
+    let cloneArgs = [
+      {
+        attribute: 'renderer',
+        value: { ...actor.renderer, background: '#A89078' }
+      },
+      {
+        attribute: 'keymap',
+        value: cloneKeymap
+      }
+    ];
+    actor.setNextAction(new Action.CloneSelf({
+      game: engine.game,
+      actor,
+      cloneArgs,
+    }))
+  }
+
   // define keymap
   const keymap = (engine) => {
     return {
@@ -275,7 +375,7 @@ export default function (engine) {
         label: 'walk',
       },
       l: {
-        activate: () => null,
+        activate: () => sandClone(engine),
         label: 'Sand Clone',
       },
       k: {
@@ -291,7 +391,7 @@ export default function (engine) {
         label: 'Sand Wall',
       },
       o: {
-        activate: () => null,
+        activate: () => activateSandPulse(engine),
         label: 'Sand Pulse',
       },
       i: {
@@ -338,8 +438,8 @@ export default function (engine) {
   })
 
   actor.container = [
-    // ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
-    ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
+    ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
   ]
 
   return actor;

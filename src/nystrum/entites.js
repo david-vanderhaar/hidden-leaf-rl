@@ -186,8 +186,6 @@ const Rendering = superclass => class extends superclass {
   }
 
   shove (targetPos, direction) {
-    console.log('direction ', direction);
-    
     let success = false;
     let targetTile = this.game.map[Helper.coordsToString(targetPos)];
     if (targetTile) {
@@ -196,9 +194,6 @@ const Rendering = superclass => class extends superclass {
           let newX = entity.pos.x + direction[0];
           let newY = entity.pos.y + direction[1];
           let newPos = { x: newX, y: newY };
-          console.log(entity.pos);
-          console.log(newPos);
-          
           entity.move(newPos);
         }
       });
@@ -549,9 +544,7 @@ const Pushing = superclass => class extends superclass {
       actor: this,
       energyCost: Constant.ENERGY_THRESHOLD
     });
-    if (this.game.canOccupyPosition(targetPos)) {
-      this.path.shift();
-    }
+    this.path.shift();
 
     return result;
   }

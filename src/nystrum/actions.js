@@ -208,16 +208,22 @@ export class DestroySelf extends Base {
 };
 
 export class CloneSelf extends Base {
-  constructor({processDelay = 0, ...args}) {
+  constructor({cloneArgs = [], ...args}) {
     super({...args});
-    this.processDelay = processDelay
+    this.cloneArgs = cloneArgs;
   }
+
   perform() {
     this.actor.energy -= this.energyCost;
     console.log(`${this.actor.name} is cloning itself`);
     let clone = cloneDeep(this.actor);
     clone.game = this.actor.game;
     clone.id = uuid();
+    this.cloneArgs.forEach((arg) => {
+      console.log(arg);
+      
+      clone[arg.attribute] = arg.value
+    });
     this.game.addActor(clone);
     return {
       success: true,

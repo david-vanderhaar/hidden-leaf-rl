@@ -24,7 +24,7 @@ const createProjectileCloud = ({
       x: actor.pos.x + slot.x + (throwDirection.x * structure.x_offset),
       y: actor.pos.y + slot.y + (throwDirection.y * structure.y_offset)
     }
-
+    
     let targetPosition = {
       x: targetPos.x + slot.x,
       y: targetPos.y + slot.y,
@@ -133,6 +133,21 @@ export const sandBurst = ({
   createProjectile: sandShuriken,
 })
 
+export const sandWallPulse = ({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+}) => createProjectileCloud({
+  engine,
+  actor,
+  targetPos,
+  throwDirection,
+  speed: 500,
+  structureType: 'smallSquare',
+  createProjectile: movingSandWall,
+})
+
 export const kunaiCloud = ({
   engine,
   actor,
@@ -187,12 +202,12 @@ export const movingSandWall = (engine, pos, targetPos) => new Entity.MovingWall(
   targetPos,
   renderer: {
     // character: '>',
-    character: '✦️',
+    character: ']',
     color: '#A89078',
     background: '#D8C0A8',
   },
-  name: TYPE.KUNAI,
-  // name: TYPE.BARRIER,
+  // name: TYPE.KUNAI,
+  name: TYPE.BARRIER,
   durability: 3,
 })
 
