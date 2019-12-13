@@ -130,7 +130,17 @@ export class Engine {
     });
     this.removeDeadStatusEffects();
   }
+
+  addActor (entity) {
+    this.actors.push(entity);
+  }
+
+  addActorAsNext (entity) {
+    this.actors.splice(this.currentActor + 1, 0, entity);
+  }
+
 }
+
 
 export class CrankEngine extends Engine {
   async process() { // a turn-based system using speed and Action Points

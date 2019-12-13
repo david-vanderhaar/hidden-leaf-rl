@@ -298,7 +298,7 @@ export default function (engine) {
       game,
       keymap: keymapSandTomb(engine, currentActor, { ...currentActor.keymap }),
     })
-    game.addActor(cursor);
+    game.addActor(cursor); // replace with engine addActor and games place and draw actor on map
     game.engine.currentActor = game.engine.actors.length - 1
   }
 
