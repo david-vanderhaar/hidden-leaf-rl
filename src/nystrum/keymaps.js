@@ -3,14 +3,9 @@ import * as Action from './actions';
 import * as Helper from '../helper';
 import * as Entity from './entites';
 import * as Item from './items';
-
-/******************** Helper ********************/
-const addAlphabeticallyToKeymap = (keymap, obj) => {
-  let alphabetAllowed = Constant.ALPHABET.filter((letter) => {
-    return !Object.keys(keymap).includes(letter);
-  });
-  keymap[alphabetAllowed[0]] = obj;
-}
+import { addAlphabeticallyToKeymap, deactivateUIKeymap } from './Keymap/helper'
+import { activateInventory } from './Keymap/activateInventory'
+import { activateEquipment } from './Keymap/activateEquipment';
 
 /******************** UI ********************/
 export const moveCursor = (direction, engine) => {
@@ -122,84 +117,11 @@ export const keymapCursorToThrowItem = (engine, initiatedBy) => {
   };
 }
 
-const closeInventory = (engine) => {
-  let currentUiActor = engine.actors[engine.currentActor];
-  engine.game.removeActor(currentUiActor);
-  engine.game.visibleInventory = null;
-}
-
-const closeEquipment = (engine) => {
-  let currentUiActor = engine.actors[engine.currentActor];
-  engine.game.removeActor(currentUiActor);
-  engine.game.visibleEquipment = null;
-}
-
-export const keymapEquipment = (engine, initiatedBy) => {
-  let keymap = {
-    Escape: {
-      activate: () => closeEquipment(engine),
-      label: 'Close',
-    }
-  };
-
-  initiatedBy.equipment.filter((slot) => slot.item).map((slot) => {
-    let obj = {
-      activate: null,
-      label: ''
-    }
-    obj['activate'] = () => {
-      console.log(`setting action for ${initiatedBy.name} to unequip ${slot.item.name}`);
-      initiatedBy.setNextAction(new Action.UnequipItem({
-        item: slot.item,
-        game: engine.game,
-        actor: initiatedBy,
-      }))
-      closeEquipment(engine);
-    }
-    obj['label'] = `Unequip ${slot.name}`;
-    addAlphabeticallyToKeymap(keymap, obj);
-    return true;
-  })
-
-  return keymap;
-}
-
-export const keymapEquipFromInventory = (engine, initiatedBy) => {
-  let keymap = {
-    Escape: {
-    // e: {
-      activate: () => closeInventory(engine),
-      label: 'Close',
-    }
-  };
-
-  initiatedBy.container.map((item, index) => {
-    let obj = {
-      activate: null,
-      label: ''
-    }
-    obj['activate'] = () => {
-      console.log(`setting action for ${initiatedBy.name} to equip ${item.name}`);
-      initiatedBy.setNextAction(new Action.EquipItemFromContainer({
-        item,
-        game: engine.game,
-        actor: initiatedBy,
-      }))
-      closeInventory(engine);
-    }
-    obj['label'] = `Equip ${item.name}`;
-    addAlphabeticallyToKeymap(keymap, obj);
-    return true;
-  })
-
-  return keymap;
-}
-
 export const keymapDropFromInventory = (engine, initiatedBy) => {
   let keymap = {
     Escape: {
     // g: {
-      activate: () => closeInventory(engine),
+      activate: () => deactivateUIKeymap(engine, 'visibleInventory'),
       label: 'Close',
     }
   };
@@ -217,7 +139,7 @@ export const keymapDropFromInventory = (engine, initiatedBy) => {
         actor: initiatedBy,
         energyCost: Constant.ENERGY_THRESHOLD
       }));
-      closeInventory(engine);
+      deactivateUIKeymap(engine, 'visibleInventory');
     }
     obj['label'] = `Drop ${item.name}`;
     addAlphabeticallyToKeymap(keymap, obj);
@@ -381,51 +303,6 @@ export const activateThrowCursor = (engine) => {
   engine.setActorToPrevious(cursor);
   engine.game.placeActorOnMap(cursor)
   engine.game.draw()
-}
-
-export const activateInventory = (engine) => {
-  let currentActor = engine.actors[engine.currentActor]
-  engine.game.visibleInventory = currentActor.container; 
-
-  let ui = new Entity.UI_Actor({
-    initiatedBy: currentActor,
-    pos: {...currentActor.pos},
-    renderer: {
-      character: 'I',
-      color: 'white',
-      background: '',
-    },
-    name: 'Inventory',
-    game: engine.game,
-    // keymap: keymapEquipFromInventory(engine, currentActor),
-  })
-  engine.addActorAsPrevious(ui);
-  engine.setActorToPrevious(ui);
-  engine.game.placeActorOnMap(ui)
-  engine.game.draw()
-  ui.keymap = keymapEquipFromInventory(engine, currentActor);
-}
-
-export const activateEquipment = (engine) => {
-  let currentActor = engine.actors[engine.currentActor]
-  engine.game.visibleEquipment = currentActor.equipment; 
-
-  let ui = new Entity.UI_Actor({
-    initiatedBy: currentActor,
-    pos: {...currentActor.pos},
-    renderer: {
-      character: 'E',
-      color: 'white',
-      background: '',
-    },
-    name: 'Equipment',
-    game: engine.game,
-  })
-  engine.addActorAsPrevious(ui);
-  engine.setActorToPrevious(ui);
-  engine.game.placeActorOnMap(ui)
-  engine.game.draw()
-  ui.keymap = keymapEquipment(engine, currentActor);
 }
 
 export const activateDrop = (engine) => {

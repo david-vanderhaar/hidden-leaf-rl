@@ -6,6 +6,8 @@ import * as Constant from '../constants';
 import * as Action from '../actions';
 import * as StatusEffect from '../statusEffects';
 import * as Helper from '../../helper';
+import { activateInventory } from '../Keymap/activateInventory';
+import { activateEquipment } from '../Keymap/activateEquipment';
 
 export default function (engine) {
   // define keymap helpers
@@ -298,11 +300,11 @@ export default function (engine) {
         label: 'Gate of Opening',
       },
       i: {
-        activate: () => Keymap.activateInventory(engine),
+        activate: () => activateInventory(engine),
         label: 'Open Inventory',
       },
       q: {
-        activate: () => Keymap.activateEquipment(engine),
+        activate: () => activateEquipment(engine),
         label: 'Open Equipment',
       },
       g: {

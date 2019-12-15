@@ -6,6 +6,8 @@ import * as Constant from '../constants';
 import * as Action from '../actions';
 import * as StatusEffect from '../statusEffects';
 import { cloneDeep } from 'lodash';
+import { activateInventory } from '../Keymap/activateInventory';
+import { activateEquipment } from '../Keymap/activateEquipment';
 
 // create class
 export default function (engine) {
@@ -397,11 +399,11 @@ export default function (engine) {
         label: 'Sand Pulse',
       },
       i: {
-        activate: () => Keymap.activateInventory(engine),
+        activate: () => activateInventory(engine),
         label: 'Open Inventory',
       },
       q: {
-        activate: () => Keymap.activateEquipment(engine),
+        activate: () => activateEquipment(engine),
         label: 'Open Equipment',
       },
       g: {
@@ -440,6 +442,7 @@ export default function (engine) {
   })
 
   actor.container = [
+    Item.sword(engine),
     ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
     // ...Array(10).fill('').map(() => Item.fireballGas(engine, actor)),
     // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
