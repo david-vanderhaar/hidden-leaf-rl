@@ -125,14 +125,12 @@ export const keymapCursorToThrowItem = (engine, initiatedBy) => {
 const closeInventory = (engine) => {
   let currentUiActor = engine.actors[engine.currentActor];
   engine.game.removeActor(currentUiActor);
-  engine.currentActor = engine.actors.length - 1;
   engine.game.visibleInventory = null;
 }
 
 const closeEquipment = (engine) => {
   let currentUiActor = engine.actors[engine.currentActor];
   engine.game.removeActor(currentUiActor);
-  engine.currentActor = engine.actors.length - 1;
   engine.game.visibleEquipment = null;
 }
 
@@ -357,12 +355,14 @@ export const addActor = (game) => {
     durability: Helper.getRandomInArray([1, 2, 4, 8]),
     speed: 100,
   })
-  game.addActor(actor);
+  game.placeActorOnMap(actor)
+  game.engine.addActor(actor);
+  game.draw();
 }
 
 export const activateThrowCursor = (engine) => {
   let game = engine.game;
-  let currentActor = game.engine.actors[game.engine.currentActor]
+  let currentActor = engine.actors[game.engine.currentActor]
   let pos = currentActor.pos;
 
   let cursor = new Entity.UI_Actor({
@@ -377,8 +377,10 @@ export const activateThrowCursor = (engine) => {
     game,
     keymap: keymapCursorToThrowItem(engine, currentActor),
   })
-  game.addActor(cursor);
-  game.engine.currentActor = game.engine.actors.length - 1
+  engine.addActorAsPrevious(cursor);
+  engine.setActorToPrevious(cursor);
+  engine.game.placeActorOnMap(cursor)
+  engine.game.draw()
 }
 
 export const activateInventory = (engine) => {
@@ -397,8 +399,10 @@ export const activateInventory = (engine) => {
     game: engine.game,
     // keymap: keymapEquipFromInventory(engine, currentActor),
   })
-  engine.game.addActor(ui);
-  engine.currentActor = engine.actors.length - 1
+  engine.addActorAsPrevious(ui);
+  engine.setActorToPrevious(ui);
+  engine.game.placeActorOnMap(ui)
+  engine.game.draw()
   ui.keymap = keymapEquipFromInventory(engine, currentActor);
 }
 
@@ -417,8 +421,10 @@ export const activateEquipment = (engine) => {
     name: 'Equipment',
     game: engine.game,
   })
-  engine.game.addActor(ui);
-  engine.currentActor = engine.actors.length - 1
+  engine.addActorAsPrevious(ui);
+  engine.setActorToPrevious(ui);
+  engine.game.placeActorOnMap(ui)
+  engine.game.draw()
   ui.keymap = keymapEquipment(engine, currentActor);
 }
 
@@ -437,8 +443,10 @@ export const activateDrop = (engine) => {
     name: 'Drop',
     game: engine.game,
   })
-  engine.game.addActor(ui);
-  engine.currentActor = engine.actors.length - 1
+  engine.addActorAsPrevious(ui);
+  engine.setActorToPrevious(ui);
+  engine.game.placeActorOnMap(ui)
+  engine.game.draw()
   ui.keymap = keymapDropFromInventory(engine, currentActor);
 }
 

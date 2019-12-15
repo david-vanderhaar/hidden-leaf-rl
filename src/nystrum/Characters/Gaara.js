@@ -298,8 +298,10 @@ export default function (engine) {
       game,
       keymap: keymapSandTomb(engine, currentActor, { ...currentActor.keymap }),
     })
-    game.addActor(cursor); // replace with engine addActor and games place and draw actor on map
-    game.engine.currentActor = game.engine.actors.length - 1
+    engine.addActorAsPrevious(cursor);
+    engine.setActorToPrevious(cursor);
+    game.placeActorOnMap(cursor)
+    game.draw()
   }
 
   // ------------ SAND SKIN ----------------------
@@ -439,6 +441,7 @@ export default function (engine) {
 
   actor.container = [
     ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    // ...Array(10).fill('').map(() => Item.fireballGas(engine, actor)),
     // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
   ]
 

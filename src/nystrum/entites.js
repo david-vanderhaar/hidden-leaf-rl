@@ -31,7 +31,6 @@ const Parent = superclass => class extends superclass {
     let tile = this.game.map[Helper.coordsToString(child.pos)];
     this.game.map[Helper.coordsToString(child.pos)].entities = tile.entities.filter((e) => e.id !== child.id);
     this.engine.actors = this.engine.actors.filter((e) => e.id !== child.id);
-    // this.game.engine.currentActor = 0;
     this.game.draw()
   }
 
@@ -49,7 +48,9 @@ const Parent = superclass => class extends superclass {
       actor.destroy = () => {this.destroyChild(actor)};
       actor.canAttack = this.canAttack.bind(this);
       // actor.canAttack = (entity) => {this.canAttack(entity)};
-      this.game.addActor(actor, this.engine);
+      this.game.placeActorOnMap(actor)
+      this.engine.addActor(actor);
+      this.game.draw();
     });
   }
 
@@ -175,7 +176,7 @@ const Rendering = superclass => class extends superclass {
 
   move (targetPos) {
     let success = false;
-    if (this.game.canOccupyPosition(targetPos)) {
+    if (this.game.canOccupyPosition(targetPos, this)) {
       let tile = this.game.map[Helper.coordsToString(this.pos)]
       this.game.map[Helper.coordsToString(this.pos)] = { ...tile, entities: tile.entities.filter((e) => e.id !== this.id) }
       this.pos = targetPos
@@ -345,7 +346,7 @@ const Projecting = superclass => class extends superclass {
       actor: this, 
       energyCost: Constant.ENERGY_THRESHOLD
     });
-    if (this.game.canOccupyPosition(targetPos)) {
+    if (this.game.canOccupyPosition(targetPos, this)) {
       this.path.shift();
     }
     return result;
@@ -478,7 +479,9 @@ const Gaseous = superclass => class extends superclass {
       }
       clone.isClone = true
       this.cloneCount += 1
-      game.addActor(clone);
+      game.placeActorOnMap(clone)
+      game.engine.addActor(clone);
+      game.draw();
     }
 
     let result = super.getAction(game);
@@ -574,7 +577,6 @@ const Destructable = superclass => class extends superclass {
     this.game.map[Helper.coordsToString(this.pos)].entities = tile.entities.filter((e) => e.id !== this.id);
     this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
     this.game.engine.removeStatusEffectByActorId(this.id);
-    // this.game.engine.currentActor = 0;
     this.game.draw()
   }
 }

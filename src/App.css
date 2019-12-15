@@ -55,6 +55,10 @@
   left: 400px;
 }
 
+.Information {
+  left: 600px;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

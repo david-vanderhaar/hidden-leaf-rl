@@ -135,8 +135,20 @@ export class Engine {
     this.actors.push(entity);
   }
 
+  addActorAsPrevious (entity) {
+    this.actors.splice(this.currentActor, 0, entity);
+  }
+
   addActorAsNext (entity) {
     this.actors.splice(this.currentActor + 1, 0, entity);
+  }
+
+  setActorToPrevious (entity) {
+    this.currentActor = Math.max(this.currentActor - 1, 0);
+  }
+
+  setActorToNext (entity) {
+    this.currentActor = (this.currentActor + 1) % this.actors.length;
   }
 
 }

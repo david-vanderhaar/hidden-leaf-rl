@@ -214,6 +214,7 @@ export class CloneSelf extends Base {
   }
 
   perform() {
+    let success = false;
     this.actor.energy -= this.energyCost;
     console.log(`${this.actor.name} is cloning itself`);
     let clone = cloneDeep(this.actor);
@@ -224,9 +225,13 @@ export class CloneSelf extends Base {
       
       clone[arg.attribute] = arg.value
     });
-    this.game.addActor(clone);
+    if (this.game.placeActorOnMap(clone)) {
+      this.game.engine.addActorAsNext(clone);
+      this.game.draw();
+      success = true;
+    };
     return {
-      success: true,
+      success,
       alternative: null,
     }
   }
@@ -353,7 +358,7 @@ export class PlaceActor extends Base {
     let success = false;
     let alternative = null;
     
-    if (this.game.canOccupyPosition(this.targetPos)) {
+    if (this.game.canOccupyPosition(this.targetPos, this.entity)) {
       this.entity.pos = this.targetPos;
       // this.game.engine.actors.push(this.entity);
       this.game.engine.addActorAsNext(this.entity);
@@ -382,7 +387,7 @@ export class PlaceItem extends Base {
     let success = false;
     let alternative = null;
     
-    if (this.game.canOccupyPosition(this.targetPos)) {
+    if (this.game.canOccupyPosition(this.targetPos, this.entity)) {
       this.entity.pos = this.targetPos;
       success = this.game.placeActorOnMap(this.entity)
     }
@@ -410,7 +415,7 @@ export class PlaceItems extends PlaceItem {
     this.targetPositions.forEach((targetPos) => {
       console.log('target ', targetPos);
       
-      if (this.game.canOccupyPosition(targetPos)) {
+      if (this.game.canOccupyPosition(targetPos, this.entity)) {
         let clone = cloneDeep(this.entity);
         clone.game = this.game;
         clone.id = uuid();

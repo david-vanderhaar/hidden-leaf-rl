@@ -86,12 +86,12 @@ export class Game {
     this.randomlyPlaceActorsOnMap()
   }
 
-  canOccupyPosition (pos) {
+  canOccupyPosition (pos, entity = {passable: false}) {
     let result = false;
     let targetTile = this.map[Helper.coordsToString(pos)];
     if (targetTile) {
       let hasImpassableEntity = targetTile.entities.filter((entity) => !entity.passable).length > 0;
-      if (!hasImpassableEntity) {
+      if (!hasImpassableEntity || entity.passable) {
         let tile = this.map[Helper.coordsToString(pos)];
         if (this.tileKey[tile.type].passable) {
           result = true;
@@ -163,14 +163,11 @@ export class Game {
 
   removeActor (actor) {
     this.engine.actors = this.engine.actors.filter((ac) => ac.id !== actor.id);
-    console.log(this.engine.currentActor);
-    console.log(this.engine.actors.length);
-    this.engine.currentActor = this.engine.actors.length - 1; // should remove need for this line
+    // this.engine.currentActor = this.engine.actors.length - 1; // should remove need for this line
     // this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
     // this.engine.currentActor = (this.engine.currentActor + 1) % this.engine.actors.length;
     this.removeActorFromMap(actor);
     console.log('remove actor');
-    console.log(actor);
     this.draw();
   }
 
