@@ -1,8 +1,8 @@
-import { UI_Actor } from '../entites';
-import { UnequipItem } from '../actions';
-import { addAlphabeticallyToKeymap, deactivateUIKeymap } from './helper';
+import { UI_Actor } from '../../entites';
+import { UnequipItem } from '../../actions';
+import { addAlphabeticallyToKeymap, deactivateUIKeymap } from '../helper';
 
-export const keymapEquipment = (engine, initiatedBy) => {
+const keymapEquipment = (engine, initiatedBy) => {
   let keymap = {
     Escape: {
       activate: () => deactivateUIKeymap(engine, 'visibleEquipment'),

@@ -1,28 +1,14 @@
 // import deps
-import * as Keymap from '../keymaps';
 import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Action from '../actions';
 import * as StatusEffect from '../statusEffects';
 import * as Helper from '../../helper';
-import { activateInventory } from '../Keymap/activateInventory';
-import { activateEquipment } from '../Keymap/activateEquipment';
+import * as Keymap from '../Keymap';
 
 export default function (engine) {
   // define keymap helpers
-  const flyingLotus = (direction, stepCount, speedModifier, additionalAttackDamage, engine) => {
-    let actor = engine.actors[engine.currentActor];
-    actor.setNextAction(new Action.Tackle({
-      direction,
-      stepCount,
-      game: engine.game,
-      actor,
-      additionalAttackDamage,
-      energyCost: Math.floor(Constant.ENERGY_THRESHOLD / speedModifier),
-    }))
-  }
-
   const leafWhirlwind = (engine) => {
     let actor = engine.actors[engine.currentActor];
     let targetPositions = [
@@ -93,49 +79,6 @@ export default function (engine) {
     }))
   }
 
-  const keymapFlyingLotus = (engine, initiatedBy, previousKeymap) => {
-    const goToPreviousKeymap = () => initiatedBy.keymap = previousKeymap;
-    return {
-      Escape: {
-        activate: goToPreviousKeymap,
-        label: 'Close',
-      },
-      w: {
-        activate: () => {
-          flyingLotus(Constant.DIRECTIONS.N, 10, 2, 10, engine);
-          goToPreviousKeymap();
-        },
-        label: 'activate N',
-      },
-      d: {
-        activate: () => {
-          flyingLotus(Constant.DIRECTIONS.E, 10, 2, 10, engine);
-          goToPreviousKeymap();
-        },
-        label: 'activate E',
-      },
-      s: {
-        activate: () => {
-          flyingLotus(Constant.DIRECTIONS.S, 10, 2, 10, engine);
-          goToPreviousKeymap();
-        },
-        label: 'activate S',
-      },
-      a: {
-        activate: () => {
-          flyingLotus(Constant.DIRECTIONS.W, 10, 2, 10, engine);
-          goToPreviousKeymap();
-        },
-        label: 'activate W',
-      },
-    };
-  }
-
-  const activateFlyingLotus = (engine) => {
-    let currentActor = engine.actors[engine.currentActor]
-    currentActor.keymap = keymapFlyingLotus(engine, currentActor, {...currentActor.keymap});
-  }
-  
   const removeWraps = (engine, speedBoost = 600, damageDebuff = 1) => {
     let currentActor = engine.actors[engine.currentActor];
 
@@ -280,7 +223,7 @@ export default function (engine) {
         label: 'walk',
       },
       l: {
-        activate: () => activateFlyingLotus(engine),
+        activate: () => Keymap.activateFlyingLotus(engine),
         label: 'Flying Lotus',
       },
       k: {
@@ -300,15 +243,15 @@ export default function (engine) {
         label: 'Gate of Opening',
       },
       i: {
-        activate: () => activateInventory(engine),
+        activate: () => Keymap.activateInventory(engine),
         label: 'Open Inventory',
       },
       q: {
-        activate: () => activateEquipment(engine),
+        activate: () => Keymap.activateEquipment(engine),
         label: 'Open Equipment',
       },
       g: {
-        activate: () => Keymap.activateDrop(engine),
+        activate: () => Keymap.activateDropItem(engine),
         label: 'Drop Item',
       },
       p: {
@@ -316,7 +259,7 @@ export default function (engine) {
         label: 'Pickup',
       },
       t: {
-        activate: () => Keymap.activateThrowCursor(engine),
+        activate: () => Keymap.activateThrow(engine),
         label: 'Throw',
       },
       // DEV KEYS

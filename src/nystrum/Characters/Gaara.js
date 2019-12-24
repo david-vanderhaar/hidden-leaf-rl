@@ -1,13 +1,11 @@
 // import deps
-import * as Keymap from '../keymaps';
 import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Action from '../actions';
 import * as StatusEffect from '../statusEffects';
 import { cloneDeep } from 'lodash';
-import { activateInventory } from '../Keymap/activateInventory';
-import { activateEquipment } from '../Keymap/activateEquipment';
+import * as Keymap from '../Keymap';
 
 // create class
 export default function (engine) {
@@ -399,15 +397,15 @@ export default function (engine) {
         label: 'Sand Pulse',
       },
       i: {
-        activate: () => activateInventory(engine),
+        activate: () => Keymap.activateInventory(engine),
         label: 'Open Inventory',
       },
       q: {
-        activate: () => activateEquipment(engine),
+        activate: () => Keymap.activateEquipment(engine),
         label: 'Open Equipment',
       },
       g: {
-        activate: () => Keymap.activateDrop(engine),
+        activate: () => Keymap.activateDropItem(engine),
         label: 'Drop Item',
       },
       p: {
@@ -415,7 +413,7 @@ export default function (engine) {
         label: 'Pickup',
       },
       t: {
-        activate: () => Keymap.activateThrowCursor(engine),
+        activate: () => Keymap.activateThrow(engine),
         label: 'Throw',
       },
       // DEV KEYS

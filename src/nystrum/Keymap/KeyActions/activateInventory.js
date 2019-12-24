@@ -1,6 +1,6 @@
-import { UI_Actor } from '../entites';
-import { EquipItemFromContainer } from '../actions';
-import { addAlphabeticallyToKeymap, deactivateUIKeymap } from './helper';
+import { UI_Actor } from '../../entites';
+import { EquipItemFromContainer } from '../../actions';
+import { addAlphabeticallyToKeymap, deactivateUIKeymap } from '../helper';
 
 const keymapEquipFromInventory = (engine, initiatedBy) => {
   let keymap = {
