@@ -215,21 +215,24 @@ export class CloneSelf extends Base {
 
   perform() {
     let success = false;
-    this.actor.energy -= this.energyCost;
-    console.log(`${this.actor.name} is cloning itself`);
-    let clone = cloneDeep(this.actor);
-    clone.game = this.actor.game;
-    clone.id = uuid();
-    this.cloneArgs.forEach((arg) => {
-      console.log(arg);
-      
-      clone[arg.attribute] = arg.value
-    });
-    if (this.game.placeActorOnMap(clone)) {
-      this.game.engine.addActorAsNext(clone);
-      this.game.draw();
+    if (this.actor.clone(this.cloneArgs)) {
       success = true;
-    };
+      this.actor.energy -= this.energyCost;
+      console.log(`${this.actor.name} is cloning itself`);
+    }
+    // let clone = cloneDeep(this.actor);
+    // clone.game = this.actor.game;
+    // clone.id = uuid();
+    // this.cloneArgs.forEach((arg) => {
+    //   console.log(arg);
+      
+    //   clone[arg.attribute] = arg.value
+    // });
+    // if (this.game.placeActorOnMap(clone)) {
+    //   this.game.engine.addActorAsNext(clone);
+    //   this.game.draw();
+    //   success = true;
+    // };
     return {
       success,
       alternative: null,

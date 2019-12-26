@@ -13,13 +13,21 @@ import { signRelease } from './KeyActions/signing'
 import { push } from './KeyActions/push';
 import { tackle } from './KeyActions/tackle';
 import { activateFlyingLotus } from './KeyActions/activateFlyingLotus';
+import { drunkenFist } from './KeyActions/drunkenFist';
+import { openInnerGate } from './KeyActions/openInnerGate';
+import { removeWeights } from './KeyActions/removeWeights';
+import { leafWhirlwind } from './KeyActions/leafWhirlwind';
+import { sandClone } from './KeyActions/sandClone';
+import { sandSkin } from './KeyActions/sandSkin';
+import { sandTomb } from './KeyActions/sandTomb';
+import { sandPulse } from './KeyActions/sandPulse';
+import { sandWall } from './KeyActions/sandWall';
 
 export {
   activateDropItem,
   activateEquipment,
   activateInventory,
   activateThrow,
-  activateFlyingLotus,
   walk,
   addActor,
   moveCursor,
@@ -30,4 +38,16 @@ export {
   signRelease,
   push,
   tackle,
+  // Rock Lee
+  activateFlyingLotus,
+  drunkenFist,
+  leafWhirlwind,
+  removeWeights,
+  openInnerGate,
+  // Gaara
+  sandWall,
+  sandPulse,
+  sandTomb,
+  sandSkin,
+  sandClone,
 }

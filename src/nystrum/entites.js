@@ -5,7 +5,6 @@ import * as Constant from './constants';
 import * as Action from './actions';
 import * as Engine from './engine';
 import { cloneDeep, cloneDeepWith } from 'lodash';
-import { access } from 'fs';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
@@ -71,6 +70,80 @@ const Parent = superclass => class extends superclass {
     return result;
   }
 
+}
+
+const HasInnerGates = superclass => class extends superclass {
+  constructor({ currentGate = null, gates = [], ...args }) {
+    super({ ...args })
+    this.entityTypes = this.entityTypes.concat('HAS_INNER_GATES');
+    this.currentGate = currentGate;
+    this.gates = [
+      {
+        name: 'Gate of Opening',
+        damageBuff: 1,
+        speedBuff: 100,
+        durabilityDebuff: 1,
+      },
+      {
+        name: 'Gate of Healing',
+        damageBuff: 1,
+        speedBuff: 100,
+        durabilityDebuff: 1,
+      },
+      {
+        name: 'Gate of Life',
+        damageBuff: 1,
+        speedBuff: 100,
+        durabilityDebuff: 1,
+      },
+      {
+        name: 'Gate of Pain',
+        damageBuff: 1,
+        speedBuff: 100,
+        durabilityDebuff: 1,
+      },
+      {
+        name: 'Gate of Limit',
+        damageBuff: 1,
+        speedBuff: 100,
+        durabilityDebuff: 1,
+      },
+    ];
+  }
+
+  setNextGate() {
+    let currentGate = this.currentGate;
+    let nextGate = null;
+    if (!currentGate) {
+      nextGate = this.gates[0];
+      this.currentGate = { ...nextGate };
+    } else {
+      let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
+      console.log('next gate index ', nextGateIndex);
+
+      if (this.gates.length > nextGateIndex) {
+        nextGate = this.gates[nextGateIndex];
+        this.currentGate = { ...nextGate };
+      }
+    }
+    return nextGate;
+  }
+
+  getNextGate() {
+    let currentGate = this.currentGate;
+    let nextGate = null;
+    if (!currentGate) {
+      nextGate = this.gates[0];
+    } else {
+      let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
+      console.log('next gate index ', nextGateIndex);
+
+      if (this.gates.length > nextGateIndex) {
+        nextGate = this.gates[nextGateIndex];
+      }
+    }
+    return nextGate;
+  }
 }
 
 const UI = superclass => class extends superclass {
@@ -320,6 +393,47 @@ const Playing = superclass => class extends superclass {
       this.nextAction = null;
       return action;
     }
+}
+
+const Cloning = superclass => class extends superclass {
+  constructor({cloneLimit = 1, ...args}) {
+    super({...args})
+    this.entityTypes = this.entityTypes.concat('CLONING')
+    this.cloneLimit = cloneLimit;
+    this.clones = [];
+  }
+
+  // add function to override clone destroy function
+    // if clone is destroyed, clone count should go down to zero
+    // clone should be wiped from memory
+
+  // add function to override self destroy funtion 
+    // if this actor dies, clones should be destroyed as well
+
+  // perhaps clones should have a status effect that leeches parent actor's energy or chakra
+
+  // status effects should be removed from engine when owner is removed.
+
+  clone (cloneArgs) {
+    if (this.clones.length < this.cloneLimit) {
+      // clone
+      let clone = cloneDeep(this);
+      clone.game = this.game;
+      clone.id = uuid();
+      cloneArgs.forEach((arg) => {
+        console.log(arg);
+
+        clone[arg.attribute] = arg.value
+      });
+      if (this.game.placeActorOnMap(clone)) {
+        this.game.engine.addActorAsNext(clone);
+        this.game.draw();
+        this.clones.push(clone);
+        return true;
+      };
+    }
+    return false;
+  }
 }
 
 const Projecting = superclass => class extends superclass {
@@ -629,7 +743,9 @@ export const Player = pipe(
   Containing, 
   Equiping, 
   Attacking, 
-  Playing
+  HasInnerGates,
+  Cloning,
+  Playing,
 )(Entity);
 
 export const Weapon = pipe(
