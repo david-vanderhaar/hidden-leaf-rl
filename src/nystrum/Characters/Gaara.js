@@ -70,6 +70,10 @@ export default function (engine) {
         activate: () => Keymap.addActor(engine.game),
         label: 'Add NPC',
       },
+      u: {
+        activate: () => Keymap.die(engine),
+        label: 'Destroy Self',
+      },
     };
   }
 
@@ -84,7 +88,8 @@ export default function (engine) {
     name: 'Gaara',
     actions: [],
     speed: 200,
-    durability: 1,
+    durability: 3,
+    cloneLimit: 3,
     keymap: keymap(engine),
   })
 

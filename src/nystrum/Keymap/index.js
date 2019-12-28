@@ -22,6 +22,7 @@ import { sandSkin } from './KeyActions/sandSkin';
 import { sandTomb } from './KeyActions/sandTomb';
 import { sandPulse } from './KeyActions/sandPulse';
 import { sandWall } from './KeyActions/sandWall';
+import { die } from './KeyActions/die';
 
 export {
   activateDropItem,
@@ -38,6 +39,7 @@ export {
   signRelease,
   push,
   tackle,
+  die,
   // Rock Lee
   activateFlyingLotus,
   drunkenFist,

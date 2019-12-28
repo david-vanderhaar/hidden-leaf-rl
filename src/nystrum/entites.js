@@ -1,6 +1,7 @@
 import uuid from 'uuid/v1';
 import pipe from 'lodash/fp/pipe';
 import * as Helper from '../helper';
+import { destroyEntity } from './Entities/helper';
 import * as Constant from './constants';
 import * as Action from './actions';
 import * as Engine from './engine';
@@ -402,27 +403,42 @@ const Cloning = superclass => class extends superclass {
     this.cloneLimit = cloneLimit;
     this.clones = [];
   }
-
-  // add function to override clone destroy function
-    // if clone is destroyed, clone count should go down to zero
-    // clone should be wiped from memory
-
-  // add function to override self destroy funtion 
-    // if this actor dies, clones should be destroyed as well
-
+  
   // perhaps clones should have a status effect that leeches parent actor's energy or chakra
-
+  
   // status effects should be removed from engine when owner is removed.
+  
+  destroy() {
+    // add function to override self destroy funtion 
+    // if this actor dies, clones should be destroyed as well
+    if (this.clones) {
+      this.clones.map((clone) => {
+        destroyEntity(clone)
+      });
+    }
+    destroyEntity(this);
+  }
 
-  clone (cloneArgs) {
+  destroyClone (id) {
+  // overrides clone destroy function
+  // when clone is destroyed, clone count will change accordingly
+    const index = this.clones.findIndex((c) => c.id == id);
+    if (index >= 0) {
+      this.clones[index].super__destroy();
+      this.clones.splice(index, 1);
+    }
+  }
+
+  createClone (cloneArgs) {
     if (this.clones.length < this.cloneLimit) {
-      // clone
       let clone = cloneDeep(this);
+      clone.name += ` Clone ${this.clones.length}`
       clone.game = this.game;
       clone.id = uuid();
+      delete clone.clones;
+      clone['super__destroy'] = clone.destroy;
+      clone.destroy = () => { this.destroyClone(clone.id) };
       cloneArgs.forEach((arg) => {
-        console.log(arg);
-
         clone[arg.attribute] = arg.value
       });
       if (this.game.placeActorOnMap(clone)) {
@@ -686,12 +702,7 @@ const Destructable = superclass => class extends superclass {
   }
 
   destroy () {
-    this.energy = 0;
-    let tile = this.game.map[Helper.coordsToString(this.pos)];
-    this.game.map[Helper.coordsToString(this.pos)].entities = tile.entities.filter((e) => e.id !== this.id);
-    this.game.engine.actors = this.game.engine.actors.filter((e) => e.id !== this.id);
-    this.game.engine.removeStatusEffectByActorId(this.id);
-    this.game.draw()
+    destroyEntity(this);
   }
 }
 
@@ -737,13 +748,13 @@ export const Bandit = pipe(
 export const Player = pipe(
   Acting, 
   Rendering, 
-  Destructable, 
   Charging, 
   Signing, 
   Containing, 
   Equiping, 
   Attacking, 
   HasInnerGates,
+  Destructable, 
   Cloning,
   Playing,
 )(Entity);

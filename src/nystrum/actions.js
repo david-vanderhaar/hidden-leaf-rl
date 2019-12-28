@@ -215,7 +215,7 @@ export class CloneSelf extends Base {
 
   perform() {
     let success = false;
-    if (this.actor.clone(this.cloneArgs)) {
+    if (this.actor.createClone(this.cloneArgs)) {
       success = true;
       this.actor.energy -= this.energyCost;
       console.log(`${this.actor.name} is cloning itself`);
