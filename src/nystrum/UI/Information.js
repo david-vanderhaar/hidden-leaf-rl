@@ -10,7 +10,7 @@ class Information extends React.Component {
           this.props.data && (
             this.props.data.map((item, index) => {
               return (
-                <Button key={index} onClick={() => null}>
+                <Button key={index} color={item['color']} onClick={() => null}>
                   {`${item.label}: ${item.value}`}
                 </Button>
               )

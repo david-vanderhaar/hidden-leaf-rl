@@ -36,6 +36,8 @@ export class Engine {
 
   async process() { // a turn-based system using speed and Action Points
     let actor = this.actors[this.currentActor]
+    console.log(actor);
+    
     let acting = true;
     while (acting) {
       let timePassed = 0;
@@ -45,8 +47,19 @@ export class Engine {
         timePassed += action.energyCost;
         while (true) {
           let result = await action.perform();
+          if (action['particles']) {
+            action.particles.forEach((particle) => {
+              this.game.placeActorOnMap(particle);
+            })
+          }
           this.game.draw();
           await Helper.delay(action.processDelay);
+          if (action['particles']) {
+            action.particles.forEach((particle) => {
+              this.game.removeActorFromMap(particle);
+            })
+          }
+          this.game.draw();
           if (!result.success) return false;
           if (result.alternative === null) break;
           action = result.alternative;
@@ -65,7 +78,6 @@ export class Engine {
     this.isRunning = true;
     while (this.isRunning) {
       this.isRunning = await this.process();
-
     }
     let actor = this.actors[this.currentActor]
     if (actor.keymap) {
@@ -144,7 +156,8 @@ export class Engine {
   }
 
   setActorToPrevious (entity) {
-    this.currentActor = Math.max(this.currentActor - 1, 0);
+    this.currentActor -= 1;
+    if (this.currentActor <= -1) this.currentActor = this.actors.length - 1;
   }
 
   setActorToNext (entity) {
@@ -163,9 +176,9 @@ export class CrankEngine extends Engine {
         let action = actor.getAction(this.game);
         if (!action) { return false; } // if no action given, kick out to UI input
         while (true) {
-          await Helper.delay(action.processDelay);
-          let result = await action.perform();
           this.game.draw();
+          let result = await action.perform();
+          await Helper.delay(action.processDelay);
           if (!result.success) return false;
           if (result.alternative === null) break;
           action = result.alternative;

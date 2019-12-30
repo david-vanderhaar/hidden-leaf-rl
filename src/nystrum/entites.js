@@ -483,8 +483,6 @@ const Projecting = superclass => class extends superclass {
   }
 }
 
-
-
 const DestructiveProjecting = superclass => class extends superclass {
   constructor({path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
@@ -684,10 +682,11 @@ const Pushing = superclass => class extends superclass {
 }
 
 const Destructable = superclass => class extends superclass {
-  constructor({durability = 1, ...args }) {
+  constructor({durability = 1, onDestroy = () => null, ...args }) {
     super({ ...args })
     this.entityTypes = this.entityTypes.concat('DESTRUCTABLE')
     this.durability = durability;
+    this.onDestroy = onDestroy;
   }
 
   decreaseDurability (value) {
@@ -702,7 +701,34 @@ const Destructable = superclass => class extends superclass {
   }
 
   destroy () {
+    this.onDestroy();
     destroyEntity(this);
+  }
+}
+
+const IsParticle = superclass => class extends superclass {
+  constructor({
+    pos = { x: 1, y: 1 },
+    direction = { x: 0, y: 0 },
+    ...args
+  }) {
+    super({ ...args })
+    this.pos = pos;
+    this.direction = direction;
+  }
+
+  getAction(game) {
+    let targetPos = {
+      x: this.pos.x + this.direction.x,
+      y: this.pos.y + this.direction.y,
+    }
+    let result = new Action.ParticleMove({
+      targetPos,
+      game,
+      actor: this,
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+    return result;
   }
 }
 
@@ -783,6 +809,18 @@ export const DestructiveCloudProjectile = pipe(
 )(Entity);
 
 export const DestructiveCloudProjectileV2 = pipe(
+  Acting, 
+  Destructable,
+  Parent, 
+)(Entity);
+
+export const Particle = pipe(
+  Acting,
+  Rendering,
+  IsParticle,
+)(Entity);
+
+export const ParticleEmitter = pipe(
   Acting, 
   Destructable,
   Parent, 

@@ -1,8 +1,10 @@
 import * as Helper from '../helper';
 import * as Action from './actions';
 import * as Constant from './constants';
+import { destroyEntity } from './Entities/helper';
 import { cloneDeep } from 'lodash';
 import uuid from 'uuid/v1';
+import { Particle } from './entites';
 
 export class Base {
   constructor({game, actor, energyCost = 100, processDelay = 50}) {
@@ -351,6 +353,21 @@ export class CursorMove extends Base {
   }
 };
 
+export class ParticleMove extends CursorMove {
+  constructor({...args}) {
+    super({...args})
+  }
+
+  perform () {
+    this.actor.energy -= this.energyCost;
+    if (this.actor.energy <= 0) {
+      this.actor.destroy();
+      return { success: false }
+    } 
+    return super.perform();
+  }
+}
+
 export class PlaceActor extends Base {
   constructor({ targetPos, entity, ...args}) {
     super({...args});
@@ -600,15 +617,32 @@ export class Attack extends Base {
 };
 
 export class MultiTargetAttack extends Base {
-  constructor({ targetPositions, processDelay = 25, ...args }) {
+  constructor({ particles = [], targetPositions, processDelay = 25, ...args }) {
     super({ ...args });
     this.targetPositions = targetPositions
     this.processDelay = processDelay
+    this.particles = particles
   }
+
+  particle (pos) {
+    return new Particle({
+      game: this.game,
+      name: 'particle',
+      passable: true,
+      pos,
+      energy: 100,
+      renderer: {
+        character: '*',
+        color: 'white',
+        background: 'black',
+      },
+    })
+  }
+
   perform() {
     let success = false;
     let alternative = null;
-
+    
     if (!this.actor.entityTypes.includes('ATTACKING')) {
       return {
         success: true,
@@ -621,11 +655,19 @@ export class MultiTargetAttack extends Base {
     }
     this.targetPositions.forEach((targetPos) => {
       let attackSuccess = this.actor.attack(targetPos);
+      let particle = this.particle({ ...targetPos });
+      this.particles.push(particle);
+      // this.game.placeActorOnMap(particle);
+      // this.game.draw()
       if (attackSuccess) success = true;
     })
 
+    console.log('success ', success);
+    
     if (success) {
+      console.log(this.actor.energy);
       this.actor.energy -= this.energyCost;
+      console.log(this.actor.energy);
     }
 
     return {

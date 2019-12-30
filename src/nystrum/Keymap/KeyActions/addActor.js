@@ -16,7 +16,8 @@ export const addActor = (game) => {
     name: 'Ross',
     game,
     actions: [],
-    durability: Helper.getRandomInArray([1, 2, 4, 8]),
+    durability: Helper.getRandomInArray([1]),
+    // durability: Helper.getRandomInArray([1, 2, 4, 8]),
     speed: 100,
   })
   game.placeActorOnMap(actor)

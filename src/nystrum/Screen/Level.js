@@ -9,15 +9,22 @@ import KeymapUI from '../UI/Keymap';
 import RockLee from '../Characters/RockLee';
 import NarutoUzumaki from '../Characters/NarutoUzumaki';
 import Gaara from '../Characters/Gaara';
+import { ParticleEngine } from '../Engine/ParticleEngine';
 
 let ENGINE = new Engine.Engine({});
 
 // let actor = NarutoUzumaki(ENGINE);
-// let actor = RockLee(ENGINE);
-let actor = Gaara(ENGINE);
+let actor = RockLee(ENGINE);
+// let actor = Gaara(ENGINE);
 ENGINE.actors.push(actor)
 
-let game = new Game.Game({ engine: ENGINE })
+let P_ENGINE = new ParticleEngine({delay: 500});
+// P_ENGINE.addParticle({life: 20, directionX: 1, directionY: 1})
+// P_ENGINE.addParticle({life: 20, directionX: 1, directionY: 0})
+// P_ENGINE.addParticle({life: 20, directionX: 0, directionY: 1})
+// P_ENGINE.start();
+
+let game = new Game.Game({ engine: ENGINE, particleEngine: P_ENGINE })
 
 class Level extends React.Component {
   constructor(props) {
@@ -50,6 +57,21 @@ class Level extends React.Component {
         value: `${currentActor.speed} / ${currentActor.energy}`,
       },
     ];
+
+    data = data.concat(
+      [
+        ...this.state.game.engine.actors.map((actor, index) => {
+          let result = {
+            label: actor.name,
+            value: index,
+          };
+          if (index === this.state.game.engine.currentActor) {
+            result['color'] = 'red';
+          }
+          return result;
+        })
+      ]
+    )
 
     return (
       <div className="Level">
