@@ -7,12 +7,33 @@ import uuid from 'uuid/v1';
 import { Particle } from './entites';
 
 export class Base {
-  constructor({game, actor, energyCost = 100, processDelay = 50}) {
+  constructor({game, actor, energyCost = 100, processDelay = 50, particles = [], particleTemplate = Constant.PARTICLE_TEMPLATES.default}) {
     this.actor = actor
     this.game = game
     this.energyCost = energyCost
     this.processDelay = processDelay
+    this.particles = particles
+    this.particleTemplate = particleTemplate
   }
+
+  addParticle(life, pos, direction, renderer = {...this.particleTemplate.renderer}) {
+    let particle = new Particle({
+      game: this.game,
+      name: 'particle',
+      passable: true,
+      life,
+      pos,
+      direction,
+      energy: 100,
+      renderer,
+    })
+    this.particles.push(particle);
+  }
+
+  removeDeadParticles() {
+    this.particles = this.particles.filter((particle) => particle.life > 0);
+  }
+
 
   perform() {
     console.log(`${this.actor.name} performs`)
@@ -617,26 +638,10 @@ export class Attack extends Base {
 };
 
 export class MultiTargetAttack extends Base {
-  constructor({ particles = [], targetPositions, processDelay = 25, ...args }) {
+  constructor({ targetPositions, processDelay = 25, ...args }) {
     super({ ...args });
     this.targetPositions = targetPositions
     this.processDelay = processDelay
-    this.particles = particles
-  }
-
-  particle (pos) {
-    return new Particle({
-      game: this.game,
-      name: 'particle',
-      passable: true,
-      pos,
-      energy: 100,
-      renderer: {
-        character: '*',
-        color: 'white',
-        background: 'black',
-      },
-    })
   }
 
   perform() {
@@ -655,20 +660,19 @@ export class MultiTargetAttack extends Base {
     }
     this.targetPositions.forEach((targetPos) => {
       let attackSuccess = this.actor.attack(targetPos);
-      let particle = this.particle({ ...targetPos });
-      this.particles.push(particle);
-      // this.game.placeActorOnMap(particle);
-      // this.game.draw()
+      const direction = {
+        x: -1 * Math.sign(this.actor.pos.x - targetPos.x),
+        y: -1 * Math.sign(this.actor.pos.y - targetPos.y),
+      }
+      // const direction = {
+      //   x: 0,
+      //   y: 0,
+      // }
+      this.addParticle(2, { x: this.actor.pos.x, y: this.actor.pos.y }, direction);
       if (attackSuccess) success = true;
     })
 
-    console.log('success ', success);
-    
-    if (success) {
-      console.log(this.actor.energy);
-      this.actor.energy -= this.energyCost;
-      console.log(this.actor.energy);
-    }
+    if (success) { this.actor.energy -= this.energyCost; }
 
     return {
       success,

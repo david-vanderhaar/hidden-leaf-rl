@@ -6,7 +6,6 @@ import * as Helper from '../helper';
 export class Game {
   constructor({
     engine = null,
-    particleEngine = null,
     map = {},
     display = new ROT.Display({ 
       // forceSquareRatio: true,
@@ -18,7 +17,6 @@ export class Game {
     tileKey = Constant.TILE_KEY,
   }) {
     this.engine = engine;
-    this.particleEngine = particleEngine;
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
@@ -174,8 +172,6 @@ export class Game {
   }
 
   initialize (presserRef) {
-    this.particleEngine.game = this;
-    this.particleEngine.start();
     this.engine.game = this;
     this.engine.actors.forEach((actor) => {
       actor.game = this;

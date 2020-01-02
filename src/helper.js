@@ -69,6 +69,5 @@ export const getPointsOnCircumference = (centerX = 0, centerY = 0, r = 3) => {
     let y = Math.round(centerY + (Math.sin(2 * Math.PI / n * i) * r))
     list.push({ x, y });
   }
-  console.table(list);
   return list
 }

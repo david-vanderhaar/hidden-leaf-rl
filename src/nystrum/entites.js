@@ -710,11 +710,29 @@ const IsParticle = superclass => class extends superclass {
   constructor({
     pos = { x: 1, y: 1 },
     direction = { x: 0, y: 0 },
+    life = 1,
+    speed = 1,
     ...args
   }) {
     super({ ...args })
     this.pos = pos;
     this.direction = direction;
+    this.life = life;
+    this.speed = speed;
+  }
+
+  getNextPos(step) {
+    return {
+      x: this.pos.x + (this.direction.x * this.speed) * step,
+      y: this.pos.y + (this.direction.y * this.speed) * step,
+    }
+  }
+
+  update(step) {
+    this.life -= step;
+    if (this.life > 0) {
+      this.pos = this.getNextPos(step);
+    }
   }
 
   getAction(game) {

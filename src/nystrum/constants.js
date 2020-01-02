@@ -189,4 +189,21 @@ export const CLONE_PATTERNS = {
   },
 }
 
+export const PARTICLE_TEMPLATES = {
+  default: {
+    renderer: {
+      character: '*',
+      color: 'black',
+      background: 'white',
+    }
+  },
+  leaf: {
+    renderer: {
+      character: 'v',
+      color: '#36635b',
+      background: '#F0D8C0',
+    }
+  },
+}
+
 export const ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];

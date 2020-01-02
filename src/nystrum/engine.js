@@ -36,8 +36,6 @@ export class Engine {
 
   async process() { // a turn-based system using speed and Action Points
     let actor = this.actors[this.currentActor]
-    console.log(actor);
-    
     let acting = true;
     while (acting) {
       let timePassed = 0;
@@ -47,19 +45,10 @@ export class Engine {
         timePassed += action.energyCost;
         while (true) {
           let result = await action.perform();
-          if (action['particles']) {
-            action.particles.forEach((particle) => {
-              this.game.placeActorOnMap(particle);
-            })
+          if (!await this.processActionFX(action)) {
+              await Helper.delay(action.processDelay);
+              this.game.draw();
           }
-          this.game.draw();
-          await Helper.delay(action.processDelay);
-          if (action['particles']) {
-            action.particles.forEach((particle) => {
-              this.game.removeActorFromMap(particle);
-            })
-          }
-          this.game.draw();
           if (!result.success) return false;
           if (result.alternative === null) break;
           action = result.alternative;
@@ -141,6 +130,27 @@ export class Engine {
       } 
     });
     this.removeDeadStatusEffects();
+  }
+
+  async processActionFX (action) {
+    if (action.particles.length) {
+      while (action.particles.length > 0) {
+        action.particles.forEach((particle) => {
+          this.game.placeActorOnMap(particle);
+        })
+        this.game.draw();
+        await Helper.delay(action.processDelay);
+        action.particles.forEach((particle) => {
+          this.game.removeActorFromMap(particle);
+          particle.update(1);
+
+        })
+        this.game.draw();
+        action.removeDeadParticles();
+      }
+      return true;
+    }
+    return false;
   }
 
   addActor (entity) {
