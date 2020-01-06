@@ -34,7 +34,7 @@ export class Game {
 
   initializeMode () {
     if (this.mode.type === GAME_MODE_TYPES.WAVE) {
-      for (let i = 0; i < this.mode.data.level * 2; i++) {
+      for (let i = 0; i < Math.pow(this.mode.data.level), 2; i++) {
         addWaveEnemy(this);
       }
     }
