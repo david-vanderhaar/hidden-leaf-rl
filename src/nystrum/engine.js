@@ -72,6 +72,7 @@ export class Engine {
     if (actor.keymap) {
       this.game.visibleKeymap = actor.keymap;
     }
+    this.game.updateMode();
     await this.game.updateReact(this.game);
   }
   
@@ -133,12 +134,29 @@ export class Engine {
   }
 
   async processActionFX (action) {
+    // EASE IN
+    // let time = .8
+    // let nextT = (t) => t *= t; 
+    // EASE OUT
+    // let time = .03
+    // let nextT = (t) => t * (2 - t); 
+    // EASE IN OUT QUAD
+    // let time = .4
+    // let nextT = (t) => t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; 
+    // EASE IN CUBIC
+    // let time = .8
+    // let nextT = (t) => t * t * t; 
+    // EASE OUT CUBIC
+    // let time = .001
+    // let nextT = (t) => (--t) * t * t + 1; 
     if (action.particles.length) {
       while (action.particles.length > 0) {
         action.particles.forEach((particle) => {
           this.game.placeActorOnMap(particle);
         })
         this.game.draw();
+        // await Helper.delay(time * 100);
+        // await Helper.delay(time * action.processDelay);
         await Helper.delay(action.processDelay);
         action.particles.forEach((particle) => {
           this.game.removeActorFromMap(particle);
@@ -147,6 +165,7 @@ export class Engine {
         })
         this.game.draw();
         action.removeDeadParticles();
+        // time = nextT(time);
       }
       return true;
     }

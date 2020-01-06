@@ -34,6 +34,14 @@ export const openInnerGate = (engine) => {
       effect,
       actor: currentActor,
       game: engine.game,
+      processDelay: 25,
+      particleTemplate: {
+        renderer: {
+          color: '#3cc2bb',
+          background: '#24fe88',
+          character: '#'
+        }
+      }
     }));
   }
 }

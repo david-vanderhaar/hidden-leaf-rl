@@ -197,13 +197,25 @@ export const PARTICLE_TEMPLATES = {
       background: 'white',
     }
   },
+  fail: {
+    renderer: {
+      character: 'x',
+      color: 'black',
+      background: 'red',
+    }
+  },
   leaf: {
     renderer: {
-      character: 'v',
+      character: '✤',
       color: '#36635b',
       background: '#F0D8C0',
     }
   },
+}
+
+export const PARTICLE_TYPE = {
+  directional: 0,
+  path: 1,
 }
 
 export const ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];

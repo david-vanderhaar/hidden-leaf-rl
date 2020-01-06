@@ -38,16 +38,8 @@ class Level extends React.Component {
     let currentActor = this.state.game.engine.actors[this.state.game.engine.currentActor];
     let data = [
       {
-        label: 'Engine: Current Actor Index',
-        value: this.state.game.engine.currentActor,
-      },
-      {
-        label: 'Current Actor',
-        value: currentActor.name,
-      },
-      {
-        label: 'Current Actor: Speed / Energy',
-        value: `${currentActor.speed} / ${currentActor.energy}`,
+        label: 'Wave',
+        value: this.state.game.mode.data.level,
       },
     ];
 
@@ -57,6 +49,7 @@ class Level extends React.Component {
           let result = {
             label: actor.name,
             value: index,
+            value: `HP: ${actor.durability}, En/Sp: ${actor.energy}/${actor.speed}`,
           };
           if (index === this.state.game.engine.currentActor) {
             result['color'] = 'red';

@@ -1,5 +1,5 @@
 import { Tackle } from '../../actions';
-import { ENERGY_THRESHOLD, DIRECTIONS } from '../../constants';
+import { ENERGY_THRESHOLD, DIRECTIONS, PARTICLE_TEMPLATES } from '../../constants';
 
 const flyingLotus = (direction, stepCount, speedModifier, additionalAttackDamage, engine) => {
   let actor = engine.actors[engine.currentActor];
@@ -10,6 +10,7 @@ const flyingLotus = (direction, stepCount, speedModifier, additionalAttackDamage
     actor,
     additionalAttackDamage,
     energyCost: Math.floor(ENERGY_THRESHOLD / speedModifier),
+    particleTemplate: PARTICLE_TEMPLATES.leaf
   }))
 }
 

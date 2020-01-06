@@ -25,5 +25,12 @@ export const sandSkin = (engine, durabilityBuff = 1) => {
     effect,
     actor: currentActor,
     game: engine.game,
+    particleTemplate: {
+      renderer: {
+        character: '✦️',
+        color: '#A89078',
+        background: '#D8C0A8',
+      }
+    },
   }));
 }

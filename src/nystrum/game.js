@@ -2,6 +2,9 @@ import React from 'react';
 import * as ROT from 'rot-js';
 import * as Constant from './constants';
 import * as Helper from '../helper';
+import { addActor as addWaveEnemy } from './Keymap/KeyActions/addActor';
+
+const GAME_MODE_TYPES = {WAVE: 0};
 
 export class Game {
   constructor({
@@ -15,11 +18,49 @@ export class Game {
       bg: '#424242' 
     }),
     tileKey = Constant.TILE_KEY,
+    mode = {
+      type: GAME_MODE_TYPES.WAVE,
+      data: {
+        level: 1
+      }
+    },
   }) {
     this.engine = engine;
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
+    this.mode = mode;
+  }
+
+  initializeMode () {
+    if (this.mode.type === GAME_MODE_TYPES.WAVE) {
+      for (let i = 0; i < this.mode.data.level * 2; i++) {
+        addWaveEnemy(this);
+      }
+    }
+  }
+  
+  updateMode () {
+    if (this.mode.type === GAME_MODE_TYPES.WAVE) {
+      const nonPlayerCharacters = this.engine.actors.filter((actor) => !actor.entityTypes.includes('PLAYING'));
+      if (!nonPlayerCharacters.length) {
+        this.nextModeLevel();
+        this.initializeMode();
+      }
+    }
+  }
+
+  setModeLevel (level) {
+    this.mode.data.level = level;
+  }
+
+  nextModeLevel () {
+    this.setModeLevel(this.mode.data.level + 1);
+  }
+  
+  resetMode () {
+    this.setModeLevel(1);
+    this.initializeMode();
   }
 
   randomlyPlaceActorsOnMap() {
@@ -55,7 +96,9 @@ export class Game {
 
   removeActorFromMap (actor) {
     let tile = this.map[Helper.coordsToString(actor.pos)]
+    if (!tile) return false;
     this.map[Helper.coordsToString(actor.pos)].entities = tile.entities.filter((ac) => ac.id !== actor.id);
+    return true;
   }
 
   createLevel () {
@@ -180,7 +223,10 @@ export class Game {
     this.createLevel();
     this.draw();
     presserRef.current.focus();
+    this.initializeMode();
   }
+
+  
 }
 
 /************************** UI ********************************/

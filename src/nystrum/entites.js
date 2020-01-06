@@ -712,6 +712,8 @@ const IsParticle = superclass => class extends superclass {
     direction = { x: 0, y: 0 },
     life = 1,
     speed = 1,
+    type = Constant.PARTICLE_TYPE.directional,
+    path = null,
     ...args
   }) {
     super({ ...args })
@@ -719,12 +721,21 @@ const IsParticle = superclass => class extends superclass {
     this.direction = direction;
     this.life = life;
     this.speed = speed;
+    this.type = type;
+    this.path = path;
+    this.entityTypes = this.entityTypes.concat('PARTICLE')
   }
 
   getNextPos(step) {
-    return {
-      x: this.pos.x + (this.direction.x * this.speed) * step,
-      y: this.pos.y + (this.direction.y * this.speed) * step,
+    switch (this.type) {
+      case Constant.PARTICLE_TYPE.directional:
+        return {
+          x: this.pos.x + (this.direction.x * this.speed) * step,
+          y: this.pos.y + (this.direction.y * this.speed) * step,
+        }
+      case Constant.PARTICLE_TYPE.path:
+        const nextPos = this.path.shift();
+        return nextPos ? {...nextPos} : {...this.pos}
     }
   }
 
@@ -733,20 +744,6 @@ const IsParticle = superclass => class extends superclass {
     if (this.life > 0) {
       this.pos = this.getNextPos(step);
     }
-  }
-
-  getAction(game) {
-    let targetPos = {
-      x: this.pos.x + this.direction.x,
-      y: this.pos.y + this.direction.y,
-    }
-    let result = new Action.ParticleMove({
-      targetPos,
-      game,
-      actor: this,
-      energyCost: Constant.ENERGY_THRESHOLD
-    });
-    return result;
   }
 }
 

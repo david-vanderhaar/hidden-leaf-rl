@@ -7,7 +7,14 @@ import uuid from 'uuid/v1';
 import { Particle } from './entites';
 
 export class Base {
-  constructor({game, actor, energyCost = 100, processDelay = 50, particles = [], particleTemplate = Constant.PARTICLE_TEMPLATES.default}) {
+  constructor({
+    game, 
+    actor, 
+    energyCost = 100, 
+    processDelay = 50, 
+    particles = [], 
+    particleTemplate = Constant.PARTICLE_TEMPLATES.default,
+  }) {
     this.actor = actor
     this.game = game
     this.energyCost = energyCost
@@ -16,7 +23,14 @@ export class Base {
     this.particleTemplate = particleTemplate
   }
 
-  addParticle(life, pos, direction, renderer = {...this.particleTemplate.renderer}) {
+  addParticle(
+    life, 
+    pos, 
+    direction, 
+    renderer = {...this.particleTemplate.renderer}, 
+    type = Constant.PARTICLE_TYPE.directional, 
+    path = null
+  ) {
     let particle = new Particle({
       game: this.game,
       name: 'particle',
@@ -26,6 +40,8 @@ export class Base {
       direction,
       energy: 100,
       renderer,
+      type,
+      path,
     })
     this.particles.push(particle);
   }
@@ -54,6 +70,17 @@ export class AddStatusEffect extends Base {
 
   perform() {
     let success = this.game.engine.addStatusEffect(this.effect);
+    let positions = Helper.getPointsOnCircumference(this.actor.pos.x, this.actor.pos.y, 2);
+    positions.forEach((pos) => {
+      this.addParticle(
+        5, 
+        {...pos}, 
+        {
+          x: Math.sign(pos.x - this.actor.pos.x), 
+          y: Math.sign(pos.y - this.actor.pos.y)
+        },
+      )
+    })
     if (success) this.actor.energy -= this.energyCost;
     return {
       success,
@@ -591,6 +618,16 @@ export class Tackle extends MoveMultiple {
       this.stepCount -= 1;
       this.actor.energy -= this.energyCost;
       this.actor.setNextAction(this);
+      for (let i = 0; i < 3; i++) {
+        this.addParticle(
+          1,
+          {
+            x: this.actor.pos.x - (this.direction[0] * i),
+            y: this.actor.pos.y - (this.direction[1] * i),
+          },
+          { x: 0, y: 0 }
+        )
+      }
       success = true;
     } else {
       success = true;
@@ -658,21 +695,27 @@ export class MultiTargetAttack extends Base {
         }),
       }
     }
+
+    let particlePath = [];
+    let particlePos = { x: this.actor.pos.x, y: this.actor.pos.y };
+    let renderer = this.particleTemplate.renderer;
     this.targetPositions.forEach((targetPos) => {
       let attackSuccess = this.actor.attack(targetPos);
-      const direction = {
-        x: -1 * Math.sign(this.actor.pos.x - targetPos.x),
-        y: -1 * Math.sign(this.actor.pos.y - targetPos.y),
-      }
-      // const direction = {
-      //   x: 0,
-      //   y: 0,
-      // }
-      this.addParticle(2, { x: this.actor.pos.x, y: this.actor.pos.y }, direction);
-      if (attackSuccess) success = true;
+      particlePath.push(targetPos);
+      if (attackSuccess) success = true
     })
-
-    if (success) { this.actor.energy -= this.energyCost; }
+    this.addParticle(
+      particlePath.length + 1, 
+      particlePos, 
+      null, 
+      renderer, 
+      Constant.PARTICLE_TYPE.path, 
+      particlePath
+    )
+    
+    if (success) { 
+      this.actor.energy -= this.energyCost; 
+    }
 
     return {
       success,

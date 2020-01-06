@@ -57,7 +57,8 @@
 }
 
 .Information {
-  left: 600px;
+  right: 0;
+  /* left: 600px; */
 }
 
 @keyframes App-logo-spin {

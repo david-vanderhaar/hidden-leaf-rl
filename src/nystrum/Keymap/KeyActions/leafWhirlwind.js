@@ -6,6 +6,10 @@ export const leafWhirlwind = (engine) => {
   let targetPositions = [
     {
       x: actor.pos.x - 1,
+      y: actor.pos.y,
+    },
+    {
+      x: actor.pos.x - 1,
       y: actor.pos.y - 1,
     },
     {
@@ -17,15 +21,11 @@ export const leafWhirlwind = (engine) => {
       y: actor.pos.y - 1,
     },
     {
-      x: actor.pos.x - 1,
-      y: actor.pos.y,
-    },
-    {
       x: actor.pos.x + 1,
       y: actor.pos.y,
     },
     {
-      x: actor.pos.x - 1,
+      x: actor.pos.x + 1,
       y: actor.pos.y + 1,
     },
     {
@@ -33,11 +33,10 @@ export const leafWhirlwind = (engine) => {
       y: actor.pos.y + 1,
     },
     {
-      x: actor.pos.x + 1,
+      x: actor.pos.x - 1,
       y: actor.pos.y + 1,
     },
   ]
-  console.log('leaf whirlwind!');
 
   actor.setNextAction(new MultiTargetAttack({
     targetPositions,

@@ -40,6 +40,7 @@ export const drunkenFist = (engine, damageBuff = 1) => {
     allowDuplicates: false,
     onStart: () => {
       currentActor.attackDamage += damageBuff;
+      currentActor.renderer.character = '?';
       console.log(`${currentActor.name} took a sip of sake.`);
       currentActor.keymap.w = {
         activate: () => drunkWalk(DIRECTIONS.N, engine),
@@ -60,6 +61,7 @@ export const drunkenFist = (engine, damageBuff = 1) => {
     },
     onStop: () => {
       currentActor.attackDamage -= damageBuff;
+      currentActor.renderer.character = 'R';
       console.log(`${currentActor.name} recovered from drunkeness.`);
       currentActor.keymap.w = {
         activate: () => walk(DIRECTIONS.N, engine),
@@ -83,5 +85,13 @@ export const drunkenFist = (engine, damageBuff = 1) => {
     effect,
     actor: currentActor,
     game: engine.game,
+    processDelay: 100,
+    particleTemplate: {
+      renderer: {
+        color: '#c45ffd',
+        background: '#424242',
+        character: '?'
+      }
+    },
   }));
 }
