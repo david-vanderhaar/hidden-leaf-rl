@@ -63,12 +63,30 @@ export class Game {
     this.initializeMode();
   }
 
-  randomlyPlaceActorsOnMap() {
-    this.engine.actors.forEach((actor) => {
+  randomlyPlaceActorOnMap(actor) {
+    let kill = 0;
+    let placed = false;
+    while (!placed) {
       let pos = Helper.getRandomPos(this.map).coordinates
-      let tile = this.map[Helper.coordsToString(pos)]
-      actor.pos = {...pos}
-      tile.entities.push(actor);
+      if (this.canOccupyPosition(pos, actor)) {
+        console.log(actor.name)
+        let tile = this.map[Helper.coordsToString(pos)]
+        actor.pos = { ...pos }
+        tile.entities.push(actor);
+        placed = true;
+      }
+      kill += 1;
+      console.log(kill);
+      if (kill >= 100) {
+        placed = true;
+      }
+    }
+    return placed;
+  }
+
+  randomlyPlaceAllActorsOnMap() {
+    this.engine.actors.forEach((actor) => {
+      this.randomlyPlaceActorOnMap(actor);
     })
   }
 
@@ -102,13 +120,24 @@ export class Game {
   }
 
   createLevel () {
-    let digger = new ROT.Map.Arena();
+    // let digger = new ROT.Map.Arena();
+    // let digger = new ROT.Map.Rogue();
+    // let digger = new ROT.Map.DividedMaze();
+    // let digger = new ROT.Map.EllerMaze();
+    // let digger = new ROT.Map.Cellular();
+    // let digger = new ROT.Map.Digger();
+    // let digger = new ROT.Map.IceyMaze();
+    let digger = new ROT.Map.Uniform();
     let freeCells = [];
     let digCallback = function (x, y, value) {
-      if (value) { return; }
+      // if (value) { return; }
       let key = x + "," + y;
       let type = 'GROUND';
       let currentFrame = 0;
+      if (value) { 
+        type = 'WALL';
+        // type = 'WATER';
+      }
 
       if (Constant.TILE_KEY[type].animation) {
         currentFrame = Helper.getRandomInt(0, Constant.TILE_KEY[type].animation.length)
@@ -126,7 +155,7 @@ export class Game {
       type: 'WIN',
       entities:[],
     }
-    this.randomlyPlaceActorsOnMap()
+    this.randomlyPlaceAllActorsOnMap()
   }
 
   canOccupyPosition (pos, entity = {passable: false}) {
@@ -169,15 +198,15 @@ export class Game {
       let { character, foreground, background } = this.tileKey[tile.type]
 
       // Proto code to handle tile animations
-      // let tileRenderer = this.tileKey[tile.type]
-      // if (tileRenderer.animation) {
-      //   let frame = tileRenderer.animation[tile.currentFrame];
+      let tileRenderer = this.tileKey[tile.type]
+      if (tileRenderer.animation) {
+        let frame = tileRenderer.animation[tile.currentFrame];
         
-      //   character = frame.character;
-      //   foreground = frame.foreground;
-      //   background = frame.background;
-      //   tile.currentFrame = (tile.currentFrame + 1) % tileRenderer.animation.length;
-      // }
+        character = frame.character;
+        foreground = frame.foreground;
+        background = frame.background;
+        tile.currentFrame = (tile.currentFrame + 1) % tileRenderer.animation.length;
+      }
 
       if (tile.entities.length > 0) {
         let entity = tile.entities[tile.entities.length - 1]

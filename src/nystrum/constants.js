@@ -8,6 +8,11 @@ export const TILE_KEY = {
     character: '',
     passable: true,
   },
+  'WALL': {
+    background: '#424242',
+    character: '#',
+    passable: false,
+  },
   'WATER': {
     animation: [
       { background: '#424242', foreground: '#9dc3d3', character: '░', passable: false,},

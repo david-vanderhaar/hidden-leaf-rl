@@ -20,7 +20,9 @@ export const addActor = (game) => {
     // durability: Helper.getRandomInArray([1, 2, 4, 8]),
     speed: 100,
   })
-  game.placeActorOnMap(actor)
-  game.engine.addActor(actor);
-  game.draw();
+  // game.placeActorOnMap(actor)
+  if (game.randomlyPlaceActorOnMap(actor)) {
+    game.engine.addActor(actor);
+    game.draw();
+  };
 }
