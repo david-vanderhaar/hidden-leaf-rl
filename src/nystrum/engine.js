@@ -1,4 +1,6 @@
 import * as Helper from '../helper';
+import { Particle } from './entites';
+import { PARTICLE_TEMPLATES } from './constants';
 
 export class Engine {
   constructor({
@@ -45,7 +47,7 @@ export class Engine {
         timePassed += action.energyCost;
         while (true) {
           let result = await action.perform();
-          if (!await this.processActionFX(action)) {
+          if (!await this.processActionFX(action, result.success)) {
               await Helper.delay(action.processDelay);
               this.game.draw();
           }
@@ -133,7 +135,7 @@ export class Engine {
     this.removeDeadStatusEffects();
   }
 
-  async processActionFX (action) {
+  async processActionFX (action, actionSuccess) {
     // EASE IN
     // let time = .8
     // let nextT = (t) => t *= t; 
@@ -149,6 +151,22 @@ export class Engine {
     // EASE OUT CUBIC
     // let time = .001
     // let nextT = (t) => (--t) * t * t + 1; 
+    if (!actionSuccess) {
+      const particle = new Particle({
+        game: this.game,
+        name: 'particle',
+        passable: true,
+        pos: {...action.actor.pos},
+        renderer: PARTICLE_TEMPLATES.fail.renderer,
+      })
+      this.game.placeActorOnMap(particle);
+      this.game.draw();
+      await Helper.delay(100);
+      this.game.removeActorFromMap(particle);
+      particle.update(1);
+      this.game.draw();
+      return true;
+    }
     if (action.particles.length) {
       while (action.particles.length > 0) {
         action.particles.forEach((particle) => {
