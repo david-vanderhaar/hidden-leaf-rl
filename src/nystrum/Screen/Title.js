@@ -17,7 +17,24 @@ class Title extends React.Component {
             backgroundColor: '#e2e2e2',
           }}
         >
-          <div class='flow-text'>Hidden Leaf RL</div>
+          <div class='flow-text grey-text'>Hidden Leaf RL</div>
+          {
+            this.props.characters.map((character, index) => {
+              let color = '';
+              if (this.props.selectedCharacter) {
+                color = this.props.selectedCharacter.name === character.name ? 'red' : ''
+              }
+
+              return (
+                <button 
+                  class={`btn ${color}`} 
+                  onClick={() => this.props.setSelectedCharacter(character)}
+                >
+                  { character.name }
+                </button>
+              )
+            })
+          }
           <button class='btn' onClick={() => this.props.setActiveScreen(SCREENS.LEVEL)}>Play</button>
         </div>
       </div>

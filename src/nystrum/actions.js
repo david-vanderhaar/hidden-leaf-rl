@@ -642,10 +642,11 @@ export class Tackle extends MoveMultiple {
 };
 
 export class Attack extends Base {
-  constructor({ targetPos, processDelay = 25, ...args}) {
+  constructor({ targetPos, processDelay = 100, ...args}) {
     super({...args});
     this.targetPos = targetPos
     this.processDelay = processDelay
+    this.particleTemplate = Constant.PARTICLE_TEMPLATES.damage
   }
   perform() {
     let success = false;
@@ -664,6 +665,7 @@ export class Attack extends Base {
     
     success = this.actor.attack(this.targetPos);
     if (success) {
+      this.addParticle(1, {...this.targetPos}, {x: 0, y:0})
       this.actor.energy -= this.energyCost;
     }
 

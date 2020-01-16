@@ -120,8 +120,8 @@ export class Game {
   }
 
   createLevel () {
-    // let digger = new ROT.Map.Arena();
-    let digger = new ROT.Map.Rogue();
+    let digger = new ROT.Map.Arena();
+    // let digger = new ROT.Map.Rogue();
     // let digger = new ROT.Map.DividedMaze();
     // let digger = new ROT.Map.EllerMaze();
     // let digger = new ROT.Map.Cellular();
@@ -130,7 +130,6 @@ export class Game {
     // let digger = new ROT.Map.Uniform();
     let freeCells = [];
     let digCallback = function (x, y, value) {
-      // if (value) { return; }
       let key = x + "," + y;
       let type = 'GROUND';
       let currentFrame = 0;
@@ -151,10 +150,6 @@ export class Game {
       freeCells.push(key);
     }
     digger.create(digCallback.bind(this));
-    // this.map[`10,10`] = {
-    //   type: 'WIN',
-    //   entities:[],
-    // }
     this.randomlyPlaceAllActorsOnMap()
   }
 

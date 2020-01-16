@@ -9,7 +9,7 @@ export const addActor = (game) => {
     targetEntity,
     pos,
     renderer: {
-      character: Helper.getRandomInArray(['◉', '⛨']),
+      character: Helper.getRandomInArray(['◉']),
       color: 'white',
       background: '',
     },

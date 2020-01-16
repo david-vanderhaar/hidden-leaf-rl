@@ -16,7 +16,7 @@ const flyingLotus = (direction, stepCount, energyCost, additionalAttackDamage, e
 
 const keymapFlyingLotus = (engine, initiatedBy, previousKeymap) => {
   const energyCost = Math.floor(ENERGY_THRESHOLD / 2);
-  const stepCount = Math.floor(initiatedBy.energy / energyCost);
+  const stepCount = Math.floor(initiatedBy.energy / energyCost) - 1;
   const additionalAttackDamage = stepCount;
   const goToPreviousKeymap = () => initiatedBy.keymap = previousKeymap;
   return {

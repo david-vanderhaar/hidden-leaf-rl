@@ -151,7 +151,9 @@ export class Engine {
     // EASE OUT CUBIC
     // let time = .001
     // let nextT = (t) => (--t) * t * t + 1; 
-    if (!actionSuccess) {
+    if (!actionSuccess) { 
+      // If action is not successful, instead of running action's normal particle animation
+      // we'll show a red X on the entity that initiated the action
       const particle = new Particle({
         game: this.game,
         name: 'particle',
@@ -165,8 +167,10 @@ export class Engine {
       this.game.removeActorFromMap(particle);
       particle.update(1);
       this.game.draw();
+      action.removeDeadParticles(); // is this needed?
       return true;
     }
+
     if (action.particles.length) {
       while (action.particles.length > 0) {
         action.particles.forEach((particle) => {

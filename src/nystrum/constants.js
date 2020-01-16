@@ -209,6 +209,13 @@ export const PARTICLE_TEMPLATES = {
       background: 'red',
     }
   },
+  damage: {
+    renderer: {
+      character: '*',
+      color: 'darkred',
+      background: 'red',
+    }
+  },
   leaf: {
     renderer: {
       character: '✤',
