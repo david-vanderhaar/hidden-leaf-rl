@@ -40,6 +40,7 @@ export class Engine {
     let actor = this.actors[this.currentActor]
     let acting = true;
     while (acting) {
+      if (!actor) return false;
       let timePassed = 0;
       if (actor.hasEnoughEnergy()) {
         let action = actor.getAction(this.game);
@@ -71,6 +72,10 @@ export class Engine {
       this.isRunning = await this.process();
     }
     let actor = this.actors[this.currentActor]
+    if (!actor) {
+      this.game.backToTitle();
+      return;
+    }
     if (actor.keymap) {
       this.game.visibleKeymap = actor.keymap;
     }

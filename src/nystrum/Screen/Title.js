@@ -1,5 +1,29 @@
 import React from 'react';
 import { SCREENS } from './constants';
+const CharacterSelect = (props) => {
+  return (
+    <div className='CharacterSelect'>
+      {
+        props.characters.map((character, index) => {
+          let color = '';
+          if (props.selectedCharacter) {
+            color = props.selectedCharacter.name === character.name ? 'red' : ''
+          }
+
+          return (
+            <button
+              key={index}
+              className={`CharacterSelect__button btn ${color}`}
+              onClick={() => props.setSelectedCharacter(character)}
+            >
+              {character.name}
+            </button>
+          )
+        })
+      }
+    </div>
+  );
+}
 
 class Title extends React.Component {
   constructor(props) {
@@ -18,24 +42,18 @@ class Title extends React.Component {
           }}
         >
           <div class='flow-text grey-text'>Hidden Leaf RL</div>
-          {
-            this.props.characters.map((character, index) => {
-              let color = '';
-              if (this.props.selectedCharacter) {
-                color = this.props.selectedCharacter.name === character.name ? 'red' : ''
-              }
-
-              return (
-                <button 
-                  class={`btn ${color}`} 
-                  onClick={() => this.props.setSelectedCharacter(character)}
-                >
-                  { character.name }
-                </button>
-              )
-            })
-          }
-          <button class='btn' onClick={() => this.props.setActiveScreen(SCREENS.LEVEL)}>Play</button>
+          <CharacterSelect 
+            characters={this.props.characters} 
+            selectedCharacter={this.props.selectedCharacter} 
+            setSelectedCharacter={this.props.setSelectedCharacter}
+          />
+          <button 
+            class='btn' 
+            onClick={() => this.props.setActiveScreen(SCREENS.LEVEL)}
+            disabled={!this.props.selectedCharacter}
+          >
+            Play
+          </button>
         </div>
       </div>
     );

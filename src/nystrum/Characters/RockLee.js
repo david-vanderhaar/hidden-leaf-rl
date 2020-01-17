@@ -69,6 +69,10 @@ export default function (engine) {
         activate: () => Keymap.addActor(engine.game),
         label: 'Add NPC',
       },
+      c: {
+        activate: () => Keymap.die(engine),
+        label: 'Die',
+      },
     };
   }
   // instantiate class

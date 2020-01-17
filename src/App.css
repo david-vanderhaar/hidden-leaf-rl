@@ -30,6 +30,17 @@
   /* outline: none; */
 }
 
+.CharacterSelect {
+  margin: auto;
+  width: 300px;
+}
+
+.CharacterSelect__button {
+  display: block;
+  margin: auto;
+  width: 300px;
+}
+
 .UI {
   position: absolute;
   min-width: 200px;

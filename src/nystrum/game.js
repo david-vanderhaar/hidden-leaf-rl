@@ -21,7 +21,8 @@ export class Game {
     mode = {
       type: GAME_MODE_TYPES.WAVE,
       data: {
-        level: 1
+        level: 1,
+        highestLevel: null,
       }
     },
   }) {
@@ -34,6 +35,14 @@ export class Game {
 
   initializeMode () {
     if (this.mode.type === GAME_MODE_TYPES.WAVE) {
+      let highestLevel = localStorage.getItem('hidden_leaf_rl__highestLevel');
+      if (!highestLevel) { 
+        highestLevel = this.mode.data.level;
+      } else { 
+        highestLevel = Math.max(highestLevel , this.mode.data.level);
+      }
+      localStorage.setItem('hidden_leaf_rl__highestLevel', highestLevel);
+      this.mode.data.highestLevel = highestLevel
       for (let i = 0; i < Math.pow(this.mode.data.level, 2); i++) {
         addWaveEnemy(this);
       }
@@ -120,14 +129,14 @@ export class Game {
   }
 
   createLevel () {
-    let digger = new ROT.Map.Arena();
+    // let digger = new ROT.Map.Arena();
     // let digger = new ROT.Map.Rogue();
     // let digger = new ROT.Map.DividedMaze();
     // let digger = new ROT.Map.EllerMaze();
     // let digger = new ROT.Map.Cellular();
     // let digger = new ROT.Map.Digger();
     // let digger = new ROT.Map.IceyMaze();
-    // let digger = new ROT.Map.Uniform();
+    let digger = new ROT.Map.Uniform();
     let freeCells = [];
     let digCallback = function (x, y, value) {
       let key = x + "," + y;

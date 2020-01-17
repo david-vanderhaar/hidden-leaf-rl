@@ -26,6 +26,7 @@ class Level extends React.Component {
 
   async componentDidMount() {
     this.state.game.initialize(this.presserRef)
+    this.state.game['backToTitle'] = () => this.props.setActiveScreen(SCREENS.TITLE);
     this.state.game.updateReact = (newGameState) => { this.setState({game: newGameState}) }
     this.state.game.engine.start()
   }
@@ -35,7 +36,7 @@ class Level extends React.Component {
     let data = [
       {
         label: 'Wave',
-        value: this.state.game.mode.data.level,
+        value: `Current: ${this.state.game.mode.data.level}, Highest: ${this.state.game.mode.data.highestLevel}`,
       },
     ];
 
