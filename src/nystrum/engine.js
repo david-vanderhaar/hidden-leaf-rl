@@ -1,6 +1,7 @@
 import * as Helper from '../helper';
 import { Particle } from './entites';
 import { PARTICLE_TEMPLATES } from './constants';
+import RockLee from './Characters/RockLee';
 
 export class Engine {
   constructor({
@@ -72,10 +73,12 @@ export class Engine {
       this.isRunning = await this.process();
     }
     let actor = this.actors[this.currentActor]
+    
     if (!actor) {
       this.game.backToTitle();
       return;
     }
+    
     if (actor.keymap) {
       this.game.visibleKeymap = actor.keymap;
     }
@@ -252,5 +255,18 @@ export class CrankEngine extends Engine {
       return false;
     }
     return true
+  }
+
+  async start() {
+    this.isRunning = true;
+    while (this.isRunning) {
+      this.isRunning = await this.process();
+    }
+    let actor = this.actors[this.currentActor]
+    if (actor.keymap) {
+      this.game.visibleKeymap = actor.keymap;
+    }
+    this.game.updateMode();
+    await this.game.updateReact(this.game);
   }
 }
