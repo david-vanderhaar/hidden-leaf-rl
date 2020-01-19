@@ -86,13 +86,13 @@ export default function (engine) {
     name: 'Rock Lee',
     actions: [],
     speed: 400,
-    durability: 3,
+    durability: 20,
     keymap: keymap(engine),
   })
 
   // add default items to container
   actor.container = [
-    ...Array(10).fill('').map(() => Item.kunai(engine, { ...actor.pos })),
+    ...Array(100).fill('').map(() => Item.kunai(engine, { ...actor.pos })),
   ]
 
   return actor;

@@ -190,7 +190,7 @@ export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectil
     background: '',
   },
   name: TYPE.KUNAI,
-  speed: 100,
+  speed: 600,
   energy: 0,
   range: 30,
 })
@@ -223,7 +223,7 @@ export const sandShuriken = (engine, pos, targetPos) => new Entity.DestructivePr
     background: '#D8C0A8',
   },
   name: TYPE.KUNAI,
-  speed: 100,
+  speed: 600,
   energy: 0,
   range: 30,
 })
