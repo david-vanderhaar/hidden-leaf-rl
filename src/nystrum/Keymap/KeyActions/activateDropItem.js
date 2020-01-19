@@ -51,7 +51,6 @@ export const activateDropItem = (engine) => {
     game: engine.game,
   })
   engine.addActorAsPrevious(ui);
-  engine.setActorToPrevious(ui);
   engine.game.placeActorOnMap(ui)
   engine.game.draw()
   ui.keymap = keymapDropFromInventory(engine, currentActor);

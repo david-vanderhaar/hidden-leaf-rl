@@ -48,7 +48,6 @@ export const activateEquipment = (engine) => {
     game: engine.game,
   })
   engine.addActorAsPrevious(ui);
-  engine.setActorToPrevious(ui);
   engine.game.placeActorOnMap(ui)
   engine.game.draw()
   ui.keymap = keymapEquipment(engine, currentActor);

@@ -49,7 +49,6 @@ export const activateInventory = (engine) => {
     // keymap: keymapEquipFromInventory(engine, currentActor),
   })
   engine.addActorAsPrevious(ui);
-  engine.setActorToPrevious(ui);
   engine.game.placeActorOnMap(ui)
   engine.game.draw()
   ui.keymap = keymapEquipFromInventory(engine, currentActor);

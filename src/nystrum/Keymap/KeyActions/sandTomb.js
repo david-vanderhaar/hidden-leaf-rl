@@ -81,7 +81,6 @@ export const sandTomb = (engine) => {
     keymap: keymapSandTomb(engine, currentActor, { ...currentActor.keymap }),
   })
   engine.addActorAsPrevious(cursor);
-  engine.setActorToPrevious(cursor);
   game.placeActorOnMap(cursor)
   game.draw()
 }

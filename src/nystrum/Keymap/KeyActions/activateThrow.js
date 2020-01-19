@@ -122,7 +122,6 @@ export const activateThrow = (engine) => {
     keymap: keymapCursorToThrowItem(engine, currentActor),
   })
   engine.addActorAsPrevious(cursor);
-  engine.setActorToPrevious(cursor);
   engine.game.placeActorOnMap(cursor)
   engine.game.draw()
 }
