@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c66b5d675d7f0e1789e338d1d3f23954",
+    "revision": "0eebedb154d05ddf65f255277adef732",
     "url": "/hidden-leaf-rl/index.html"
   },
   {
-    "revision": "e504a01d9934d19f22cd",
+    "revision": "b27c9bd42123fb8ab8ca",
     "url": "/hidden-leaf-rl/static/css/main.60e509e1.chunk.css"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/hidden-leaf-rl/static/js/2.3b9fbb5d.chunk.js"
   },
   {
-    "revision": "e504a01d9934d19f22cd",
-    "url": "/hidden-leaf-rl/static/js/main.1860d6ca.chunk.js"
+    "revision": "b27c9bd42123fb8ab8ca",
+    "url": "/hidden-leaf-rl/static/js/main.b1675660.chunk.js"
   },
   {
     "revision": "232df49ca87a6930aa23",
