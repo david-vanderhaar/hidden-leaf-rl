@@ -88,14 +88,14 @@ export default function (engine) {
     name: 'Gaara',
     actions: [],
     speed: 200,
-    durability: 3,
+    durability: 15,
     cloneLimit: 3,
     keymap: keymap(engine),
   })
 
   actor.container = [
     Item.sword(engine),
-    ...Array(10).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    ...Array(100).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
     // ...Array(10).fill('').map(() => Item.fireballGas(engine, actor)),
     // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
   ]

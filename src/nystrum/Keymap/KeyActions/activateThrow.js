@@ -21,7 +21,9 @@ const throwKunai = (engine, actor) => {
     };
     kunai.targetPos = { ...cursor.pos };
     actor.removeFromContainer(kunai);
-    engine.actors.push(kunai);
+    engine.addActorAsPrevious(kunai);
+    engine.setActorToPrevious(kunai);
+    // engine.actors.push(kunai);
     kunai.createPath(engine.game);
     engine.game.placeActorsOnMap();
     engine.game.draw();
@@ -90,11 +92,12 @@ const keymapCursorToThrowItem = (engine, initiatedBy) => {
       activate: () => moveCursor(Constant.DIRECTIONS.W, engine),
       label: 'move',
     },
+    // t: {
+    //   activate: () => throwKunaiCloud(engine, initiatedBy),
+    //   label: 'Throw Cloud',
+    // },
+    // y: {
     t: {
-      activate: () => throwKunaiCloud(engine, initiatedBy),
-      label: 'Throw Cloud',
-    },
-    y: {
       activate: () => throwKunai(engine, initiatedBy),
       label: 'Throw Kunai',
     },

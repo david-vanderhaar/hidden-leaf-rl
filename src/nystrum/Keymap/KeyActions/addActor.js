@@ -48,7 +48,7 @@ const getBanditStats = () => {
       speed: 300,
     },
     {
-      name: 'Izzy',
+      name: 'Bigii',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
         color: 'violet',
