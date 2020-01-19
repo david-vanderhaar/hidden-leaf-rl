@@ -34,7 +34,7 @@ export default function (engine) {
         label: 'Sand Tomb',
       },
       j: {
-        activate: () => Keymap.sandSkin(engine, 10),
+        activate: () => Keymap.sandSkin(engine, 2),
         label: 'Sand Skin',
       },
       h: {
@@ -91,6 +91,7 @@ export default function (engine) {
     durability: 15,
     cloneLimit: 3,
     keymap: keymap(engine),
+    defense: 2,
   })
 
   actor.container = [

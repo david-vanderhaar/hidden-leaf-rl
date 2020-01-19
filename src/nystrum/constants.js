@@ -9,8 +9,8 @@ export const TILE_KEY = {
     passable: true,
   },
   'WALL': {
-    background: '#424242',
-    character: '#',
+    background: '#66625b',
+    character: '',
     passable: false,
   },
   'WATER': {

@@ -682,15 +682,23 @@ const Pushing = superclass => class extends superclass {
 }
 
 const Destructable = superclass => class extends superclass {
-  constructor({durability = 1, onDestroy = () => null, ...args }) {
+  constructor({durability = 1, defense = 0 ,onDestroy = () => null, ...args }) {
     super({ ...args })
     this.entityTypes = this.entityTypes.concat('DESTRUCTABLE')
     this.durability = durability;
+    this.defense = defense;
     this.onDestroy = onDestroy;
   }
 
+  getDefense () {
+    // add in reducer to get defense stats of all equpiment
+    return this.defense;
+  }
+
   decreaseDurability (value) {
-    this.durability -= value
+    const current = this.durability;
+    const newDurability = current - (value - this.getDefense());
+    this.durability = Math.min(current, newDurability);
     if (this.durability <= 0) {
       this.destroy();
     }

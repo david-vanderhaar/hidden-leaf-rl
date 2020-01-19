@@ -78,14 +78,12 @@ export class Game {
     while (!placed) {
       let pos = Helper.getRandomPos(this.map).coordinates
       if (this.canOccupyPosition(pos, actor)) {
-        console.log(actor.name)
         let tile = this.map[Helper.coordsToString(pos)]
         actor.pos = { ...pos }
         tile.entities.push(actor);
         placed = true;
       }
       kill += 1;
-      console.log(kill);
       if (kill >= 100) {
         placed = true;
       }
@@ -143,8 +141,8 @@ export class Game {
       let type = 'GROUND';
       let currentFrame = 0;
       if (value) { 
-        // type = 'WALL';
-        type = 'WATER';
+        type = 'WALL';
+        // type = 'WATER';
       }
 
       if (Constant.TILE_KEY[type].animation) {
@@ -243,7 +241,6 @@ export class Game {
     // this.engine.currentActor = (this.engine.currentActor) % this.engine.actors.length;
     // this.engine.currentActor = (this.engine.currentActor + 1) % this.engine.actors.length;
     this.removeActorFromMap(actor);
-    console.log('remove actor');
     this.draw();
   }
 
@@ -258,8 +255,6 @@ export class Game {
     presserRef.current.focus();
     this.initializeMode();
   }
-
-  
 }
 
 /************************** UI ********************************/
