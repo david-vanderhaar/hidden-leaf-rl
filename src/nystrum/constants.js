@@ -190,7 +190,10 @@ export const CLONE_PATTERNS = {
   circle: {
     x_offset: 0,
     y_offset: 0,
-    positions: Helper.getPointsOnCircumference(0, 0, 2)
+    positions: [
+      ...Helper.getPointsOnCircumference(0, 0, 2),
+      ...Helper.getPointsOnCircumference(0, 0, 3)
+    ]
   },
 }
 

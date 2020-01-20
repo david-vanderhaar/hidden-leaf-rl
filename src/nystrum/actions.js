@@ -428,8 +428,9 @@ export class PlaceActor extends Base {
     
     if (this.game.canOccupyPosition(this.targetPos, this.entity)) {
       this.entity.pos = this.targetPos;
-      // this.game.engine.actors.push(this.entity);
-      this.game.engine.addActorAsNext(this.entity);
+      // this.game.engine.addActorAsNext(this.entity);
+      this.game.engine.addActorAsPrevious(this.entity);
+      this.game.engine.start()
       success = true;
     }
       

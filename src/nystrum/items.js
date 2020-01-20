@@ -206,8 +206,8 @@ export const movingSandWall = (engine, pos, targetPos) => new Entity.MovingWall(
     color: '#A89078',
     background: '#D8C0A8',
   },
-  // name: TYPE.KUNAI,
-  name: TYPE.BARRIER,
+  name: TYPE.KUNAI,
+  // name: TYPE.BARRIER,
   durability: 3,
 })
 
