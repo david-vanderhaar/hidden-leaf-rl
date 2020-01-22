@@ -13,15 +13,24 @@ const triggerSandTomb = (engine, actor) => {
     actor,
     targetPos: { ...cursor.pos },
   });
+
   if (cloud) {
+    engine.addActorAsNext(cloud);
     actor.setNextAction(
-      new Action.PlaceActor({
-        targetPos: { ...cursor.pos },
-        entity: cloud,
+      new Action.Say({
         game: engine.game,
         actor,
+        message: 'I\'ll crush you!',
         energyCost: Constant.ENERGY_THRESHOLD
       })
+      // new Action.PlaceActor({
+      //   targetPos: { ...cursor.pos },
+      //   entity: cloud,
+      //   game: engine.game,
+      //   actor,
+      //   // energyCost: actor.energy
+      //   energyCost: Constant.ENERGY_THRESHOLD
+      // })
     )
   }
 }

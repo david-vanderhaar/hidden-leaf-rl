@@ -150,8 +150,8 @@ export const CLONE_PATTERNS = {
     ]
   },
   square: {
-    x_offset: 1,
-    y_offset: 1,
+    x_offset: 2,
+    y_offset: 2,
     positions: [
       { x: 0, y: 0, taken: false, },
       { x: 0, y: 1, taken: false, },

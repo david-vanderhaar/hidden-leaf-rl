@@ -426,11 +426,27 @@ export class PlaceActor extends Base {
     let success = false;
     let alternative = null;
     
+    // let canPlace = true;
+    // if (!this.game.canOccupyPosition(this.targetPos, this.entity)) canPlace = false;
+    // if (this.entity.entityTypes.includes('PARENT')) {
+    //   this.entity.children.forEach((child) => {
+    //     console.log(child.pos);
+        
+    //     if (!this.game.canOccupyPosition(child.pos, child)) canPlace = false;
+    //   })
+    // }
+
+    // if (canPlace) {
+    //   this.entity.pos = this.targetPos;
+    //   this.game.engine.addActorAsPrevious(this.entity);
+    //   this.game.engine.start(); // should this be used outside of engine?
+    //   success = true;      
+    // }
     if (this.game.canOccupyPosition(this.targetPos, this.entity)) {
       this.entity.pos = this.targetPos;
-      // this.game.engine.addActorAsNext(this.entity);
-      this.game.engine.addActorAsPrevious(this.entity);
-      this.game.engine.start()
+      this.game.engine.addActorAsNext(this.entity);
+      // this.game.engine.addActorAsPrevious(this.entity);
+      // this.game.engine.start(); // BUGGED - should this be used outside of engine?
       success = true;
     }
       

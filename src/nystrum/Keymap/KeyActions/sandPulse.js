@@ -1,4 +1,4 @@
-import { PlaceActor } from '../../actions';
+import { PlaceActor, Say } from '../../actions';
 import { sandWallPulse } from '../../items';
 import { DIRECTIONS, ENERGY_THRESHOLD } from '../../constants';
 
@@ -17,17 +17,24 @@ const triggerSandPulse = (direction, actor, engine) => {
   });
 
   if (cloud) {
+    engine.addActorAsPrevious(cloud);
     actor.setNextAction(
-      new PlaceActor({
-        targetPos: {
-          x: actor.pos.x + direction[0],
-          y: actor.pos.y + direction[1],
-        },
-        entity: cloud,
+      new Say({
         game: engine.game,
         actor,
+        message: 'Away from me!',
         energyCost: ENERGY_THRESHOLD
       })
+      // new PlaceActor({
+      //   targetPos: {
+      //     x: actor.pos.x + direction[0],
+      //     y: actor.pos.y + direction[1],
+      //   },
+      //   entity: cloud,
+      //   game: engine.game,
+      //   actor,
+      //   energyCost: ENERGY_THRESHOLD
+      // })
     )
   }
 }

@@ -14,7 +14,10 @@ const CharacterSelect = (props) => {
             <button
               key={index}
               className={`CharacterSelect__button btn ${color}`}
-              onClick={() => props.setSelectedCharacter(character)}
+              onClick={() => {
+                props.setSelectedCharacter(character)
+                props.setActiveScreen(SCREENS.LEVEL)
+              }}
             >
               {character.name}
             </button>
@@ -46,7 +49,8 @@ class Title extends React.Component {
             characters={this.props.characters} 
             selectedCharacter={this.props.selectedCharacter} 
             setSelectedCharacter={this.props.setSelectedCharacter}
-          />
+            setActiveScreen={this.props.setActiveScreen}
+        />
           <button 
             class='btn' 
             onClick={() => this.props.setActiveScreen(SCREENS.LEVEL)}

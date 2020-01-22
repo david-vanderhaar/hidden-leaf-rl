@@ -76,7 +76,7 @@ export class Engine {
     
     if (!actor) {
       this.game.backToTitle();
-      return;
+      return false;
     }
     
     if (actor.keymap) {
