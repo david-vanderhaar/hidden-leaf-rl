@@ -7,7 +7,7 @@ const getBanditStats = () => {
       name: 'Ross',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
-        color: 'white',
+        color: '#ced5dd',
         background: '',
       },
       durability: 1,
@@ -18,7 +18,7 @@ const getBanditStats = () => {
       name: 'Kevin',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
-        color: 'green',
+        color: '#3fc072',
         background: '',
       },
       durability: 2,
@@ -29,7 +29,7 @@ const getBanditStats = () => {
       name: 'Jacob',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
-        color: 'blue',
+        color: '#67a1d7',
         background: '',
       },
       durability: 3,
@@ -40,7 +40,7 @@ const getBanditStats = () => {
       name: 'Jarod',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
-        color: 'red',
+        color: '#e16264',
         background: '',
       },
       durability: 1,
@@ -51,7 +51,7 @@ const getBanditStats = () => {
       name: 'Bigii',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
-        color: 'violet',
+        color: '#9f62e1',
         background: '',
       },
       durability: 15,

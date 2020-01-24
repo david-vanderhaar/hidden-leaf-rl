@@ -2,15 +2,26 @@ import * as Helper from '../helper'
 
 export const ENERGY_THRESHOLD = 100;
 
+export const COLORS = {
+  black_1: '#424242',
+  gray_1: '#262d37',
+  gray_2: '#606b79',
+  green_1: '#1d533c',
+  green_2: '#227743',
+  green_3: '#2d9c59',
+}
+
 export const TILE_KEY = {
   'GROUND': {
-    background: '#424242',
-    character: '',
+    background: COLORS.black_1,
+    foreground: COLORS.gray_2,
+    character: '.',
     passable: true,
   },
   'WALL': {
-    background: '#66625b',
-    character: '',
+    background: COLORS.black_1,
+    foreground: COLORS.gray_2,
+    character: '#',
     passable: false,
   },
   'WATER': {
