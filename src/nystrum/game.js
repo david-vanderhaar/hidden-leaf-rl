@@ -201,25 +201,49 @@ export class Game {
 
       // Proto code to handle tile animations
       let tileRenderer = this.tileKey[tile.type]
-      if (tileRenderer.animation) {
-        let frame = tileRenderer.animation[tile.currentFrame];
-        
-        character = frame.character;
-        foreground = frame.foreground;
-        background = frame.background;
-        tile.currentFrame = (tile.currentFrame + 1) % tileRenderer.animation.length;
-      }
+      let nextFrame = this.animateTile(tile, tileRenderer);
+      character = nextFrame.character;
+      foreground = nextFrame.foreground;
+      background = nextFrame.background;
 
       if (tile.entities.length > 0) {
         let entity = tile.entities[tile.entities.length - 1]
-        character = entity.renderer.character
-        foreground = entity.renderer.color
-        if (entity.renderer.background) {
-          background = entity.renderer.background
+        nextFrame = this.animateEntity(entity);
+        
+        character = nextFrame.character
+        foreground = nextFrame.foreground
+        if (nextFrame.background) {
+          background = nextFrame.background
         }
       }
       this.display.draw(x, y, character, foreground, background);
     }
+  }
+
+  animateEntity (entity) {
+    let renderer = entity.renderer;
+    let {character, color, background} = {...renderer}
+    if (renderer.animation) {
+      let frame = renderer.animation[entity.currentFrame];
+
+      character = frame.character;
+      color = frame.foreground;
+      background = frame.background;
+      entity.currentFrame = (entity.currentFrame + 1) % renderer.animation.length;
+    }
+    return {character, foreground: color, background}
+  }
+
+  animateTile (tile, renderer) {
+    let {character, foreground, background} = {...renderer}
+    if (renderer.animation) {
+      let frame = renderer.animation[tile.currentFrame];
+      character = frame.character;
+      foreground = frame.foreground;
+      background = frame.background;
+      tile.currentFrame = (tile.currentFrame + 1) % renderer.animation.length;
+    }
+    return {character, foreground, background}
   }
 
   addActor (actor, engine = this.engine) {

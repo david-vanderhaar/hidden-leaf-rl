@@ -242,6 +242,7 @@ const Rendering = superclass => class extends superclass {
     this.entityTypes = this.entityTypes.concat('RENDERING')
     this.pos = pos;
     this.renderer = {...renderer};
+    this.currentFrame = 0;
   }
 
   getPosition () {
