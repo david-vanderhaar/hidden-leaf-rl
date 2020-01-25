@@ -1,23 +1,15 @@
 import * as Action from '../../actions';
 import * as Constant from '../../constants';
-import * as Item from '../../items';
+import { movingSandWall } from '../../items';
 import { UI_Actor } from '../../entites';
 
 const throwDirectionalKunai = (direction, engine, actor) => {
   let cursor = engine.actors[engine.currentActor];
   cursor.active = false;
-  let throwDirection = {
-    x: Math.sign(cursor.pos.x - actor.pos.x),
-    y: Math.sign(cursor.pos.y - actor.pos.y),
-  }
   engine.game.removeActor(cursor);
-  let kunai = actor.contains(Item.TYPE.DIRECTIONAL_KUNAI);
+  let kunai = movingSandWall(engine, {...actor.pos}, direction, 10);
   if (kunai) {
     kunai.game = engine.game;
-    kunai.pos = {
-      x: actor.pos.x + throwDirection.x,
-      y: actor.pos.y + throwDirection.y,
-    };
     kunai.direction = direction;
     actor.removeFromContainer(kunai);
     engine.addActorAsPrevious(kunai);
@@ -73,7 +65,7 @@ const keymapCursorToThrowItem = (engine, initiatedBy) => {
   };
 }
 
-export const activateThrow = (engine) => {
+export const sandPulse = (engine) => {
   let game = engine.game;
   let currentActor = engine.actors[game.engine.currentActor]
   let pos = currentActor.pos;

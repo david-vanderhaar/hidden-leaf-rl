@@ -99,7 +99,7 @@ export class Engine {
       actor.gainEnergy(actor.speed);
     }
     this.currentActor = (this.currentActor + 1) % this.actors.length;
-    if (this.currentActor === 0) this.sortActorsByEnery();
+    if (this.currentActor === 0) this.sortActorsByEnergy();
     return true
   }
 
@@ -128,7 +128,7 @@ export class Engine {
     this.isRunning = false;
   }
 
-  sortActorsByEnery () {
+  sortActorsByEnergy () {
     this.actors = this.actors.sort((a, b) => b.energy - a.energy);
     console.log(this.actors);
   }

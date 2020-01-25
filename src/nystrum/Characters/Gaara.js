@@ -112,7 +112,7 @@ export default function (engine) {
 
   actor.container = [
     Item.sword(engine),
-    ...Array(100).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos })),
+    ...Array(100).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos }, null, 20)),
     // ...Array(10).fill('').map(() => Item.fireballGas(engine, actor)),
     // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
   ]

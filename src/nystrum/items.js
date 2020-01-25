@@ -4,6 +4,7 @@ import * as Helper from '../helper';
 
 export const TYPE = {
   KUNAI: 'Kunai',
+  DIRECTIONAL_KUNAI: 'Directional Kunai',
   SWORD: 'Sword',
   BARRIER: 'Barrier',
 }
@@ -205,13 +206,13 @@ export const directionalKunai = (engine, pos, direction, range) => new Entity.Di
     color: 'white',
     background: '',
   },
-  name: 'directionalKunai',
+  name: TYPE.DIRECTIONAL_KUNAI,
   speed: 600,
   energy: 0,
   range,
 })
 
-export const movingSandWall = (engine, pos, targetPos) => new Entity.MovingWall({
+export const movingSandWall = (engine, pos, targetPos, range) => new Entity.MovingWall({
   game: engine.game,
   passable: false,
   pos: { x: pos.x, y: pos.y },
@@ -225,11 +226,13 @@ export const movingSandWall = (engine, pos, targetPos) => new Entity.MovingWall(
   name: TYPE.KUNAI,
   // name: TYPE.BARRIER,
   durability: 3,
+  range,
+  speed: 300,
 })
 
-export const sandShuriken = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
+export const sandShuriken = (engine, pos, direction, range) => new Entity.DirectionalProjectile({
   game: engine.game,
-  targetPos,
+  direction,
   passable: true,
   pos: { x: pos.x, y: pos.y },
   renderer: {
@@ -238,10 +241,10 @@ export const sandShuriken = (engine, pos, targetPos) => new Entity.DestructivePr
     color: '#A89078',
     background: '#D8C0A8',
   },
-  name: TYPE.KUNAI,
+  name: TYPE.DIRECTIONAL_KUNAI,
   speed: 600,
   energy: 0,
-  range: 30,
+  range,
 })
 
 export const fireball = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
