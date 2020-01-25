@@ -37,7 +37,7 @@ export class Engine {
     return true
   }
 
-  async process() { // a turn-based system using speed and Action Points
+  async processV2() { // a turn-based system using speed and Action Points
     let actor = this.actors[this.currentActor]
     let acting = true;
     while (acting) {
@@ -48,7 +48,14 @@ export class Engine {
         if (!action) { return false; } // if no action given, kick out to UI input
         timePassed += action.energyCost;
         while (true) {
+          action.onBefore();
           let result = await action.perform();
+          if (result.success) {
+            action.onSuccess();
+          } else {
+            action.onFailure();
+          }
+          action.onAfter();
           if (!await this.processActionFX(action, result.success)) {
               await Helper.delay(action.processDelay);
               this.game.draw();
@@ -67,10 +74,41 @@ export class Engine {
     return true
   }
 
+  // a turn-based system using speed and Action Points
+  // it reorders all actors by energy after every round robin
+  async processV3() { 
+    let actor = this.actors[this.currentActor]
+    if (!actor) return false;
+    let timePassed = 0;
+    if (actor.hasEnoughEnergy()) {
+      let action = actor.getAction(this.game);
+      if (!action) { return false; } // if no action given, kick out to UI input
+      timePassed += action.energyCost;
+      while (true) {
+        let result = await action.perform();
+        if (!await this.processActionFX(action, result.success)) {
+            await Helper.delay(action.processDelay);
+            this.game.draw();
+        }
+        if (!result.success) return false;
+        if (result.alternative === null) break;
+        action = result.alternative;
+      }
+      this.processStatusEffects(timePassed);
+    } else {
+      actor.gainEnergy(actor.speed);
+    }
+    this.currentActor = (this.currentActor + 1) % this.actors.length;
+    if (this.currentActor === 0) this.sortActorsByEnery();
+    return true
+  }
+
+  // TODO process that reorders actors after every action
+
   async start() {
     this.isRunning = true;
     while (this.isRunning) {
-      this.isRunning = await this.process();
+      this.isRunning = await this.processV2();
     }
     let actor = this.actors[this.currentActor]
     
@@ -88,6 +126,11 @@ export class Engine {
   
   stop() {
     this.isRunning = false;
+  }
+
+  sortActorsByEnery () {
+    this.actors = this.actors.sort((a, b) => b.energy - a.energy);
+    console.log(this.actors);
   }
 
   addStatusEffect(newEffect) {

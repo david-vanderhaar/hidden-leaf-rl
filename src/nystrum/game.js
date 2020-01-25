@@ -127,14 +127,14 @@ export class Game {
   }
 
   createLevel () {
-    // let digger = new ROT.Map.Arena();
+    let digger = new ROT.Map.Arena();
     // let digger = new ROT.Map.Rogue();
     // let digger = new ROT.Map.DividedMaze();
     // let digger = new ROT.Map.EllerMaze();
     // let digger = new ROT.Map.Cellular();
     // let digger = new ROT.Map.Digger();
     // let digger = new ROT.Map.IceyMaze();
-    let digger = new ROT.Map.Uniform();
+    // let digger = new ROT.Map.Uniform();
     let freeCells = [];
     let digCallback = function (x, y, value) {
       let key = x + "," + y;

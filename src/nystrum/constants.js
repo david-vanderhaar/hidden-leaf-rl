@@ -102,9 +102,13 @@ export const HAND_SIGNS = {
 
 export const DIRECTIONS = {
   N: [0, -1],
-  S: [0, 1],
-  E: [1, 0],
+  NE: [1, -1],
   W: [-1, 0],
+  NW: [-1, -1],
+  SW: [-1, 1],
+  S: [0, 1],
+  SE: [1, 1],
+  E: [1, 0],
 }
 
 export const getDirectionKey = (direction) => {

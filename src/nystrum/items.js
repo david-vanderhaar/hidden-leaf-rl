@@ -195,6 +195,22 @@ export const kunai = (engine, pos, targetPos) => new Entity.DestructiveProjectil
   range: 30,
 })
 
+export const directionalKunai = (engine, pos, direction, range) => new Entity.DirectionalProjectile({
+  game: engine.game,
+  direction,
+  passable: true,
+  pos: { x: pos.x, y: pos.y },
+  renderer: {
+    character: '>',
+    color: 'white',
+    background: '',
+  },
+  name: 'directionalKunai',
+  speed: 600,
+  energy: 0,
+  range,
+})
+
 export const movingSandWall = (engine, pos, targetPos) => new Entity.MovingWall({
   game: engine.game,
   passable: false,

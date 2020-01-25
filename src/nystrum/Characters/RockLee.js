@@ -93,6 +93,7 @@ export default function (engine) {
   // add default items to container
   actor.container = [
     ...Array(100).fill('').map(() => Item.kunai(engine, { ...actor.pos })),
+    ...Array(100).fill('').map(() => Item.directionalKunai(engine, { ...actor.pos }, null, 10)),
   ]
 
   return actor;

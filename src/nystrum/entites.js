@@ -516,6 +516,45 @@ const DestructiveProjecting = superclass => class extends superclass {
   }
 }
 
+const DirectionalProjecting = superclass => class extends superclass {
+  constructor({path = false, direction = {x: 0, y: 0}, attackDamage = 1, range = 3, ...args}) {
+    super({...args})
+    this.entityTypes = this.entityTypes.concat('DIRECTIONAL_PROJECTING')
+    this.path = path;
+    this.direction = direction;
+    this.attackDamage = attackDamage;
+    this.range = range;
+  }
+
+  getAction (game) {
+    let result = null;
+    let newX = this.pos.x + this.direction[0];
+    let newY = this.pos.y + this.direction[1];
+    let targetPos = { x: newX, y: newY };
+    this.passable = false
+    console.log(this.range);
+    
+    if (this.range > 0) {
+      result = new Action.ProjectileMove({
+        targetPos: targetPos,
+        game: game,
+        actor: this,
+        energyCost: Constant.ENERGY_THRESHOLD,
+        damageToSelf: 1,
+        onSuccess: () => this.range -= 1
+      })
+    } else {
+      result = new Action.DestroySelf({
+        game: game,
+        actor: this,
+        energyCost: 0
+      })
+    }
+
+    return result;
+  }
+}
+
 const GaseousDestructiveProjecting = superclass => class extends superclass {
   constructor({owner_id = null, path = false, targetPos = null, attackDamage = 1, range = 3, ...args}) {
     super({...args})
@@ -695,6 +734,13 @@ const Destructable = superclass => class extends superclass {
     return this.defense;
   }
 
+  decreaseDurabilityWithoutDefense (value) {
+    this.durability -= value;
+    if (this.durability <= 0) {
+      this.destroy();
+    }
+  }
+
   decreaseDurability (value) {
     const current = this.durability;
     const newDurability = current - (value - this.getDefense());
@@ -819,6 +865,14 @@ export const DestructiveProjectile = pipe(
   Rendering, 
   Attacking, 
   DestructiveProjecting, 
+  Destructable
+)(Entity);
+
+export const DirectionalProjectile = pipe(
+  Acting, 
+  Rendering, 
+  Attacking, 
+  DirectionalProjecting, 
   Destructable
 )(Entity);
 

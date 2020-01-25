@@ -14,6 +14,10 @@ export class Base {
     processDelay = 50, 
     particles = [], 
     particleTemplate = Constant.PARTICLE_TEMPLATES.default,
+    onBefore = () => null,
+    onAfter = () => null,
+    onSuccess = () => null,
+    onFailure = () => null,
   }) {
     this.actor = actor
     this.game = game
@@ -21,6 +25,10 @@ export class Base {
     this.processDelay = processDelay
     this.particles = particles
     this.particleTemplate = particleTemplate
+    this.onBefore = onBefore
+    this.onAfter = onAfter
+    this.onSuccess = onSuccess
+    this.onFailure = onFailure
   }
 
   addParticle(
@@ -49,7 +57,6 @@ export class Base {
   removeDeadParticles() {
     this.particles = this.particles.filter((particle) => particle.life > 0);
   }
-
 
   perform() {
     console.log(`${this.actor.name} performs`)
@@ -549,6 +556,38 @@ export class Move extends Base {
   }
 };
 
+export class ProjectileMove extends Base {
+  constructor({ targetPos, damageToSelf = 1, processDelay = 25, ...args}) {
+    super({...args});
+    this.targetPos = targetPos
+    this.processDelay = processDelay
+    this.damageToSelf = damageToSelf
+  }
+  perform() {
+    let success = false;
+    let alternative = null;
+    let moveSuccess = this.actor.move(this.targetPos);
+    if (moveSuccess) {
+      this.actor.energy -= this.energyCost;
+      success = true;
+    } else {
+      success = true;
+      alternative = new Action.SelfDestructiveAttack({
+        targetPos: this.targetPos,
+        game: this.game, 
+        actor: this.actor, 
+        energyCost: Constant.ENERGY_THRESHOLD,
+        damageToSelf: this.damageToSelf,
+      })
+    }
+
+    return {
+      success,
+      alternative,
+    }
+  }
+};
+
 export class MoveMultiple extends Base {
   constructor({ direction, stepCount, processDelay = 25, ...args}) {
     super({...args});
@@ -692,6 +731,15 @@ export class Attack extends Base {
     }
   }
 };
+
+export class SelfDestructiveAttack extends Attack {
+  constructor({ damageToSelf, ...args }) {
+    super({ ...args });
+    this.damageToSelf = damageToSelf
+    this.onSuccess = () => this.actor.decreaseDurabilityWithoutDefense(damageToSelf)
+    this.onFailure = () => this.actor.destroy()
+  }
+}
 
 export class MultiTargetAttack extends Base {
   constructor({ targetPositions, processDelay = 25, ...args }) {
