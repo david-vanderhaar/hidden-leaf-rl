@@ -10,19 +10,39 @@ export default function (engine) {
     return {
       w: {
         activate: () => Keymap.walk(Constant.DIRECTIONS.N, engine),
-        label: 'walk',
+        label: 'walk N',
+      },
+      e: {
+        activate: () => Keymap.walk(Constant.DIRECTIONS.NE, engine),
+        label: 'walk NE',
       },
       d: {
         activate: () => Keymap.walk(Constant.DIRECTIONS.E, engine),
-        label: 'walk',
+        label: 'walk E',
       },
-      s: {
+      c: {
+        activate: () => Keymap.walk(Constant.DIRECTIONS.SE, engine),
+        label: 'walk SE',
+      },
+      x: {
         activate: () => Keymap.walk(Constant.DIRECTIONS.S, engine),
-        label: 'walk',
+        label: 'walk S',
+      },
+      z: {
+        activate: () => Keymap.walk(Constant.DIRECTIONS.SW, engine),
+        label: 'walk SW',
       },
       a: {
         activate: () => Keymap.walk(Constant.DIRECTIONS.W, engine),
-        label: 'walk',
+        label: 'walk W',
+      },
+      q: {
+        activate: () => Keymap.walk(Constant.DIRECTIONS.NW, engine),
+        label: 'walk NW',
+      },
+      s: {
+        activate: () => Keymap.none(engine),
+        label: 'stay',
       },
       l: {
         activate: () => Keymap.activateFlyingLotus(engine),
@@ -40,7 +60,7 @@ export default function (engine) {
         activate: () => Keymap.leafWhirlwind(engine),
         label: 'Leaf Whirlwind',
       },
-      o: {
+      g: {
         activate: () => Keymap.openInnerGate(engine),
         label: 'Gate of Opening',
       },
@@ -48,11 +68,11 @@ export default function (engine) {
         activate: () => Keymap.activateInventory(engine),
         label: 'Open Inventory',
       },
-      q: {
+      o: {
         activate: () => Keymap.activateEquipment(engine),
         label: 'Open Equipment',
       },
-      g: {
+      u: {
         activate: () => Keymap.activateDropItem(engine),
         label: 'Drop Item',
       },
@@ -68,10 +88,6 @@ export default function (engine) {
       y: {
         activate: () => Keymap.addActor(engine.game),
         label: 'Add NPC',
-      },
-      c: {
-        activate: () => Keymap.die(engine),
-        label: 'Die',
       },
     };
   }
