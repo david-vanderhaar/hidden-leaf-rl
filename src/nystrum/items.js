@@ -118,7 +118,7 @@ export const sandTomb = ({
   targetPos,
   speed: 100,
   structureType: 'circle',
-  createProjectile: sandShuriken,
+  createProjectile: sandTombPart,
 })
 
 export const sandBurst = ({
@@ -131,7 +131,7 @@ export const sandBurst = ({
   targetPos,
   speed: 500,
   structureType: 'circle',
-  createProjectile: sandShuriken,
+  createProjectile: sandTombPart,
 })
 
 export const sandWallPulse = ({
@@ -245,6 +245,23 @@ export const sandShuriken = (engine, pos, direction, range) => new Entity.Direct
   speed: 600,
   energy: 0,
   range,
+})
+
+export const sandTombPart = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
+  game: engine.game,
+  targetPos,
+  passable: true,
+  pos: { x: pos.x, y: pos.y },
+  renderer: {
+    // character: '>',
+    character: '✦️',
+    color: '#A89078',
+    background: '#D8C0A8',
+  },
+  name: TYPE.KUNAI,
+  speed: 600,
+  energy: 0,
+  range: 30,
 })
 
 export const fireball = (engine, pos, targetPos) => new Entity.DestructiveProjectile({
