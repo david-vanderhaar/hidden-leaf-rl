@@ -30,6 +30,11 @@
   /* outline: none; */
 }
 
+.game_display_container {
+  overflow-x: scroll;
+  border: solid 4px #eee;
+}
+
 .CharacterSelect {
   margin: auto;
   width: 300px;
@@ -42,13 +47,7 @@
 }
 
 .UI {
-  position: absolute;
-  min-width: 200px;
-  border: solid;
-  background-color: #424242;
-  text-align: center;
-  top: 0px;  
-  z-index: 10;
+  text-align: left;
 }
 
 .UI button {
@@ -56,20 +55,24 @@
 }
 
 .Keymap {
-  left: 0px;
+  /* left: 0px; */
 }
 
 .Inventory {
-  left: 200px;
+  /* left: 200px; */
 }
 
 .Equipment {
-  left: 400px;
+  /* left: 400px; */
 }
 
 .Information {
-  right: 0;
+  /* right: 0; */
   /* left: 600px; */
+}
+
+.Information .Button {
+  display: inline;
 }
 
 @keyframes App-logo-spin {

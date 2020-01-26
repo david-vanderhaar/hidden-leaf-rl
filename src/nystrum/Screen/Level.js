@@ -6,9 +6,6 @@ import Information from '../UI/Information';
 import Equipment from '../UI/Equipment';
 import Inventory from '../UI/Inventory';
 import KeymapUI from '../UI/Keymap';
-import RockLee from '../Characters/RockLee';
-import NarutoUzumaki from '../Characters/NarutoUzumaki';
-import Gaara from '../Characters/Gaara';
 
 class Level extends React.Component {
   constructor(props) {
@@ -20,6 +17,7 @@ class Level extends React.Component {
 
     this.state = {
       game: game,
+      activeTab: 0,
     };
     this.presserRef = React.createRef();
   }
@@ -61,11 +59,17 @@ class Level extends React.Component {
         <div className='flow-text'>Chunin Exams</div>
         <button className='btn' onClick={() => this.props.setActiveScreen(SCREENS.TITLE)}>Quit</button>
         <div className='row'>
-          <Information data={data} />
-          <Equipment equipment={this.state.game.visibleEquipment} />
-          <Inventory inventory={this.state.game.visibleInventory} />
-          <KeymapUI keymap={this.state.game.visibleKeymap} />
-          {Game.DisplayElement(this.presserRef, Game.handleKeyPress, this.state.game.engine)}
+          <div className='col s8 game_display_container'>
+            {Game.DisplayElement(this.presserRef, Game.handleKeyPress, this.state.game.engine)}
+            <Information data={data} />
+          </div>
+          <div className='col s2'>
+            <KeymapUI keymap={this.state.game.visibleKeymap} />
+          </div>
+          <div className='col s2'>
+            <Equipment equipment={this.state.game.visibleEquipment} />
+            <Inventory inventory={this.state.game.visibleInventory} />
+          </div>
         </div>
       </div>
     );

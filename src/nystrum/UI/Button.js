@@ -6,7 +6,7 @@ function Button(props) {
   return (
     <button
       onClick={props.onClick}
-      className={`btn ${color} darken-3`}
+      className={`Button btn ${color} darken-3`}
     >
       {props.children}  
     </button>
