@@ -16,18 +16,17 @@ export const openInnerGate = (engine) => {
         currentActor.speed += nextGate.speedBuff;
         currentActor.energy += nextGate.speedBuff;
         currentActor.attackDamage += nextGate.damageBuff;
+        currentActor.renderer.character = nextGate.character;
         console.log(`${currentActor.name} opened the ${nextGate.name}.`);
+        currentActor.decreaseDurability(nextGate.durabilityDebuff);
+        currentActor.decreaseDurability(0);
+        console.log(`${currentActor.name} suffers ${nextGate.durabilityDebuff} damage from physical stress.`)
         let nextGateToLabel = currentActor.getNextGate();
         if (nextGateToLabel) {
           currentActor.keymap.o.label = nextGateToLabel.name;
         } else {
-          delete currentActor.keymap.o;
+          delete currentActor.keymap.g;
         }
-      },
-      onStep: () => {
-        currentActor.decreaseDurability(nextGate.durabilityDebuff);
-        currentActor.decreaseDurability(0);
-        console.log(`${currentActor.name} suffers ${nextGate.durabilityDebuff} damage from physical stress.`)
       },
     });
     currentActor.setNextAction(new AddStatusEffect({

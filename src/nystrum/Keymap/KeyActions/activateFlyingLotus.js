@@ -1,5 +1,6 @@
 import { Tackle } from '../../actions';
-import { ENERGY_THRESHOLD, DIRECTIONS, PARTICLE_TEMPLATES } from '../../constants';
+import { ENERGY_THRESHOLD, PARTICLE_TEMPLATES } from '../../constants';
+import { createFourDirectionMoveOptions } from '../helper';
 
 const flyingLotus = (direction, stepCount, energyCost, additionalAttackDamage, engine) => {
   let actor = engine.actors[engine.currentActor];
@@ -24,34 +25,14 @@ const keymapFlyingLotus = (engine, initiatedBy, previousKeymap) => {
       activate: goToPreviousKeymap,
       label: 'Close',
     },
-    w: {
-      activate: () => {
-        flyingLotus(DIRECTIONS.N, stepCount, energyCost, additionalAttackDamage, engine);
+    ...createFourDirectionMoveOptions(
+      (direction, engine) => {
+        flyingLotus(direction, stepCount, energyCost, additionalAttackDamage, engine);
         goToPreviousKeymap();
       },
-      label: 'activate N',
-    },
-    d: {
-      activate: () => {
-        flyingLotus(DIRECTIONS.E, stepCount, energyCost, additionalAttackDamage, engine);
-        goToPreviousKeymap();
-      },
-      label: 'activate E',
-    },
-    s: {
-      activate: () => {
-        flyingLotus(DIRECTIONS.S, stepCount, energyCost, additionalAttackDamage, engine);
-        goToPreviousKeymap();
-      },
-      label: 'activate S',
-    },
-    a: {
-      activate: () => {
-        flyingLotus(DIRECTIONS.W, stepCount, energyCost, additionalAttackDamage, engine);
-        goToPreviousKeymap();
-      },
-      label: 'activate W',
-    },
+      engine,
+      'activate',
+    ),
   };
 }
 

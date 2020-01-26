@@ -7,7 +7,7 @@ export const sandSkin = (engine, defenseBuff = 1) => {
     game: engine.game,
     actor: currentActor,
     name: 'Sand Skin',
-    lifespan: 500,
+    lifespan: 1000,
     stepInterval: 100,
     allowDuplicates: false,
     onStart: () => {

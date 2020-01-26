@@ -2,6 +2,7 @@ import * as Action from '../../actions';
 import * as Constant from '../../constants';
 import * as Item from '../../items';
 import { UI_Actor } from '../../entites';
+import { createEightDirectionMoveOptions } from '../helper';
 
 const throwDirectionalKunai = (direction, engine, actor) => {
   let cursor = engine.actors[engine.currentActor];
@@ -38,39 +39,12 @@ const throwDirectionalKunai = (direction, engine, actor) => {
 
 const keymapCursorToThrowItem = (engine, initiatedBy) => {
   return {
-    w: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.N, engine, initiatedBy),
-      label: 'throw N',
-    },
-    e: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.NE, engine, initiatedBy),
-      label: 'throw NE',
-    },
-    d: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.E, engine, initiatedBy),
-      label: 'throw E',
-    },
-    c: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.SE, engine, initiatedBy),
-      label: 'throw SE',
-    },
-    x: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.S, engine, initiatedBy),
-      label: 'throw S',
-    },
-    z: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.SW, engine, initiatedBy),
-      label: 'throw SW',
-    },
-    a: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.W, engine, initiatedBy),
-      label: 'throw W',
-    },
-    q: {
-      activate: () => throwDirectionalKunai(Constant.DIRECTIONS.NW, engine, initiatedBy),
-      label: 'throw NW',
-    },
-  };
+    ...createEightDirectionMoveOptions(
+      (direction, engine) => throwDirectionalKunai(direction, engine, initiatedBy),
+      engine,
+      'throw',
+    )
+  }
 }
 
 export const activateThrow = (engine) => {

@@ -3,6 +3,7 @@ import * as Item from '../../items';
 import * as Constant from '../../constants';
 import { UI_Actor } from '../../entites';
 import { moveCursor } from './moveCursor';
+import { createEightDirectionMoveOptions } from '../helper';
 
 // ------------ SAND TOMB ----------------------
 const triggerSandTomb = (engine, actor) => {
@@ -46,22 +47,7 @@ const keymapSandTomb = (engine, initiatedBy, previousKeymap) => {
       activate: goToPreviousKeymap,
       label: 'Close',
     },
-    w: {
-      activate: () => moveCursor(Constant.DIRECTIONS.N, engine),
-      label: 'move',
-    },
-    d: {
-      activate: () => moveCursor(Constant.DIRECTIONS.E, engine),
-      label: 'move',
-    },
-    s: {
-      activate: () => moveCursor(Constant.DIRECTIONS.S, engine),
-      label: 'move',
-    },
-    a: {
-      activate: () => moveCursor(Constant.DIRECTIONS.W, engine),
-      label: 'move',
-    },
+    ...createEightDirectionMoveOptions(moveCursor, engine),
     k: {
       activate: () => {
         triggerSandTomb(engine, initiatedBy);

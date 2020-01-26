@@ -3,44 +3,14 @@ import * as Item from '../items';
 import * as Entity from '../entites';
 import * as Constant from '../constants';
 import * as Keymap from '../Keymap';
+import { createEightDirectionMoveOptions } from '../Keymap/helper';
 
 // create class
 export default function (engine) {
   // define keymap
   const keymap = (engine) => {
     return {
-      w: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.N, engine),
-        label: 'walk N',
-      },
-      e: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.NE, engine),
-        label: 'walk NE',
-      },
-      d: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.E, engine),
-        label: 'walk E',
-      },
-      c: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.SE, engine),
-        label: 'walk SE',
-      },
-      x: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.S, engine),
-        label: 'walk S',
-      },
-      z: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.SW, engine),
-        label: 'walk SW',
-      },
-      a: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.W, engine),
-        label: 'walk W',
-      },
-      q: {
-        activate: () => Keymap.walk(Constant.DIRECTIONS.NW, engine),
-        label: 'walk NW',
-      },
+      ...createEightDirectionMoveOptions(Keymap.walk, engine),
       s: {
         activate: () => Keymap.none(engine),
         label: 'stay',
