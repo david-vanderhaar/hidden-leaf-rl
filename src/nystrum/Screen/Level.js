@@ -6,6 +6,7 @@ import Information from '../UI/Information';
 import Equipment from '../UI/Equipment';
 import Inventory from '../UI/Inventory';
 import KeymapUI from '../UI/Keymap';
+import Messages from '../UI/Messages';
 
 class Level extends React.Component {
   constructor(props) {
@@ -70,6 +71,19 @@ class Level extends React.Component {
             <Equipment equipment={this.state.game.visibleEquipment} />
             <Inventory inventory={this.state.game.visibleInventory} />
           </div>
+          {
+            !this.state.game.visibleEquipment && !this.state.game.visibleInventory && (
+              <div className='col s2'>
+                <Messages messages={this.state.game.messages.slice(-15).reverse()} />
+              </div>
+            )
+          }
+          {/* <div className='col s2'>
+            <Messages messages={this.state.game.messages.slice(-15).reverse()} />
+          </div>
+          <div className='col s2'>
+            <Messages messages={this.state.game.messages} />
+          </div> */}
         </div>
       </div>
     );

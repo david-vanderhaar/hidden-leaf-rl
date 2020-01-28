@@ -3,6 +3,7 @@ import * as ROT from 'rot-js';
 import * as Constant from './constants';
 import * as Helper from '../helper';
 import { addActor as addWaveEnemy } from './Keymap/KeyActions/addActor';
+import * as Message from './message';
 
 const GAME_MODE_TYPES = {WAVE: 0};
 
@@ -25,12 +26,14 @@ export class Game {
         highestLevel: null,
       }
     },
+    messages = [],
   }) {
     this.engine = engine;
     this.map = map;
     this.display = display;
     this.tileKey = tileKey;
     this.mode = mode;
+    this.messages = messages;
   }
 
   initializeMode () {
@@ -279,7 +282,13 @@ export class Game {
     presserRef.current.focus();
     this.initializeMode();
   }
+
+  addMessage (text, type) {
+    const message = new Message.Message({text, type})
+    this.messages.push(message);
+  }
 }
+
 
 /************************** UI ********************************/
 export const handleKeyPress = (event, engine) => {

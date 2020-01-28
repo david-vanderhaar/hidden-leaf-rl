@@ -6,6 +6,7 @@ import * as Constant from './constants';
 import * as Action from './actions';
 import * as Engine from './engine';
 import { cloneDeep, cloneDeepWith } from 'lodash';
+import { MESSAGE_TYPE } from './message';
 
 export class Entity {
   constructor({ game = null, passable = false}) {
@@ -125,8 +126,6 @@ const HasInnerGates = superclass => class extends superclass {
       this.currentGate = { ...nextGate };
     } else {
       let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
-      console.log('next gate index ', nextGateIndex);
-
       if (this.gates.length > nextGateIndex) {
         nextGate = this.gates[nextGateIndex];
         this.currentGate = { ...nextGate };
@@ -142,8 +141,6 @@ const HasInnerGates = superclass => class extends superclass {
       nextGate = this.gates[0];
     } else {
       let nextGateIndex = this.gates.findIndex((gate) => currentGate.name === gate.name) + 1;
-      console.log('next gate index ', nextGateIndex);
-
       if (this.gates.length > nextGateIndex) {
         nextGate = this.gates[nextGateIndex];
       }
@@ -198,7 +195,7 @@ export const Attacking = superclass => class extends superclass {
             }
           });
         }
-        console.log(`${this.name} does ${damage} to ${target.name}`);
+        this.game.addMessage(`${this.name} does ${damage} to ${target.name}`, MESSAGE_TYPE.DANGER);
         target.decreaseDurability(damage);
         success = true;
       }

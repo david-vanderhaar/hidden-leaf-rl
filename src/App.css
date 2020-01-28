@@ -71,6 +71,28 @@
   /* left: 600px; */
 }
 
+.Messages {
+  /* right: 0; */
+  /* left: 600px; */
+  overflow-y: scroll;
+  height: 800px; 
+}
+
+.Messages .Message {
+  width: 100%;
+  text-align: left;
+  display: block;
+  text-overflow: ellipsis;
+  height: unset;
+  transition: background-color .2s ease-out;
+  border-radius: 2px;
+  line-height: 36px;
+  padding: 0 16px;
+  text-transform: uppercase;
+  vertical-align: middle;
+
+}
+
 .Information .Button {
   display: inline;
 }

@@ -5,6 +5,7 @@ import { destroyEntity } from './Entities/helper';
 import { cloneDeep } from 'lodash';
 import uuid from 'uuid/v1';
 import { Particle } from './entites';
+import { MESSAGE_TYPE } from './message';
 
 export class Base {
   constructor({
@@ -103,7 +104,7 @@ export class Say extends Base {
     this.processDelay = processDelay
   }
   perform() {
-    console.log(`${this.actor.name} says ${this.message}`);
+    this.game.addMessage(`${this.actor.name} says ${this.message}`, MESSAGE_TYPE.INFORMATION);
     this.actor.energy -= this.energyCost;
     return {
       success: true,
@@ -121,7 +122,7 @@ export class SayManyThings extends Base {
   perform() {
     let message = this.messages.shift();
     if (message) {
-      console.log(`${this.actor.name} says ${message}`);
+      this.game.addMessage(`${this.actor.name} says ${message}`, MESSAGE_TYPE.INFORMATION);
       this.actor.energy -= this.energyCost;
     }
     if (this.messages.length) {
@@ -151,7 +152,7 @@ export class EquipItemFromContainer extends Base {
       }
       this.actor.removeFromContainer(this.item);
       this.actor.equip(this.item.equipmentType, this.item);
-      console.log(`${this.actor.name} equips ${this.item.name}.`);
+      this.game.addMessage(`${this.actor.name} equips ${this.item.name}.`, MESSAGE_TYPE.ACTION);
       success = true;
     }
 
@@ -184,7 +185,7 @@ export class EquipItemFromTile extends Base {
       this.game.map[Helper.coordsToString(this.actor.pos)].entities = entities.filter((it) => it.id !== this.item.id);
       
       this.actor.equip(this.item);
-      console.log(`${this.actor.name} equips ${this.item.name}.`);
+      this.game.addMessage(`${this.actor.name} equips ${this.item.name}.`, MESSAGE_TYPE.ACTION);
       success = true;
     }
 
@@ -202,7 +203,7 @@ export class UnequipItem extends Base {
     this.item = item;
   }
   perform() {
-    console.log(`${this.actor.name} puts ${this.item.name} away.`);
+    this.game.addMessage(`${this.actor.name} puts ${this.item.name} away.`, MESSAGE_TYPE.ACTION);
     this.actor.unequip(this.item);
     this.actor.addToContainer(this.item);
     this.actor.energy -= this.energyCost;
@@ -219,7 +220,7 @@ export class DropItem extends Base {
     this.item = item;
   }
   perform() {
-    console.log(`${this.actor.name} drops ${this.item.name}.`);
+    this.game.addMessage(`${this.actor.name} drops ${this.item.name}.`, MESSAGE_TYPE.ACTION);
     this.actor.removeFromContainer(this.item);
     this.game.map[Helper.coordsToString(this.actor.pos)].entities.push(this.item);
     this.actor.energy -= this.energyCost;
@@ -236,7 +237,7 @@ export class PickupItem extends Base {
     this.item = item;
   }
   perform() {
-    console.log(`${this.actor.name} picks up ${this.item.name}.`);
+    this.game.addMessage(`${this.actor.name} picks up ${this.item.name}.`, MESSAGE_TYPE.ACTION);
     this.actor.addToContainer(this.item);
     let entities = this.game.map[Helper.coordsToString(this.actor.pos)].entities
     this.game.map[Helper.coordsToString(this.actor.pos)].entities = entities.filter((it) => it.id !== this.item.id);
@@ -275,7 +276,7 @@ export class CloneSelf extends Base {
     if (this.actor.createClone(this.cloneArgs)) {
       success = true;
       this.actor.energy -= this.energyCost;
-      console.log(`${this.actor.name} is cloning itself`);
+      this.game.addMessage(`${this.actor.name} is cloning itself`, MESSAGE_TYPE.ACTION);
     }
     // let clone = cloneDeep(this.actor);
     // clone.game = this.actor.game;
@@ -303,7 +304,7 @@ export class Charge extends Base {
     this.chargeAmount = chargeAmount;
   }
   perform() {
-    console.log(`${this.actor.name} is charging up!`);
+    this.game.addMessage(`${this.actor.name} is charging up!`, MESSAGE_TYPE.ACTION);
     this.actor.energy -= this.energyCost;
     this.actor.increaseCharge(this.chargeAmount);
     return {
@@ -321,7 +322,7 @@ export class Release extends Base {
   perform() {
     let success = false;
     if (this.actor.charge >= this.chargeCost) {
-      console.log(`${this.actor.name} is releasing ${this.chargeCost} volts!`);
+      this.game.addMessage(`${this.actor.name} is releasing ${this.chargeCost} volts!`, MESSAGE_TYPE.ACTION);
       this.actor.energy -= this.energyCost;
       this.actor.decreaseCharge(this.chargeCost);
       success = true;
@@ -339,7 +340,7 @@ export class Sign extends Base {
     this.sign = sign;
   }
   perform() {
-    console.log(`${this.actor.name} threw a ${this.sign.name} sign.`);
+    this.game.addMessage(`${this.actor.name} threw a ${this.sign.name} sign.`, MESSAGE_TYPE.ACTION);
     this.actor.addSign(this.sign);
     this.actor.energy -= this.energyCost;
     return {
@@ -367,10 +368,11 @@ export class SignRelease extends Base {
   perform() {
     let success = false;
     if (this.requiredSequenceIsFulfilled()) {
-      console.log(
+      this.game.addMessage(
         `${this.actor.name} is releasing the power of ${this.requiredSequence.map(
           (sign) => sign.type
-        ).join(' and ')}!`
+        ).join(' and ')}!`,
+        MESSAGE_TYPE.ACTION
       );
       this.actor.energy -= this.energyCost;
       success = true;
@@ -503,10 +505,7 @@ export class PlaceItems extends PlaceItem {
   perform() {
     let success = false;
     let alternative = null;
-    console.log('actor ', this.actor.pos);
     this.targetPositions.forEach((targetPos) => {
-      console.log('target ', targetPos);
-      
       if (this.game.canOccupyPosition(targetPos, this.entity)) {
         let clone = cloneDeep(this.entity);
         clone.game = this.game;

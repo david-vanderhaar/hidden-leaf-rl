@@ -6,9 +6,14 @@ export const COLORS = {
   black_1: '#424242',
   gray_1: '#262d37',
   gray_2: '#606b79',
+  gray_4: '#B7C3CD',
+  gray_5: '#CED5DD',
   green_1: '#1d533c',
   green_2: '#227743',
   green_3: '#2d9c59',
+  red_4: '#D82D33',
+  red_5: '#E16264',
+  purple_3: '#c45ffd',
 }
 
 export const TILE_KEY = {
