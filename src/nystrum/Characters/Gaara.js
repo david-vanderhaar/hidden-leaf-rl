@@ -80,11 +80,17 @@ export default function (engine) {
     defense: 2,
   })
 
+  const kunais = Array(3).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos }, null, 10));
+  const swords = Array(2).fill('').map(() => Item.sword(engine));
   actor.container = [
-    Item.sword(engine),
-    ...Array(100).fill('').map(() => Item.sandShuriken(engine, { ...actor.pos }, null, 20)),
-    // ...Array(10).fill('').map(() => Item.fireballGas(engine, actor)),
-    // ...Array(10).fill('').map(() => Item.movingSandWall(engine, { ...actor.pos })),
+    new Entity.ContainerSlot({
+      itemType: kunais[0].name,
+      items: kunais,
+    }),
+    new Entity.ContainerSlot({
+      itemType: swords[0].name,
+      items: swords,
+    }),
   ]
 
   return actor;

@@ -11,10 +11,10 @@ class Inventory extends React.Component {
               <div className='flow-text'>Inventory</div>
               <div>
                 {
-                  this.props.inventory.map((item, index) => {
+                  this.props.inventory.map((slot, index) => {
                     return (
                       <Button key={index} onClick={() => null}>
-                        {index} {item.name} {item.renderer.character}
+                        {`${slot.itemType} | x ${slot.items.length}`}
                       </Button>
                     )
                   })

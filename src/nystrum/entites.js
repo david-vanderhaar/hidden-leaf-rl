@@ -281,6 +281,13 @@ const Rendering = superclass => class extends superclass {
   }
 }
 
+export class ContainerSlot {
+  constructor({ itemType, items }) {
+    this.itemType = itemType;
+    this.items = items;
+  }
+}
+
 const Containing = superclass => class extends superclass {
   constructor({container = [], ...args}) {
     super({...args})
@@ -289,17 +296,17 @@ const Containing = superclass => class extends superclass {
   }
 
   createSlot (item) {
-    let slot = {
+    let slot = new ContainerSlot({
       itemType: item.name,
       items: [item],
-    }
+    });
     this.container.push(slot)
   }
 
   contains (itemType) {
     let container = this.container;
     let slots = container.filter((slot) => slot.itemType === itemType);
-    return slots.length > 0 ? slots[0] : false;
+    return slots.length > 0 ? slots[0].items[0] : false;
   }
 
   addToContainer (item) {
@@ -312,8 +319,9 @@ const Containing = superclass => class extends superclass {
   }
   
   removeFromContainer (item) {
-    this.container.forEach((slot) => {
-      slot = slot.items.filter((it) => it.id !== item.id);
+    this.container.forEach((slot, index) => {
+      slot.items = slot.items.filter((it) => it.id !== item.id);
+      if (!slot.items.length) this.container.splice(index, 1);
     });
   }
 }

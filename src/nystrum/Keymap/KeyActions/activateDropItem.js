@@ -12,7 +12,8 @@ const keymapDropFromInventory = (engine, initiatedBy) => {
     }
   };
 
-  initiatedBy.container.map((item, index) => {
+  initiatedBy.container.map((slot, index) => {
+    const item = slot.items[0];
     let obj = {
       activate: null,
       label: ''
