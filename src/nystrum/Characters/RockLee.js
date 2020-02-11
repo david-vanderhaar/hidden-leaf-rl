@@ -77,7 +77,7 @@ export default function (engine) {
   })
 
   // add default items to container
-  const kunais = Array(3).fill('').map(() => Item.directionalKunai(engine, { ...actor.pos }, null, 10));
+  const kunais = Array(100).fill('').map(() => Item.directionalKunai(engine, { ...actor.pos }, null, 10));
   const swords = Array(2).fill('').map(() => Item.sword(engine));
   actor.container = [
     new Entity.ContainerSlot({

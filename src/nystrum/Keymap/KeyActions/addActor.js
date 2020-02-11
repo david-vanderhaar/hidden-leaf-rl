@@ -1,5 +1,6 @@
 import * as Helper from '../../../helper';
-import { Bandit } from '../../entites';
+import { Bandit, RangedBandit } from '../../entites';
+import * as Item from '../../items';
 
 const getBanditStats = () => {
   let banditLevels = [
@@ -67,7 +68,7 @@ export const addActor = (game) => {
   let targetEntity = game.engine.actors[game.engine.currentActor]
   let pos = Helper.getRandomPos(game.map).coordinates
   const banditStats = getBanditStats();
-  let actor = new Bandit({
+  let actor = new RangedBandit({
     targetEntity,
     pos,
     renderer: banditStats.renderer,
@@ -77,6 +78,9 @@ export const addActor = (game) => {
     attackDamage: banditStats.attackDamage,
     durability: banditStats.durability,
     speed: banditStats.speed,
+    // directional projectile destruction breaks engine
+    projectile: (pos) => Item.directionalKunai(game.engine, { ...pos }, null, 10)
+    // projectile: (pos) => Item.kunai(game.engine, { ...pos }, null)
   })
   // game.placeActorOnMap(actor)
   if (game.randomlyPlaceActorOnMap(actor)) {

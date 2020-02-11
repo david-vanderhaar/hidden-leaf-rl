@@ -42,8 +42,11 @@ export class Engine {
     let acting = true;
     while (acting) {
       if (!actor) return false;
+      // if (!actor.active) return false;
+      if (!actor.active) break;
       let timePassed = 0;
       if (actor.hasEnoughEnergy()) {
+        // if (!actor.active) break;
         let action = actor.getAction(this.game);
         if (!action) { return false; } // if no action given, kick out to UI input
         timePassed += action.energyCost;
@@ -57,9 +60,10 @@ export class Engine {
           }
           action.onAfter();
           if (!await this.processActionFX(action, result.success)) {
-              await Helper.delay(action.processDelay);
-              this.game.draw();
+            await Helper.delay(action.processDelay);
+            this.game.draw();
           }
+          if (!actor.active) break;
           if (!result.success) return false;
           if (result.alternative === null) break;
           action = result.alternative;
@@ -70,7 +74,11 @@ export class Engine {
         acting = false;
       }
     }
-    this.currentActor = (this.currentActor + 1) % this.actors.length;
+    this.actors = this.actors.filter((actor) => actor.active)
+    this.currentActor += 1;
+    if (this.currentActor >= this.actors.length) {
+      this.currentActor = 0;
+    }
     return true
   }
 

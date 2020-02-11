@@ -453,8 +453,9 @@ export class PlaceActor extends Base {
     // }
     if (this.game.canOccupyPosition(this.targetPos, this.entity)) {
       this.entity.pos = this.targetPos;
-      this.game.engine.addActorAsNext(this.entity);
       // this.game.engine.addActorAsPrevious(this.entity);
+      // this.game.engine.addActor(this.entity);
+      this.game.engine.addActorAsNext(this.entity);
       // this.game.engine.start(); // BUGGED - should this be used outside of engine?
       success = true;
     }
@@ -735,8 +736,14 @@ export class SelfDestructiveAttack extends Attack {
   constructor({ damageToSelf, ...args }) {
     super({ ...args });
     this.damageToSelf = damageToSelf
-    this.onSuccess = () => this.actor.decreaseDurabilityWithoutDefense(damageToSelf)
-    this.onFailure = () => this.actor.destroy()
+    this.onSuccess = () => {
+      console.log('Self destruct success');
+      this.actor.decreaseDurabilityWithoutDefense(damageToSelf)
+    }
+    this.onFailure = () => {
+      console.log('Self destruct fails');
+      this.actor.destroy()
+    }
   }
 }
 

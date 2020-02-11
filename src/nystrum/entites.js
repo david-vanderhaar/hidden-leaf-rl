@@ -15,6 +15,7 @@ export class Entity {
     this.id = id;
     this.game = game;
     this.passable = passable;
+    this.active = true;
   }
 }
 
@@ -739,6 +740,66 @@ const Chasing = superclass => class extends superclass {
   }
 }
 
+const RangedChasing = superclass => class extends superclass {
+  constructor({ targetEntity = null, projectile = () => null, ...args }) {
+    super({ ...args })
+    this.entityTypes = this.entityTypes.concat('RANGED_CHASING')
+    this.targetEntity = targetEntity;
+    this.projectile = projectile;
+  }
+
+  getAction(game) {
+    let result = null;
+    // generate projectile
+    let projectile = this.projectile(this.pos);
+    // generate path
+    let path = Helper.calculatePath(game, this.targetEntity.pos, this.pos);
+    // check if in range to throw
+    if (path.length <= projectile.range) {
+      // throw
+      let throwDirection = {
+        x: Math.sign(this.targetEntity.pos.x - this.pos.x),
+        y: Math.sign(this.targetEntity.pos.y - this.pos.y),
+      }
+      projectile.game = game;
+      projectile.pos = {
+        x: this.pos.x + throwDirection.x,
+        y: this.pos.y + throwDirection.y,
+      };
+      projectile.direction = [throwDirection.x, throwDirection.y];
+      // game.engine.addActorAsPrevious(projectile);
+      // game.engine.addActor(projectile)
+      // game.placeActorsOnMap();
+      // game.draw();
+      if (game.canOccupyPosition(projectile.pos, projectile)) {
+        return new Action.PlaceActor({
+          targetPos: { ...projectile.pos },
+          entity: projectile,
+          game,
+          actor: this,
+          // energyCost: actor.energy
+          energyCost: Constant.ENERGY_THRESHOLD
+        })
+      }
+      return new Action.Say({
+        message: `I'll get you with this kunai!`,
+        game,
+        actor: this,
+        energyCost: Constant.ENERGY_THRESHOLD
+      })
+    }
+    // if not, select target tile in range of enemy and move
+    let targetPos = path.length > 0 ? path[0] : this.pos;
+    return new Action.Move({
+      targetPos,
+      game,
+      actor: this,
+      energyCost: Constant.ENERGY_THRESHOLD
+    });
+
+  }
+}
+
 const Pushing = superclass => class extends superclass {
   constructor({ path = false, targetPos = null, ...args }) {
     super({ ...args })
@@ -899,6 +960,14 @@ export const Bandit = pipe(
   Acting, 
   Rendering, 
   Chasing, 
+  Destructable,
+  Attacking,
+)(Entity);
+
+export const RangedBandit = pipe(
+  Acting, 
+  Rendering, 
+  RangedChasing, 
   Destructable,
   Attacking,
 )(Entity);
