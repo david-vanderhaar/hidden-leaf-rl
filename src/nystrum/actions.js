@@ -456,6 +456,7 @@ export class PlaceActor extends Base {
       // this.game.engine.addActorAsPrevious(this.entity);
       // this.game.engine.addActor(this.entity);
       this.game.engine.addActorAsNext(this.entity);
+      this['interrupt'] = true;
       // this.game.engine.start(); // BUGGED - should this be used outside of engine?
       success = true;
     }

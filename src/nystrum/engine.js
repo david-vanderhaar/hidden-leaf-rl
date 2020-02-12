@@ -69,6 +69,10 @@ export class Engine {
           action = result.alternative;
         }
         this.processStatusEffects(timePassed);
+        if (action['interrupt']) {
+          acting = false;
+          break;
+        }
       } else {
         actor.gainEnergy(actor.speed);
         acting = false;

@@ -763,21 +763,16 @@ const RangedChasing = superclass => class extends superclass {
       }
       projectile.game = game;
       projectile.pos = {
-        x: this.pos.x + throwDirection.x,
-        y: this.pos.y + throwDirection.y,
+        x: this.pos.x,
+        y: this.pos.y,
       };
       projectile.direction = [throwDirection.x, throwDirection.y];
-      // game.engine.addActorAsPrevious(projectile);
-      // game.engine.addActor(projectile)
-      // game.placeActorsOnMap();
-      // game.draw();
       if (game.canOccupyPosition(projectile.pos, projectile)) {
         return new Action.PlaceActor({
           targetPos: { ...projectile.pos },
           entity: projectile,
           game,
           actor: this,
-          // energyCost: actor.energy
           energyCost: Constant.ENERGY_THRESHOLD
         })
       }
