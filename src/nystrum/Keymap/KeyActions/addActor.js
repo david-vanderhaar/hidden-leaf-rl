@@ -5,6 +5,18 @@ import * as Item from '../../items';
 const getBanditStats = () => {
   let banditLevels = [
     {
+      name: 'Slingshot',
+      renderer: {
+        character: Helper.getRandomInArray(['S']),
+        color: '#ced5dd',
+        background: '',
+      },
+      durability: 1,
+      attackDamage: 1,
+      speed: 100,
+      entityClass: RangedBandit
+    },
+    {
       name: 'Ross',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
@@ -14,6 +26,7 @@ const getBanditStats = () => {
       durability: 1,
       attackDamage: 1,
       speed: 100,
+      entityClass: Bandit
     },
     {
       name: 'Kevin',
@@ -25,6 +38,7 @@ const getBanditStats = () => {
       durability: 2,
       attackDamage: 1,
       speed: 100,
+      entityClass: Bandit
     },
     {
       name: 'Jacob',
@@ -36,6 +50,7 @@ const getBanditStats = () => {
       durability: 3,
       attackDamage: 1,
       speed: 100,
+      entityClass: Bandit
     },
     {
       name: 'Jarod',
@@ -47,6 +62,7 @@ const getBanditStats = () => {
       durability: 1,
       attackDamage: 5,
       speed: 300,
+      entityClass: Bandit
     },
     {
       name: 'Bigii',
@@ -58,6 +74,7 @@ const getBanditStats = () => {
       durability: 15,
       attackDamage: 10,
       speed: 100,
+      entityClass: Bandit
     },
   ]
   return Helper.getRandomInArray(banditLevels);
@@ -68,7 +85,8 @@ export const addActor = (game) => {
   let targetEntity = game.engine.actors[game.engine.currentActor]
   let pos = Helper.getRandomPos(game.map).coordinates
   const banditStats = getBanditStats();
-  let actor = new RangedBandit({
+  // let actor = new RangedBandit({
+  let actor = new banditStats.entityClass({
     targetEntity,
     pos,
     renderer: banditStats.renderer,

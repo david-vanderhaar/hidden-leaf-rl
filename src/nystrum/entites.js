@@ -750,23 +750,40 @@ const RangedChasing = superclass => class extends superclass {
 
   getAction(game) {
     let result = null;
-    // generate projectile
     let projectile = this.projectile(this.pos);
-    // generate path
-    let path = Helper.calculatePath(game, this.targetEntity.pos, this.pos);
-    // check if in range to throw
-    if (path.length <= projectile.range) {
+    let throwDirection = {
+      x: Math.sign(this.targetEntity.pos.x - this.pos.x),
+      y: Math.sign(this.targetEntity.pos.y - this.pos.y),
+    }
+    projectile.game = game;
+    projectile.pos = {
+      x: this.pos.x,
+      y: this.pos.y,
+    };
+    projectile.direction = [throwDirection.x, throwDirection.y];
+
+    let path = [];
+    let pathPosition = {...this.pos};
+    for (let i = 1; i < projectile.range + 1; i++) {
+      path.push({
+        x: pathPosition.x + (throwDirection.x * i),
+        y: pathPosition.y + (throwDirection.y * i)
+      })
+    }
+    const targetInPath = (pathToCheck, targetPos) => {
+      let inPath = false;
+      pathToCheck.forEach((pos) => {
+        if (pos.x === targetPos.x && pos.y === targetPos.y) {
+          inPath = true;
+        }
+      })
+      return inPath;
+    }
+    
+    const inPath = targetInPath(path, this.targetEntity.pos);
+    
+    if (inPath) {
       // throw
-      let throwDirection = {
-        x: Math.sign(this.targetEntity.pos.x - this.pos.x),
-        y: Math.sign(this.targetEntity.pos.y - this.pos.y),
-      }
-      projectile.game = game;
-      projectile.pos = {
-        x: this.pos.x,
-        y: this.pos.y,
-      };
-      projectile.direction = [throwDirection.x, throwDirection.y];
       if (game.canOccupyPosition(projectile.pos, projectile)) {
         return new Action.PlaceActor({
           targetPos: { ...projectile.pos },
@@ -784,7 +801,9 @@ const RangedChasing = superclass => class extends superclass {
       })
     }
     // if not, select target tile in range of enemy and move
-    let targetPos = path.length > 0 ? path[0] : this.pos;
+    let movePath = Helper.calculatePath(game, this.targetEntity.pos, this.pos);
+    let targetPos = movePath.length > 0 ? movePath[0] : this.pos;
+    
     return new Action.Move({
       targetPos,
       game,

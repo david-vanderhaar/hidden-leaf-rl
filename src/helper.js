@@ -20,6 +20,8 @@ export const getRandomIntInclusive = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export const coordsAreEqual = (pos_one, pos_two) => pos_one.x === pos_two.x && pos_one.y === pos_two.y
+
 export const coordsToString = (coords) => `${coords.x},${coords.y}`
 
 export const calculatePath = (game, targetPos, currentPos, topology = 4) => {
