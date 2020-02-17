@@ -17,6 +17,18 @@ const getBanditStats = () => {
       entityClass: RangedBandit
     },
     {
+      name: 'Buckshot',
+      renderer: {
+        character: Helper.getRandomInArray(['B']),
+        color: '#3fc072',
+        background: '',
+      },
+      durability: 2,
+      attackDamage: 1,
+      speed: 200,
+      entityClass: RangedBandit
+    },
+    {
       name: 'Ross',
       renderer: {
         character: Helper.getRandomInArray(['◉']),
@@ -97,8 +109,8 @@ export const addActor = (game) => {
     durability: banditStats.durability,
     speed: banditStats.speed,
     // directional projectile destruction breaks engine
-    projectile: (pos) => Item.directionalKunai(game.engine, { ...pos }, null, 10)
-    // projectile: (pos) => Item.kunai(game.engine, { ...pos }, null)
+    getProjectile: ({pos, targetPos, direction, range}) => Item.directionalKunai(game.engine, { ...pos }, direction, range)
+    // getProjectile: ({ pos, targetPos, direction, range }) => Item.kunai(game.engine, { ...pos }, { ...targetPos })
   })
   // game.placeActorOnMap(actor)
   if (game.randomlyPlaceActorOnMap(actor)) {

@@ -69,7 +69,7 @@ export class Engine {
           action = result.alternative;
         }
         this.processStatusEffects(timePassed);
-        if (action['interrupt']) {
+        if (action.interrupt) {
           acting = false;
           break;
         }

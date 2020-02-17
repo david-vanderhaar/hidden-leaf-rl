@@ -1,7 +1,6 @@
 import * as Helper from '../helper';
 import * as Action from './actions';
 import * as Constant from './constants';
-import { destroyEntity } from './Entities/helper';
 import { cloneDeep } from 'lodash';
 import uuid from 'uuid/v1';
 import { Particle } from './entites';
@@ -19,6 +18,7 @@ export class Base {
     onAfter = () => null,
     onSuccess = () => null,
     onFailure = () => null,
+    interrupt = false,
   }) {
     this.actor = actor
     this.game = game
@@ -30,6 +30,7 @@ export class Base {
     this.onAfter = onAfter
     this.onSuccess = onSuccess
     this.onFailure = onFailure
+    this.interrupt = interrupt
   }
 
   addParticle(
@@ -456,7 +457,7 @@ export class PlaceActor extends Base {
       // this.game.engine.addActorAsPrevious(this.entity);
       // this.game.engine.addActor(this.entity);
       this.game.engine.addActorAsNext(this.entity);
-      this['interrupt'] = true;
+      this.interrupt = true;
       // this.game.engine.start(); // BUGGED - should this be used outside of engine?
       success = true;
     }
@@ -564,6 +565,7 @@ export class ProjectileMove extends Base {
     this.processDelay = processDelay
     this.damageToSelf = damageToSelf
   }
+
   perform() {
     let success = false;
     let alternative = null;

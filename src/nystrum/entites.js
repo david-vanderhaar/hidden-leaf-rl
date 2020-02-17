@@ -553,6 +553,17 @@ const DirectionalProjecting = superclass => class extends superclass {
     this.range = range;
   }
 
+  createPath(game) {
+    let path = [];
+    for (let i = 1; i < this.range + 1; i++) {
+      path.push({
+        x: this.pos.x + (this.direction[0] * i),
+        y: this.pos.y + (this.direction[1] * i)
+      })
+    }
+    this.path = path;
+  }
+
   getAction (game) {
     let result = null;
     let newX = this.pos.x + this.direction[0];
@@ -567,7 +578,12 @@ const DirectionalProjecting = superclass => class extends superclass {
         actor: this,
         energyCost: Constant.ENERGY_THRESHOLD,
         damageToSelf: 1,
-        onSuccess: () => this.range -= 1
+        onSuccess: () => this.range -= 1,
+        onAfter: () => {
+          if (this.energy <= 100) {
+            game.engine.setActorToPrevious();
+          }
+        }
       })
     } else {
       result = new Action.DestroySelf({
@@ -741,47 +757,45 @@ const Chasing = superclass => class extends superclass {
 }
 
 const RangedChasing = superclass => class extends superclass {
-  constructor({ targetEntity = null, projectile = () => null, ...args }) {
+  constructor({ targetEntity = null, getProjectile = () => null, ...args }) {
     super({ ...args })
     this.entityTypes = this.entityTypes.concat('RANGED_CHASING')
     this.targetEntity = targetEntity;
-    this.projectile = projectile;
+    this.getProjectile = getProjectile;
+  }
+
+  targetInPath (pathToCheck, targetPos) {
+    let inPath = false;
+    pathToCheck.forEach((pos) => {
+      if (pos.x === targetPos.x && pos.y === targetPos.y) {
+        inPath = true;
+      }
+    })
+    return inPath;
   }
 
   getAction(game) {
-    let result = null;
-    let projectile = this.projectile(this.pos);
     let throwDirection = {
       x: Math.sign(this.targetEntity.pos.x - this.pos.x),
       y: Math.sign(this.targetEntity.pos.y - this.pos.y),
     }
-    projectile.game = game;
-    projectile.pos = {
-      x: this.pos.x,
-      y: this.pos.y,
-    };
-    projectile.direction = [throwDirection.x, throwDirection.y];
 
-    let path = [];
-    let pathPosition = {...this.pos};
-    for (let i = 1; i < projectile.range + 1; i++) {
-      path.push({
-        x: pathPosition.x + (throwDirection.x * i),
-        y: pathPosition.y + (throwDirection.y * i)
-      })
-    }
-    const targetInPath = (pathToCheck, targetPos) => {
-      let inPath = false;
-      pathToCheck.forEach((pos) => {
-        if (pos.x === targetPos.x && pos.y === targetPos.y) {
-          inPath = true;
-        }
-      })
-      return inPath;
-    }
-    
-    const inPath = targetInPath(path, this.targetEntity.pos);
-    
+    // projectile.initialize()
+    let projectile = this.getProjectile({
+      pos: {
+        x: this.pos.x,
+        y: this.pos.y,
+      },
+      targetPos: { ...this.targetEntity.pos },
+      direction: [throwDirection.x, throwDirection.y],
+      range: 10,
+    });
+
+    // projectile.getPath()
+    projectile.createPath(game);
+    // is target in path
+    const inPath = this.targetInPath(projectile.path, this.targetEntity.pos);
+
     if (inPath) {
       // throw
       if (game.canOccupyPosition(projectile.pos, projectile)) {
