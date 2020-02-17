@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/hidden-leaf-rl/precache-manifest.269e4aa9eccf300c0e74ff31dac95754.js"
+  "/hidden-leaf-rl/precache-manifest.1ca3ee1c594e59f2a13ce0e5332f3c16.js"
 );
 
 self.addEventListener('message', (event) => {
