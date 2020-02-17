@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://david-vanderhaar.github.io/hidden-leaf-rl",
   "dependencies": {
+    "konva": "^4.1.5",
     "lodash": "^4.17.15",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",

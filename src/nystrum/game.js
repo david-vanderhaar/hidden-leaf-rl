@@ -4,6 +4,8 @@ import * as Constant from './constants';
 import * as Helper from '../helper';
 import { addActor as addWaveEnemy } from './Keymap/KeyActions/addActor';
 import * as Message from './message';
+import Konva from 'konva';
+import { Display } from './Display/konvaCustom';
 
 const GAME_MODE_TYPES = {WAVE: 0};
 
@@ -11,13 +13,20 @@ export class Game {
   constructor({
     engine = null,
     map = {},
-    display = new ROT.Display({ 
-      // forceSquareRatio: true,
-      width: 90,
-      // height: 100,
-      fontSize: 24, 
-      bg: '#424242' 
+    display = new Display({
+      containerId: 'display',
+      width: 500,
+      height: 500,
+      // width: 90,
+      // height: 60,
     }),
+    // display = new ROT.Display({ 
+    //   // forceSquareRatio: true,
+    //   width: 90,
+    //   // height: 100,
+    //   fontSize: 24, 
+    //   bg: '#424242' 
+    // }),
     tileKey = Constant.TILE_KEY,
     mode = {
       type: GAME_MODE_TYPES.WAVE,
@@ -189,9 +198,10 @@ export class Game {
     return result;
   }
 
-  show () {
-    let d = document.getElementById('display')
-    d.appendChild(this.display.getContainer())
+  show (document) {
+    // let d = document.getElementById('display')
+    // d.appendChild(this.display.getContainer())
+    this.display.initialize(document)
   }
 
   draw () {
@@ -219,8 +229,19 @@ export class Game {
           background = nextFrame.background
         }
       }
-      this.display.draw(x, y, character, foreground, background);
+      // this.display.draw(x, y, character, foreground, background);
+      
+      let circle = new Konva.Circle({
+        x: (x * 40) + 40,
+        y: (y * 40) + 40,
+        radius: 5,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 4
+      });
+      this.display.layer.add(circle);
     }
+    // this.display.draw()
   }
 
   animateEntity (entity) {
@@ -271,14 +292,15 @@ export class Game {
     this.draw();
   }
 
-  initialize (presserRef) {
+  initialize (presserRef, document) {
     this.engine.game = this;
     this.engine.actors.forEach((actor) => {
       actor.game = this;
     });
-    this.show();
+    this.show(document);
     this.createLevel();
     this.draw();
+    this.display.layer.draw()
     presserRef.current.focus();
     this.initializeMode();
   }
