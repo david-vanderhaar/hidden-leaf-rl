@@ -28,6 +28,23 @@ export class Display {
     this.stage.add(this.layer);
   }
 
+  createTile(x, y, character, foreground, background) {
+    // let node = new Konva.Rect({
+    let node = new Konva.Text({
+      id: `${x},${y}`,
+      x: (20 * x) + 20,
+      y: (20 * y) + 20,
+      text: character,
+      width: 10,
+      height: 10,
+      fill: background,
+      stroke: foreground,
+      strokeWidth: 1
+    });
+    this.layer.add(node);
+    return node;
+  }
+
   draw () {
     this.layer.draw();
   }

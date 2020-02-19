@@ -13,10 +13,11 @@ export class Game {
   constructor({
     engine = null,
     map = {},
+    tileMap = {},
     display = new Display({
       containerId: 'display',
-      width: 500,
-      height: 500,
+      width: 2000,
+      height: 600,
       // width: 90,
       // height: 60,
     }),
@@ -39,6 +40,7 @@ export class Game {
   }) {
     this.engine = engine;
     this.map = map;
+    this.tileMap = tileMap;
     this.display = display;
     this.tileKey = tileKey;
     this.mode = mode;
@@ -204,7 +206,8 @@ export class Game {
     this.display.initialize(document)
   }
 
-  draw () {
+  initializeMap () {
+    // this.display.draw();
     for (let key in this.map) {
       let parts = key.split(",");
       let x = parseInt(parts[0]);
@@ -230,18 +233,46 @@ export class Game {
         }
       }
       // this.display.draw(x, y, character, foreground, background);
-      
-      let circle = new Konva.Circle({
-        x: (x * 40) + 40,
-        y: (y * 40) + 40,
-        radius: 5,
-        fill: 'red',
-        stroke: 'black',
-        strokeWidth: 4
-      });
-      this.display.layer.add(circle);
+      let node = this.display.createTile(x, y, character, foreground, background);
+      this.tileMap[key] = node;
     }
-    // this.display.draw()
+    this.display.draw();
+  }
+
+  draw () {
+    // this.display.draw();
+    for (let key in this.map) {
+      let parts = key.split(",");
+      let x = parseInt(parts[0]);
+      let y = parseInt(parts[1]);
+      let tile = this.map[key];
+      let { character, foreground, background } = this.tileKey[tile.type]
+
+      // Proto code to handle tile animations
+      let tileRenderer = this.tileKey[tile.type]
+      let nextFrame = this.animateTile(tile, tileRenderer);
+      character = nextFrame.character;
+      foreground = nextFrame.foreground;
+      background = nextFrame.background;
+
+      if (tile.entities.length > 0) {
+        let entity = tile.entities[tile.entities.length - 1]
+        nextFrame = this.animateEntity(entity);
+        
+        character = nextFrame.character
+        foreground = nextFrame.foreground
+        if (nextFrame.background) {
+          background = nextFrame.background
+        }
+      }
+      // this.display.draw(x, y, character, foreground, background);
+      // this.display.updateOrCreateTile(x, y, character, foreground, background);
+      this.tileMap[key].text(character)
+      this.tileMap[key].fill(background)
+      this.tileMap[key].stroke(foreground)
+      // this.tileMap[key].draw()
+    }
+    this.display.draw();
   }
 
   animateEntity (entity) {
@@ -297,10 +328,11 @@ export class Game {
     this.engine.actors.forEach((actor) => {
       actor.game = this;
     });
-    this.show(document);
     this.createLevel();
+    this.show(document);
+    this.initializeMap();
     this.draw();
-    this.display.layer.draw()
+    // this.display.layer.draw()
     presserRef.current.focus();
     this.initializeMode();
   }
