@@ -24,57 +24,63 @@ export class Display {
       height: this.height
     });
 
-    this.layer = new Konva.Layer();
+    this.layer = new Konva.Layer({
+      hitGraphEnabled: false,
+    });
     this.stage.add(this.layer);
   }
 
+  updateTile(tile, character, foreground, background) {
+    // child[0] is the rectangle
+    // child[1] is the text
+    tile.children[0].fill(background);
+    tile.children[1].fill(foreground);
+    tile.children[1].text(character);
+  }
+
   createTile(x, y, character, foreground, background) {
-    // let node = new Konva.Rect({
-    let node = new Konva.Text({
+    let node = new Konva.Group({
       id: `${x},${y}`,
       x: (20 * x) + 20,
       y: (20 * y) + 20,
-      text: character,
+      width: 10,
+      height: 10,
+    });
+
+    let rect = new Konva.Rect({
+      name: 'rect',
       width: 10,
       height: 10,
       fill: background,
       stroke: foreground,
-      strokeWidth: 1
+      // strokeWidth: 1,
+      strokeEnabled: false,
+      // for optimization
+      transformsEnabled: 'position',
+      perfectDrawEnabled: false,
+      listening: false,
     });
+
+    let text = new Konva.Text({
+      name: 'text',
+      text: character,
+      width: 10,
+      height: 10,
+      fill: foreground,
+      // for optimization
+      transformsEnabled: 'position',
+      perfectDrawEnabled: false,
+      listening: false,
+    });
+
+    node.add(rect);
+    node.add(text);
     this.layer.add(node);
     return node;
   }
 
   draw () {
-    this.layer.draw();
+    this.layer.batchDraw();
+    // this.layer.draw();
   }
 }
-
-// // first we need to create a stage
-// let stage = new Konva.Stage({
-//   container: 'display',   // id of container <div>
-//   width: 500,
-//   height: 500
-// });
-
-// // then create layer
-// let layer = new Konva.Layer();
-
-// // create our shape
-// let circle = new Konva.Circle({
-//   x: stage.width() / 2,
-//   y: stage.height() / 2,
-//   radius: 70,
-//   fill: 'red',
-//   stroke: 'black',
-//   strokeWidth: 4
-// });
-
-// // add the shape to the layer
-// layer.add(circle);
-
-// // add the layer to the stage
-// stage.add(layer);
-
-// // draw the image
-// layer.draw();

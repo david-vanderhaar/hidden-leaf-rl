@@ -7,7 +7,7 @@ const getBanditStats = () => {
     {
       name: 'Slingshot',
       renderer: {
-        character: Helper.getRandomInArray(['S']),
+        character: Helper.getRandomInArray(['r']),
         color: '#ced5dd',
         background: '',
       },
@@ -19,7 +19,7 @@ const getBanditStats = () => {
     {
       name: 'Buckshot',
       renderer: {
-        character: Helper.getRandomInArray(['B']),
+        character: Helper.getRandomInArray(['r']),
         color: '#3fc072',
         background: '',
       },
@@ -31,7 +31,7 @@ const getBanditStats = () => {
     {
       name: 'Ross',
       renderer: {
-        character: Helper.getRandomInArray(['◉']),
+        character: Helper.getRandomInArray(['b']),
         color: '#ced5dd',
         background: '',
       },
@@ -43,7 +43,7 @@ const getBanditStats = () => {
     {
       name: 'Kevin',
       renderer: {
-        character: Helper.getRandomInArray(['◉']),
+        character: Helper.getRandomInArray(['b']),
         color: '#3fc072',
         background: '',
       },
@@ -55,7 +55,7 @@ const getBanditStats = () => {
     {
       name: 'Jacob',
       renderer: {
-        character: Helper.getRandomInArray(['◉']),
+        character: Helper.getRandomInArray(['b']),
         color: '#67a1d7',
         background: '',
       },
@@ -67,7 +67,7 @@ const getBanditStats = () => {
     {
       name: 'Jarod',
       renderer: {
-        character: Helper.getRandomInArray(['◉']),
+        character: Helper.getRandomInArray(['b']),
         color: '#e16264',
         background: '',
       },
@@ -79,7 +79,7 @@ const getBanditStats = () => {
     {
       name: 'Bigii',
       renderer: {
-        character: Helper.getRandomInArray(['◉']),
+        character: Helper.getRandomInArray(['b']),
         color: '#9f62e1',
         background: '',
       },

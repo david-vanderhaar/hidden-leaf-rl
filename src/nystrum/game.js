@@ -267,9 +267,11 @@ export class Game {
       }
       // this.display.draw(x, y, character, foreground, background);
       // this.display.updateOrCreateTile(x, y, character, foreground, background);
-      this.tileMap[key].text(character)
-      this.tileMap[key].fill(background)
-      this.tileMap[key].stroke(foreground)
+      // this.tileMap[key].findOne('.text').text(character)
+      // this.tileMap[key].findOne('.text').fill(foreground)
+      // this.tileMap[key].findOne('.rect').fill(background)
+      this.display.updateTile(this.tileMap[key], character, foreground, background);
+      // this.tileMap[key].findOne('.rect').stroke(foreground)
       // this.tileMap[key].draw()
     }
     this.display.draw();
