@@ -4,7 +4,6 @@ import * as Constant from './constants';
 import * as Helper from '../helper';
 import { addActor as addWaveEnemy } from './Keymap/KeyActions/addActor';
 import * as Message from './message';
-import Konva from 'konva';
 import { Display } from './Display/konvaCustom';
 
 const GAME_MODE_TYPES = {WAVE: 0};
