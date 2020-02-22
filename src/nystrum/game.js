@@ -8,26 +8,27 @@ import Konva from 'konva';
 import { Display } from './Display/konvaCustom';
 
 const GAME_MODE_TYPES = {WAVE: 0};
+const MAP_WIDTH = 60;
+const MAP_HEIGHT = 30;
+const TILE_WIDTH = 20;
+const TILE_HEIGHT = 20;
+const TILE_OFFSET = 5;
 
 export class Game {
   constructor({
     engine = null,
     map = {},
     tileMap = {},
+    mapWidth = MAP_WIDTH,
+    mapHeight = MAP_HEIGHT,
     display = new Display({
       containerId: 'display',
-      width: 2000,
-      height: 600,
-      // width: 90,
-      // height: 60,
+      width: (MAP_WIDTH * TILE_WIDTH) + TILE_OFFSET,
+      height: (MAP_HEIGHT * TILE_HEIGHT) + TILE_OFFSET,
+      tileWidth: TILE_WIDTH,
+      tileHeight: TILE_HEIGHT,
+      tileOffset: TILE_OFFSET,
     }),
-    // display = new ROT.Display({ 
-    //   // forceSquareRatio: true,
-    //   width: 90,
-    //   // height: 100,
-    //   fontSize: 24, 
-    //   bg: '#424242' 
-    // }),
     tileKey = Constant.TILE_KEY,
     mode = {
       type: GAME_MODE_TYPES.WAVE,
@@ -41,6 +42,8 @@ export class Game {
     this.engine = engine;
     this.map = map;
     this.tileMap = tileMap;
+    this.mapWidth = mapWidth;
+    this.mapHeight = mapHeight;
     this.display = display;
     this.tileKey = tileKey;
     this.mode = mode;
@@ -146,7 +149,7 @@ export class Game {
     // let digger = new ROT.Map.DividedMaze();
     // let digger = new ROT.Map.EllerMaze();
     // let digger = new ROT.Map.Cellular();
-    let digger = new ROT.Map.Digger();
+    let digger = new ROT.Map.Digger(this.mapWidth, this.mapHeight);
     // let digger = new ROT.Map.IceyMaze();
     // let digger = new ROT.Map.Uniform();
     let freeCells = [];
@@ -201,82 +204,53 @@ export class Game {
   }
 
   show (document) {
-    // let d = document.getElementById('display')
-    // d.appendChild(this.display.getContainer())
     this.display.initialize(document)
   }
 
+  processTileMap (callback) {
+    for (let key in this.map) {
+      let parts = key.split(",");
+      let x = parseInt(parts[0]);
+      let y = parseInt(parts[1]);
+      let tile = this.map[key];
+      let { character, foreground, background } = this.tileKey[tile.type]
+
+      // Proto code to handle tile animations
+      let tileRenderer = this.tileKey[tile.type]
+      let nextFrame = this.animateTile(tile, tileRenderer);
+      character = nextFrame.character;
+      foreground = nextFrame.foreground;
+      background = nextFrame.background;
+
+      if (tile.entities.length > 0) {
+        let entity = tile.entities[tile.entities.length - 1]
+        nextFrame = this.animateEntity(entity);
+        
+        character = nextFrame.character
+        foreground = nextFrame.foreground
+        if (nextFrame.background) {
+          background = nextFrame.background
+        }
+      }
+      callback(key, x, y, character, foreground, background);
+    }
+  }
+
   initializeMap () {
-    // this.display.draw();
-    for (let key in this.map) {
-      let parts = key.split(",");
-      let x = parseInt(parts[0]);
-      let y = parseInt(parts[1]);
-      let tile = this.map[key];
-      let { character, foreground, background } = this.tileKey[tile.type]
-
-      // Proto code to handle tile animations
-      let tileRenderer = this.tileKey[tile.type]
-      let nextFrame = this.animateTile(tile, tileRenderer);
-      character = nextFrame.character;
-      foreground = nextFrame.foreground;
-      background = nextFrame.background;
-
-      if (tile.entities.length > 0) {
-        let entity = tile.entities[tile.entities.length - 1]
-        nextFrame = this.animateEntity(entity);
-        
-        character = nextFrame.character
-        foreground = nextFrame.foreground
-        if (nextFrame.background) {
-          background = nextFrame.background
-        }
-      }
-      // this.display.draw(x, y, character, foreground, background);
+    this.processTileMap((tileKey, x, y, character, foreground, background) => {
       let node = this.display.createTile(x, y, character, foreground, background);
-      this.tileMap[key] = node;
-    }
+      this.tileMap[tileKey] = node;
+    });
     this.display.draw();
   }
-
+  
   draw () {
-    // this.display.draw();
-    for (let key in this.map) {
-      let parts = key.split(",");
-      let x = parseInt(parts[0]);
-      let y = parseInt(parts[1]);
-      let tile = this.map[key];
-      let { character, foreground, background } = this.tileKey[tile.type]
-
-      // Proto code to handle tile animations
-      let tileRenderer = this.tileKey[tile.type]
-      let nextFrame = this.animateTile(tile, tileRenderer);
-      character = nextFrame.character;
-      foreground = nextFrame.foreground;
-      background = nextFrame.background;
-
-      if (tile.entities.length > 0) {
-        let entity = tile.entities[tile.entities.length - 1]
-        nextFrame = this.animateEntity(entity);
-        
-        character = nextFrame.character
-        foreground = nextFrame.foreground
-        if (nextFrame.background) {
-          background = nextFrame.background
-        }
-      }
-      // this.display.draw(x, y, character, foreground, background);
-      // this.display.updateOrCreateTile(x, y, character, foreground, background);
-      // this.tileMap[key].findOne('.text').text(character)
-      // this.tileMap[key].findOne('.text').fill(foreground)
-      // this.tileMap[key].findOne('.rect').fill(background)
-      this.display.updateTile(this.tileMap[key], character, foreground, background);
-      // this.tileMap[key].findOne('.rect').stroke(foreground)
-      // this.tileMap[key].draw()
-    }
+    this.processTileMap((tileKey, x, y, character, foreground, background) => {
+      this.display.updateTile(this.tileMap[tileKey], character, foreground, background);
+    });
     this.display.draw();
   }
-
+  
   animateEntity (entity) {
     let renderer = entity.renderer;
     let {character, color, background} = {...renderer}
@@ -334,7 +308,6 @@ export class Game {
     this.show(document);
     this.initializeMap();
     this.draw();
-    // this.display.layer.draw()
     presserRef.current.focus();
     this.initializeMode();
   }

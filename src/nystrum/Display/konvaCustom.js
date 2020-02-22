@@ -5,10 +5,18 @@ export class Display {
     containerId = null,
     width = 100,
     height = 100,
+    tileWidth = 10,
+    tileHeight = 10,
+    tileGutter = 0,
+    tileOffset = 10,
   }) {
     this.containerId = containerId;
     this.width = width;
     this.height = height;
+    this.tileWidth = tileWidth;
+    this.tileHeight = tileHeight;
+    this.tileGutter = tileGutter;
+    this.tileOffset = tileOffset;
     this.stage = null;
     this.layer = null;
   }
@@ -41,19 +49,17 @@ export class Display {
   createTile(x, y, character, foreground, background) {
     let node = new Konva.Group({
       id: `${x},${y}`,
-      x: (20 * x) + 20,
-      y: (20 * y) + 20,
-      width: 10,
-      height: 10,
+      x: (this.tileWidth * x) + (this.tileOffset + this.tileGutter),
+      y: (this.tileHeight * y) + (this.tileOffset + this.tileGutter),
+      width: this.tileWidth,
+      height: this.tileHeight,
     });
 
     let rect = new Konva.Rect({
       name: 'rect',
-      width: 10,
-      height: 10,
+      width: this.tileWidth,
+      height: this.tileHeight,
       fill: background,
-      stroke: foreground,
-      // strokeWidth: 1,
       strokeEnabled: false,
       // for optimization
       transformsEnabled: 'position',
@@ -64,9 +70,11 @@ export class Display {
     let text = new Konva.Text({
       name: 'text',
       text: character,
-      width: 10,
-      height: 10,
+      width: this.tileWidth,
+      height: this.tileHeight,
       fill: foreground,
+      align: 'center',
+      verticalAlign: 'middle',
       // for optimization
       transformsEnabled: 'position',
       perfectDrawEnabled: false,

@@ -26,6 +26,10 @@
   color: #61dafb;
 }
 
+#display {
+  /* overflow: scroll; */
+}
+
 #display:focus {
   /* outline: none; */
 }
